@@ -31,7 +31,7 @@ function Modal({ buttonClassName, buttonTitle, modalTitle, children }: ModalProp
 
                     <div className='relative w-auto min-w-96 z-10'>
                         <div
-                            className='flex h-16 items-center justify-between rounded-t-xl p-4 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/60 via-fuchsia-500/60 to-red-500/60 text-white'
+                            className='border-t-[2px] border-l-[1px] border-r-[1px] border-white/20 flex h-16 items-center justify-between rounded-t-xl p-4 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/60 via-fuchsia-500/60 to-red-500/60 text-white'
                         >
                             <div className='w-6'></div>
 

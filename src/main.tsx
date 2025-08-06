@@ -68,13 +68,13 @@ const invoices = [
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <div className='h-[100vh] w-[100vw] text-center'>
-      <Modal buttonTitle='Titulo do botao' buttonClassName='mt-10' modalTitle='Criar Lista'>
+      <Modal buttonTitle='Criar Lista' buttonClassName='bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium items-center gap-2 hover:opacity-90 transition-opacity' modalTitle='Criar Lista'>
         <div className='flex h-10'>
           <h1 className='mt-auto mb-auto font-bold mr-2 text-xl'>Título:</h1>
           <Input
             className="mt-auto mb-auto border-slate-300 placeholder:text-slate-400 
               transition-all ease-in-out duration-300
-             focus:bg-slate-300 rounded-full
+             focus:bg-slate-200 rounded-full
              focus:ring-0 focus:ring-offset-0 focus:ring-transparent 
              focus:border-none focus:outline-none"
             placeholder="Insira um Título"
@@ -88,13 +88,13 @@ createRoot(document.getElementById('root')!).render(
               <Input
                 className="w-60 mt-auto mb-auto border-slate-300 placeholder:text-slate-400 
               transition-all ease-in-out duration-300
-             focus:bg-slate-300 rounded-full
+             focus:bg-slate-200 rounded-full
              focus:ring-0 focus:ring-offset-0 focus:ring-transparent 
              focus:border-none focus:outline-none"
                 placeholder="insira um e-mail"
               />
-              <Button className='mt-auto mb-auto ml-2 w-10 h-10 rounded-full hover:bg-slate-300 
-                bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 
+              <Button className='mt-auto mb-auto ml-2 w-10 h-10 rounded-full bg-slate-300 transition-all ease-in-out duration-300 hover:cursor-pointer
+                hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 
                 via-fuchsia-500 to-red-500/50 text-white"
               '>
                 <FaPlus className='text-white'></FaPlus>
@@ -113,7 +113,7 @@ createRoot(document.getElementById('root')!).render(
                   {/* Botão com gradiente */}
                   <button
                     type="button"
-                    className="px-4 py-2 rounded-md bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center gap-2 hover:opacity-90 transition-opacity"
+                    className="bg-slate-300 px-4 py-2 rounded-md hover:cursor-pointer hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center gap-2 hover:opacity-90 transition-opacity"
                   >
                     <FiUpload className="text-lg" />
                     <span>Selecionar</span>
@@ -159,7 +159,7 @@ createRoot(document.getElementById('root')!).render(
           </Table>
           </ScrollArea>
           <div className='w-full text-center mt-6'>
-            <Button className='p-6 hover:cursor-pointer mt-auto mb-auto ml-2 text-white text-xl font-bold h-10 rounded-full hover:bg-slate-300 border 
+            <Button className='p-6 hover:cursor-pointer mt-auto mb-auto ml-2 text-white text-xl font-bold h-10 rounded-[12px] hover:bg-slate-300 border 
                 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 
                 via-fuchsia-500 to-red-500/50 "
               '>
