@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from database import engine, get_db
-from models import Base, Item # Importação absoluta para o modelo
+from models import Base
 
 # Cria as tabelas no banco de dados, caso não existam
 Base.metadata.create_all(bind=engine)
