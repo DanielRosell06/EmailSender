@@ -1,14 +1,39 @@
 # main.py
 
-from fastapi import FastAPI
-from database import engine, get_db
-from models import Base
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
-# Cria as tabelas no banco de dados, caso não existam
+# Importa a conexão com o banco de dados
+from database import engine, Base, get_db
+
+# Importa os módulos de schemas e crud
+from schema import lista as schemas_lista
+from crud import lista as crud_lista
+
+# Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todos os headers
+)
+
 @app.get("/")
 def read_root():
-    return {"Olá": "Mundo"}
+    return {"message": "Bem-vindo à API!"}
+
+# Endpoint para CRIAR uma nova lista
+@app.post("/listas/", response_model=schemas_lista.Lista)
+def create_lista(lista: schemas_lista.ListaCreate, db: Session = Depends(get_db)):
+    """
+    Cria uma nova lista com os dados fornecidos.
+    """
+    return crud_lista.create_lista(db=db, lista=lista)
