@@ -2,6 +2,7 @@ import { StrictMode, useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import Modal from './components/Modal.tsx';
+import CSVReader from './components/CSVReader.tsx';
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -123,27 +124,7 @@ const App = () => {
             </div>
 
             {/* Seção de Arquivo .csv (mantida sem funcionalidade de API) */}
-            <div className='w-[350px]'>
-              <h1 className='font-bold text-xl'>Inserir Arquivo .csv</h1>
-              <h3 className='text-slate-500'>Insira um arquivo .csv, todas as célualas da planilha que possuem a formatação XXXX@XXXX.XXX serão adicionadas à lista.</h3>
-              <div className="flex flex-col gap-2 w-full max-w-md mt-2">
-                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 hover:border-slate-400 transition-colors duration-200">
-                  <div className="flex items-center gap-4">
-                    <button
-                      type="button"
-                      className="bg-slate-300 px-4 py-2 rounded-md hover:cursor-pointer hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center gap-2 hover:opacity-90 transition-opacity"
-                    >
-                      <FiUpload className="text-lg" />
-                      <span>Selecionar</span>
-                    </button>
-                    <span className="text-slate-600 truncate flex-1">
-                      {'Nenhum arquivo selecionado'}
-                    </span>
-                  </div>
-                </div>
-                <input type="file" className="hidden" />
-              </div>
-            </div>
+            <CSVReader></CSVReader>
           </div>
 
           {/* Seção de E-Mails */}
