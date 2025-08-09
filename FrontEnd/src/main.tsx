@@ -45,7 +45,7 @@ const App = () => {
         Titulo: listaTitle,
         Emails: emails
       };
-      
+
       const response = await fetch(`${API_URL}/listas/`, {
         method: 'POST',
         headers: {
@@ -73,9 +73,9 @@ const App = () => {
   return (
     <StrictMode>
       <div className='h-[100vh] w-[100vw] text-center'>
-        <Modal 
-          buttonTitle='Criar Lista' 
-          buttonClassName='bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium items-center gap-2 hover:opacity-90 transition-opacity' 
+        <Modal
+          buttonTitle='Criar Lista'
+          buttonClassName='bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium items-center gap-2 hover:opacity-90 transition-opacity'
           modalTitle='Criar Lista'
         >
           {/* Seção de Título */}
@@ -110,7 +110,7 @@ const App = () => {
                   onChange={(e) => setEmailInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddEmail()}
                 />
-                <Button 
+                <Button
                   className='mt-auto mb-auto ml-2 w-10 h-10 rounded-full bg-slate-300 transition-all ease-in-out duration-300 hover:cursor-pointer
                     hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 
                     via-fuchsia-500 to-red-500/50 text-white'
@@ -122,7 +122,7 @@ const App = () => {
             </div>
 
             {/* Seção de Arquivo .csv (mantida sem funcionalidade de API) */}
-            <CSVReader onLoadEmails={(e:any) => {
+            <CSVReader onLoadEmails={(e: any) => {
               if (Array.isArray(e.value)) {
                 // value é um array de e-mails do CSV
                 setEmails(prev => [
@@ -143,17 +143,17 @@ const App = () => {
             <ScrollArea className="h-48 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
               <Table className="border border-slate-200 rounded-lg overflow-hidden">
                 <TableBody>
-                  {emails.map((email, index) => (
+                  {emails.slice(0, 50).map((email, index) => (
                     <TableRow
                       key={index}
-                      className="border-t border-slate-300 hover:bg-slate-200/50 transition-colors"
+                      className="border-t border-slate-200 hover:bg-slate-300/50 transition-colors"
                     >
-                      <TableCell className="font-medium text-slate-600">
+                      <TableCell className="font-medium text-stone-700">
                         {email}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <button 
-                          className="text-pink-500 hover:text-pink-700 transition-colors hover:cursor-pointer w-2 h-2"
+                      <TableCell className="text-center">
+                        <button
+                          className="text-orange-500 hover:text-orange-700 transition-colors hover:cursor-pointer w-2 h-2"
                           onClick={() => handleRemoveEmail(email)}
                         >
                           <FaTimes />
@@ -161,11 +161,19 @@ const App = () => {
                       </TableCell>
                     </TableRow>
                   ))}
+
+
                 </TableBody>
               </Table>
+              {/* Mostre o contador de e-mails restantes se a lista original for maior que 50 */}
+              {emails.length > 50 && (
+                <div className="p-4 text-center text-stone-700">
+                  e outros {emails.length - 50} e-mails
+                </div>
+              )}
             </ScrollArea>
             <div className='w-full text-center mt-6'>
-              <Button 
+              <Button
                 className='p-6 hover:cursor-pointer mt-auto mb-auto ml-2 text-white text-xl font-bold h-10 rounded-[12px] hover:bg-slate-300 border 
                   bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 
                   via-fuchsia-500 to-red-500/50'

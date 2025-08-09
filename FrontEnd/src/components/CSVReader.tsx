@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import Papa from 'papaparse';
 import { FiUpload } from 'react-icons/fi';
+import { FaTimes } from 'react-icons/fa';
 
 interface CSVLoaderProps {
     onLoadEmails: Function,
@@ -8,7 +9,7 @@ interface CSVLoaderProps {
 }
 
 // function Modal({ buttonClassName, buttonTitle, modalTitle, children }: ModalProps) {
-function CSVLoader({ onLoadEmails, value }: CSVLoaderProps)  {
+function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [emails, setEmails] = useState<string[]>([]);
@@ -82,6 +83,7 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps)  {
         onLoadEmails({ value: emails });
         setEmails([])
         setLoading(false)
+        setFileName("Nenhum arquivo selecionado")
     };
 
     return (
@@ -90,13 +92,26 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps)  {
             <h3 className='text-slate-500'>Insira um arquivo .csv, todas as células da planilha que possuem a formatação XXXX@XXXX.XXX serão adicionadas à lista.</h3>
             <div className="flex flex-col gap-2 w-full max-w-md mt-2">
                 {emails.length > 0 ? (
-                    <button
-                        type="button"
-                        onClick={handleAddToList}
-                        className="bg-slate-300 px-4 py-2 rounded-md hover:cursor-pointer hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center gap-2 hover:opacity-90 transition-opacity"
-                    >
-                        <span>Adicionar {fileName} à lista</span>
-                    </button>
+                    <div className='flex flex-row items-center'>
+                        <button
+                            type="button"
+                            onClick={handleAddToList}
+                            className="px-4 py-2 rounded-md hover:cursor-pointer bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center gap-2 hover:opacity-90 transition-opacity"
+                        >
+                            <span>{emails.length} e-mails reconhecidos. Clique para adicionar à lista.</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setEmails([])
+                                setLoading(false)
+                                setFileName("Nenhum arquivo selecionado")
+                            }}
+                            className="bg-slate-300 ml-2 w-[50px] h-[50px] rounded-full px-4 py-2 hover:cursor-pointer hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center gap-2 hover:opacity-90 transition-opacity"
+                        >
+                            <FaTimes className='font-bold text-xl mt-auto mb-auto'></FaTimes>
+                        </button>
+                    </div>
                 ) :
                     <>
                         <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 hover:border-slate-400 transition-colors duration-200">
