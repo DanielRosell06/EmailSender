@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 
 import { FaPlus } from 'react-icons/fa';
 import { FaTimes } from 'react-icons/fa';
-import { FiUpload } from 'react-icons/fi';
 
 import {
   Table,
@@ -25,7 +24,6 @@ const App = () => {
   const [listaTitle, setListaTitle] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
-  const [savedLists, setSavedLists] = useState<any[]>([]);
 
   // Função para adicionar um e-mail ao estado
   const handleAddEmail = () => {
@@ -124,7 +122,18 @@ const App = () => {
             </div>
 
             {/* Seção de Arquivo .csv (mantida sem funcionalidade de API) */}
-            <CSVReader></CSVReader>
+            <CSVReader onLoadEmails={(e:any) => {
+              if (Array.isArray(e.value)) {
+                // value é um array de e-mails do CSV
+                setEmails(prev => [
+                  ...prev,
+                  ...e.value.filter(
+                    (email: string) => email && !prev.includes(email)
+                  ),
+                ]);
+                e.value = []
+              }
+            }}></CSVReader>
           </div>
 
           {/* Seção de E-Mails */}

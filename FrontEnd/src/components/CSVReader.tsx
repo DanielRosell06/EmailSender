@@ -2,7 +2,13 @@ import React, { useRef, useState } from 'react';
 import Papa from 'papaparse';
 import { FiUpload } from 'react-icons/fi';
 
-const CSVLoader: React.FC = () => {
+interface CSVLoaderProps {
+    onLoadEmails: Function,
+    value?: Array<String>,
+}
+
+// function Modal({ buttonClassName, buttonTitle, modalTitle, children }: ModalProps) {
+function CSVLoader({ onLoadEmails, value }: CSVLoaderProps)  {
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [emails, setEmails] = useState<string[]>([]);
@@ -56,6 +62,7 @@ const CSVLoader: React.FC = () => {
                                 });
 
                                 setEmails(extractedEmails);
+                                value = emails
                                 setLoading(false);
                                 setProgress(100);
                             },
@@ -72,8 +79,9 @@ const CSVLoader: React.FC = () => {
     };
 
     const handleAddToList = () => {
-        console.log("Emails prontos para serem adicionados:", emails);
-        alert(`Encontrados ${emails.length} emails. Verifique o console.`);
+        onLoadEmails({ value: emails });
+        setEmails([])
+        setLoading(false)
     };
 
     return (
