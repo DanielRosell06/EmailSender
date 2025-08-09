@@ -1,4 +1,4 @@
-import { StrictMode, useState, useEffect } from 'react';
+import { StrictMode, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import Modal from './components/Modal.tsx';
@@ -77,6 +77,7 @@ const App = () => {
           buttonTitle='Criar Lista'
           buttonClassName='bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium items-center gap-2 hover:opacity-90 transition-opacity'
           modalTitle='Criar Lista'
+          onClose={() => setEmails([])}
         >
           {/* Seção de Título */}
           <div className='flex h-10'>

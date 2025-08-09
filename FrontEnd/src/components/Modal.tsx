@@ -6,10 +6,11 @@ interface ModalProps {
     buttonClassName?: string;
     buttonTitle?: string;
     modalTitle?: string;
+    onClose?: Function;
     children: ReactNode;
 }
 
-function Modal({ buttonClassName, buttonTitle, modalTitle, children }: ModalProps) {
+function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose }: ModalProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => setIsModalOpen(true);
@@ -40,7 +41,12 @@ function Modal({ buttonClassName, buttonTitle, modalTitle, children }: ModalProp
                             </h1>
 
                             <FaTimes className='h-6 w-6 cursor-pointer text-white'
-                                onClick={closeModal}
+                                onClick={() => {
+                                    if (onClose != undefined){
+                                        onClose()
+                                    }
+                                    closeModal()
+                                }}
                             >
                             </FaTimes>
                         </div>
