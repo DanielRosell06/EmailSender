@@ -2,9 +2,11 @@
 
 from pydantic import BaseModel, ConfigDict
 from datetime import date
+from schema.email import EmailCreate, EmailListCreate
 
 class ListaCreate(BaseModel):
     Titulo: str
+    Emails: list[str]
 
 class Lista(BaseModel):
     IdLista: int

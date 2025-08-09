@@ -44,7 +44,7 @@ const App = () => {
     try {
       const newLista = {
         Titulo: listaTitle,
-        // Emails: emails // Não será usado no momento, mas é como se passaria os e-mails
+        Emails: emails
       };
       
       const response = await fetch(`${API_URL}/listas/`, {
