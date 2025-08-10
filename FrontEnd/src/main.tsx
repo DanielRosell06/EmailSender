@@ -24,6 +24,7 @@ const App = () => {
   const [listaTitle, setListaTitle] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Função para adicionar um e-mail ao estado
   const handleAddEmail = () => {
@@ -64,6 +65,7 @@ const App = () => {
       // Limpa o estado
       setListaTitle('');
       setEmails([]);
+      setIsModalOpen(false)
 
     } catch (error) {
       console.error(error);
@@ -78,6 +80,8 @@ const App = () => {
           buttonClassName='bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium items-center gap-2 hover:opacity-90 transition-opacity'
           modalTitle='Criar Lista'
           onClose={() => setEmails([])}
+          isModalOpen={isModalOpen}
+          openModal={() => setIsModalOpen(true)}
         >
           {/* Seção de Título */}
           <div className='flex h-10'>
@@ -178,7 +182,9 @@ const App = () => {
                 className='p-6 hover:cursor-pointer mt-auto mb-auto ml-2 text-white text-xl font-bold h-10 rounded-[12px] hover:bg-slate-300 border 
                   bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 
                   via-fuchsia-500 to-red-500/50'
-                onClick={handleSaveList}
+                onClick={(e)=>{
+                  handleSaveList()
+                }}
               >
                 Salvar
               </Button>

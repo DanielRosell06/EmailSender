@@ -8,11 +8,7 @@ from sqlalchemy.orm import Session
 from database import engine, Base, get_db
 
 # Importa os módulos de schemas e crud
-from schema import lista as schemas_lista
-from schema import email as schemas_email
 
-from crud import lista as crud_lista
-from crud import email as crud_email
 
 # Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
@@ -29,18 +25,34 @@ app.add_middleware(
     allow_headers=["*"],  # Permite todos os headers
 )
 
+
+import os
+import importlib
+
+ROUTERS_DIR = os.path.join(os.path.dirname(__file__), "rotas")
+
+# Itera sobre todos os arquivos na pasta 'rotas'
+for filename in os.listdir(ROUTERS_DIR):
+    # Garante que é um arquivo Python e não é o __init__.py ou __pycache__
+    if filename.endswith(".py") and filename not in ["__init__.py", "__pycache__"]:
+        # Remove a extensão .py para obter o nome do módulo
+        module_name = filename[:-3]
+        
+        # Constrói o caminho completo do módulo (ex: rotas.lista)
+        module_path = f"rotas.{module_name}"
+        
+        # Importa o módulo dinamicamente
+        router_module = importlib.import_module(module_path)
+        
+        # Verifica se o módulo tem uma instância de APIRouter chamada 'router'
+        if hasattr(router_module, "router"):
+            router_instance = getattr(router_module, "router")
+            app.include_router(router_instance)
+            print(f"Rota do módulo '{module_name}' incluída com sucesso.")
+
+
 @app.get("/")
 def read_root():
     return {"message": "Bem-vindo à API!"}
 
 # Endpoint para CRIAR uma nova lista
-@app.post("/listas/", response_model=schemas_lista.Lista)
-def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(get_db)):
-    """
-    Cria uma nova lista com os dados fornecidos.
-    """
-    # Você não precisa mais do parâmetro 'emails' separado
-    response_list = crud_lista.create_lista(db=db, lista=lista_data)
-    response_emails = crud_email.create_email(db=db, email=lista_data.Emails, lista_id=response_list.IdLista)
-     
-    return response_list

@@ -8,13 +8,17 @@ interface ModalProps {
     modalTitle?: string;
     onClose?: Function;
     children: ReactNode;
+    isModalOpen: boolean;
+    openModal: () => void;
 }
 
-function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose }: ModalProps) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose, isModalOpen, openModal }: ModalProps) {
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const closeModal = () => {
+        if (onClose != undefined){
+            onClose();
+        }
+    };
 
     return (
         <>
