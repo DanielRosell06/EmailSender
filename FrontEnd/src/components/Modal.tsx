@@ -7,12 +7,14 @@ interface ModalProps {
     buttonTitle?: string;
     modalTitle?: string;
     onClose?: Function;
+    width?: number;
     children: ReactNode;
     isModalOpen: boolean;
     openModal: () => void;
+    color?: string;
 }
 
-function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose, isModalOpen, openModal }: ModalProps) {
+function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose, isModalOpen, openModal, width, color }: ModalProps) {
 
     const closeModal = () => {
         if (onClose != undefined){
@@ -24,19 +26,32 @@ function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose, is
         <>
             <button
                 onClick={openModal}
-                className={`rounded-lg p-4 bg-black text-white cursor-pointer ${buttonClassName}`}
+                className={buttonClassName == undefined ? "rounded-lg p-4 bg-black text-white cursor-pointer" : buttonClassName}
             >
                 {buttonTitle}
             </button>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4">
+                // A classe dinâmica de width foi removida daqui
+                <div className={`fixed inset-0 z-[100] flex flex-col items-center justify-center p-4`}>
 
                     <div className="absolute inset-0 bg-stone-900/30 backdrop-blur-sm"></div>
 
-                    <div className='relative w-auto min-w-96 z-10'>
+                    {/* E a lógica do width foi movida para o atributo 'style' aqui */}
+                    <div
+                        className='relative w-auto min-w-96 z-10'
+                        style={{ width: width ? `${width}px` : undefined }}
+                    >
                         <div
-                            className='border-t-[2px] border-l-[1px] border-r-[1px] border-white/20 flex h-16 items-center justify-between rounded-t-xl p-4 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/60 via-fuchsia-500/60 to-red-500/60 text-white'
+                            className={`border-t-[2px] border-l-[1px] border-r-[1px] border-white/20 flex h-16 items-center justify-between rounded-t-xl p-4 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] 
+                            ${
+                                color === undefined
+                                    ? 'from-indigo-600/60 via-fuchsia-500/60 to-red-500/60 text-white'
+                                    : color === 'blue'
+                                    ? 'from-blue-500/60 via-cyan-500/60 to-emerald-500/60 text-white'
+                                    : ''
+                            }
+                            `}
                         >
                             <div className='w-6'></div>
 
