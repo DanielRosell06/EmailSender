@@ -78,7 +78,7 @@ export default function HtmlEditor() {
     try {
       const campanha_data = {
         Titulo: campaignTitle || "Campanha sem título",
-        Cor: selectedColor.value,
+        Cor: selectedColor.name,
         Documento: htmlCode
       }
 
@@ -154,7 +154,7 @@ export default function HtmlEditor() {
                 ))}
               </div>
               <p className="text-sm text-slate-500">
-                Cor selecionada: {selectedColor.name} ({selectedColor.value})
+                Cor selecionada: {selectedColor.name}
               </p>
             </div>
           </div>
@@ -181,6 +181,7 @@ export default function HtmlEditor() {
           <Modal
             buttonClassName="bg-slate-300 text-stone-700 hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-emerald-500 hover:text-white transition-all duration-300 rounded-full hover:cursor-pointer !p-2 !px-4 !text-sm !font-medium flex items-center gap-2"
             buttonTitle="Ajuda"
+            color="blue"
             modalTitle="Como usar o Editor HTML"
             isModalOpen={isHelpModalOpen}
             openModal={() => setIsHelpModalOpen(true)}
