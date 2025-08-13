@@ -74,8 +74,38 @@ export default function HtmlEditor() {
     URL.revokeObjectURL(url)
   }
 
-  const saveCampaign = () => {
-    downloadHtml()
+  const saveCampaign = async () => {
+    try {
+      const campanha_data = {
+        Titulo: campaignTitle || "Campanha sem título",
+        Cor: selectedColor.value,
+        Documento: htmlCode
+      }
+
+      const response = await fetch('http://127.0.0.1:8000/campanhas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(campanha_data)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Erro ao salvar campanha: ${response.status}`)
+      }
+
+      const savedCampaign = await response.json()
+      console.log('Campanha salva com sucesso:', savedCampaign)
+      
+      // Limpar o formulário após salvar
+      setCampaignTitle("")
+      setHtmlCode(defaultHtml)
+      setSelectedColor(tailwindColors[0])
+      
+    } catch (error) {
+      console.error('Erro ao salvar campanha:', error)
+      alert('Erro ao salvar campanha. Tente novamente.')
+    }
   }
 
   const resetCode = () => {
@@ -108,7 +138,7 @@ export default function HtmlEditor() {
             </div>
 
             <div className="space-y-2">
-              <Label className="font-bold text-xl text-stone-700">Tema da Campanha</Label>
+              <Label className="font-bold text-xl text-stone-700">Cor do Tema</Label>
               <div className="flex flex-wrap gap-2">
                 {tailwindColors.map((color) => (
                   <button
@@ -124,7 +154,7 @@ export default function HtmlEditor() {
                 ))}
               </div>
               <p className="text-sm text-slate-500">
-                Cor selecionada: {selectedColor.name}
+                Cor selecionada: {selectedColor.name} ({selectedColor.value})
               </p>
             </div>
           </div>
@@ -149,10 +179,8 @@ export default function HtmlEditor() {
           </Button>
           
           <Modal
-            buttonClassName="w-[70px] bg-slate-300 text-stone-700 hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-emerald-500 hover:text-white transition-all duration-300 rounded-full hover:cursor-pointer"
+            buttonClassName="bg-slate-300 text-stone-700 hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-emerald-500 hover:text-white transition-all duration-300 rounded-full hover:cursor-pointer !p-2 !px-4 !text-sm !font-medium flex items-center gap-2"
             buttonTitle="Ajuda"
-            width={700}
-            color="blue"
             modalTitle="Como usar o Editor HTML"
             isModalOpen={isHelpModalOpen}
             openModal={() => setIsHelpModalOpen(true)}
@@ -218,6 +246,7 @@ export default function HtmlEditor() {
           <Card className="p-4 flex flex-col border-slate-200 shadow-lg">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-bold text-stone-700">Editor HTML</h2>
+              <span className="text-sm text-slate-500">{htmlCode.length} caracteres</span>
             </div>
             <textarea
               value={htmlCode}

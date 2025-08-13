@@ -1,4 +1,5 @@
 # main.py
+# To install dependences run "pip install -r requirements.txt"
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
