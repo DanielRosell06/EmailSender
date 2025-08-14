@@ -20,3 +20,20 @@ def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(ge
     response_emails = crud_email.create_email(db=db, email=lista_data.Emails, lista_id=response_list.IdLista)
      
     return response_list
+
+@router.get("/all_lista/", response_model=list[schemas_lista.Lista])
+def get_all_listas(db: Session = Depends(get_db)):
+    """
+    Retorna todas as listas cadastradas.
+    """
+    listas = crud_lista.get_all_listas(db=db)
+    return listas
+
+
+@router.get("/lista/", response_model=list[schemas_lista.Lista])
+def get_all_listas(db: Session = Depends(get_db)):
+    """
+    Retorna todas as listas cadastradas.
+    """
+    listas = crud_lista.get_all_listas(db=db)
+    return listas

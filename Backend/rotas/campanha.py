@@ -17,3 +17,20 @@ def create_campanha(campanha_data: schemas_campanha.CampanhaCreate, db: Session 
     response_campain = crud_campanha.create_campanha(db=db, campanha=campanha_data)
      
     return response_campain
+
+@router.get("/all_campanha/", response_model=list[schemas_campanha.Campanha])
+def get_all_campanhas(db: Session = Depends(get_db)):
+    """
+    Retorna todas as campanhas cadastradas.
+    """
+    campanhas = crud_campanha.get_all_campanhas(db=db)
+    return campanhas
+
+
+@router.get("/campanha/", response_model=list[schemas_campanha.Campanha])
+def get_all_campanhas(db: Session = Depends(get_db)):
+    """
+    Retorna todas as campanhas cadastradas.
+    """
+    campanhas = crud_campanha.get_all_campanhas(db=db)
+    return campanhas

@@ -8,6 +8,9 @@ class ListaCreate(BaseModel):
     Titulo: str
     Emails: list[str]
 
+class ListaGet(BaseModel):
+    IdLista: int
+
 class Lista(BaseModel):
     IdLista: int
     Titulo: str

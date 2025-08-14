@@ -9,6 +9,9 @@ class CampanhaCreate(BaseModel):
     Cor: str
     Documento: str
 
+class CampanhaGet(BaseModel):
+    IdCampanha: int
+
 class Campanha(BaseModel):
     Titulo: str
     Cor: str

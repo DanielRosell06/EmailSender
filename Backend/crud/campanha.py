@@ -12,3 +12,9 @@ def create_campanha(db: Session, campanha: schemas_campanha.CampanhaCreate):
     db.commit()
     db.refresh(db_campanha)
     return db_campanha
+
+def get_all_campanha(db: Session):
+    return db.query(models.Campanha).all()
+
+def get_campanha(db: Session, id_campanha: int):
+    return db.query(models.Campanha).filter(models.Campanha.id == id_campanha).first()
