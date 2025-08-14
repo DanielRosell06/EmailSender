@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Copy, Download, RefreshCw, Save, HelpCircle } from "lucide-react"
+import { Copy,  RefreshCw, Save } from "lucide-react"
 import Modal from "../Modal"
 
 const defaultHtml = `<!DOCTYPE html>
@@ -60,18 +60,6 @@ export default function HtmlEditor() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(htmlCode)
-  }
-
-  const downloadHtml = () => {
-    const blob = new Blob([htmlCode], { type: "text/html" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = campaignTitle ? `${campaignTitle.replace(/\s+/g, "-").toLowerCase()}.html` : "campanha.html"
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
   }
 
   const saveCampaign = async () => {
@@ -181,6 +169,7 @@ export default function HtmlEditor() {
           <Modal
             buttonClassName="bg-slate-300 text-stone-700 hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-emerald-500 hover:text-white transition-all duration-300 rounded-full hover:cursor-pointer !p-2 !px-4 !text-sm !font-medium flex items-center gap-2"
             buttonTitle="Ajuda"
+            width={700}
             color="blue"
             modalTitle="Como usar o Editor HTML"
             isModalOpen={isHelpModalOpen}
