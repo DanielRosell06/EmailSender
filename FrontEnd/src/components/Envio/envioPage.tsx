@@ -27,25 +27,54 @@ const EnvioPage: React.FC = () => {
 
     useEffect(() => {
         setLoading(true);
-        
+
         Promise.all([
             fetch("http://127.0.0.1:8000/all_lista").then(res => res.json()),
             fetch("http://127.0.0.1:8000/all_campanha").then(res => res.json())
         ])
-        .then(([listasData, campanhasData]) => {
-            setListas(listasData);
-            setCampanhas(campanhasData);
-        })
-        .catch(() => {
-            setListas([]);
-            setCampanhas([]);
-        })
-        .finally(() => setLoading(false));
+            .then(([listasData, campanhasData]) => {
+                setListas(listasData);
+                setCampanhas(campanhasData);
+            })
+            .catch(() => {
+                setListas([]);
+                setCampanhas([]);
+            })
+            .finally(() => setLoading(false));
     }, []);
 
-    const handleEnvio = () => {
+    const handleEnvio = async () => {
         if (selectedLista && selectedCampanha) {
-            alert(`Enviar campanha ${selectedCampanha} para lista ${selectedLista}`);
+
+            const payload = {
+                Lista: selectedLista,
+                Campanha: selectedCampanha
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/envio', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro na requisição: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('Resposta do servidor:', result);
+
+                alert(`Campanha "${selectedCampanha}" enviada com sucesso para a lista "${selectedLista}"!`);
+
+            } catch (error) {
+                console.error('Falha ao enviar os dados:', error);
+                alert('Ocorreu um erro ao tentar enviar os dados. Verifique o console para mais detalhes.');
+            }
+        } else {
+            alert('Por favor, selecione uma lista e uma campanha antes de enviar.');
         }
     };
 
@@ -62,7 +91,7 @@ const EnvioPage: React.FC = () => {
             'Indigo': 'from-indigo-600/60 via-purple-500/60 to-violet-600/60', // Índigo → roxo → violeta
             'Cinza': 'from-gray-600/60 via-slate-500/60 to-zinc-600/60', // Cinza → slate → zinc
         };
-        
+
         return colorMap[cor] || 'from-gray-600/60 via-slate-500/60 to-zinc-600/60';
     };
 
@@ -115,11 +144,10 @@ const EnvioPage: React.FC = () => {
                             {listas.map((lista) => (
                                 <div
                                     key={lista.IdLista}
-                                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${
-                                        selectedLista === lista.IdLista
+                                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${selectedLista === lista.IdLista
                                             ? "border-purple-500 bg-purple-50 shadow-lg"
                                             : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
-                                    }`}
+                                        }`}
                                     onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
                                 >
                                     {/* Header com gradiente sutil */}
@@ -164,22 +192,21 @@ const EnvioPage: React.FC = () => {
                             {campanhas.map((campanha) => (
                                 <div
                                     key={campanha.IdCampanha}
-                                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg h-48 ${
-                                        selectedCampanha === campanha.IdCampanha
+                                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg h-48 ${selectedCampanha === campanha.IdCampanha
                                             ? "border-white/80 shadow-xl ring-2 ring-blue-400"
                                             : "border-white/50 hover:border-white/80"
-                                    }`}
+                                        }`}
                                     onClick={() => {
-                                        selectedCampanha == campanha.IdCampanha? 
-                                        (setSelectedCampanha(null))
-                                        :
-                                        (setSelectedCampanha(campanha.IdCampanha))
+                                        selectedCampanha == campanha.IdCampanha ?
+                                            (setSelectedCampanha(null))
+                                            :
+                                            (setSelectedCampanha(campanha.IdCampanha))
                                         console.log(campanhas)
                                     }}
                                 >
                                     {/* HTML Document Background - mais visível */}
                                     {campanha.Documento && (
-                                        <div 
+                                        <div
                                             className="absolute inset-0 overflow-hidden text-gray-800/60 bg-white/20"
                                             dangerouslySetInnerHTML={{ __html: campanha.Documento }}
                                             style={{
@@ -196,7 +223,7 @@ const EnvioPage: React.FC = () => {
 
                                     {/* Overlay gradiente baseado na cor da campanha - mais transparente */}
                                     <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
-                                    
+
                                     {/* Conteúdo do card */}
                                     <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
                                         <div className="flex items-start justify-between">
@@ -234,19 +261,18 @@ const EnvioPage: React.FC = () => {
                         <Button
                             disabled={!selectedLista || !selectedCampanha}
                             onClick={handleEnvio}
-                            className={`px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${
-                                !selectedLista || !selectedCampanha 
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                            className={`px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${!selectedLista || !selectedCampanha
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     : "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-700"
-                            }`}
+                                }`}
                         >
                             <FaPaperPlane className="mr-2" />
-                            {!selectedLista || !selectedCampanha 
-                                ? "Selecione uma lista e campanha" 
+                            {!selectedLista || !selectedCampanha
+                                ? "Selecione uma lista e campanha"
                                 : "Enviar Campanha"}
                         </Button>
                     </div>
-                    
+
                     {(selectedLista || selectedCampanha) && (
                         <div className="mt-4 text-sm text-gray-600">
                             {selectedLista && !selectedCampanha && "✓ Lista selecionada - Escolha uma campanha"}

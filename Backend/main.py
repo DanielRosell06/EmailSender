@@ -49,7 +49,6 @@ for filename in os.listdir(ROUTERS_DIR):
         if hasattr(router_module, "router"):
             router_instance = getattr(router_module, "router")
             app.include_router(router_instance)
-            print(f"Rota do módulo '{module_name}' incluída com sucesso.")
 
 
 @app.get("/")
