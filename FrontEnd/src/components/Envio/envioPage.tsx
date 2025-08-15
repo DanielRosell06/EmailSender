@@ -80,16 +80,16 @@ const EnvioPage: React.FC = () => {
 
     const getGradientFromColor = (cor: string) => {
         const colorMap: { [key: string]: string } = {
-            'Azul': 'from-blue-600/60 via-indigo-500/60 to-purple-600/60', // Azul → índigo → roxo
-            'Verde': 'from-green-600/60 via-emerald-500/60 to-teal-600/60', // Verde → esmeralda → teal
-            'Roxo': 'from-purple-600/60 via-violet-500/60 to-indigo-600/60', // Roxo → violeta → índigo
-            'Rosa': 'from-pink-600/60 via-rose-500/60 to-red-600/60', // Rosa → rose → vermelho
-            'Vermelho': 'from-red-600/60 via-pink-500/60 to-rose-600/60', // Vermelho → rosa → rose
-            'Laranja': 'from-orange-600/60 via-amber-500/60 to-yellow-600/60', // Laranja → âmbar → amarelo
-            'Amarelo': 'from-yellow-600/60 via-amber-500/60 to-orange-600/60', // Amarelo → âmbar → laranja
-            'Ciano': 'from-cyan-600/60 via-sky-500/60 to-blue-600/60', // Ciano → sky → azul
-            'Indigo': 'from-indigo-600/60 via-purple-500/60 to-violet-600/60', // Índigo → roxo → violeta
-            'Cinza': 'from-gray-600/60 via-slate-500/60 to-zinc-600/60', // Cinza → slate → zinc
+            'Azul': 'from-blue-500/100 via-indigo-500/60 to-purple-600/60', // Azul → índigo → roxo
+            'Verde': 'from-green-500/100 via-emerald-500/60 to-teal-600/60', // Verde → esmeralda → teal
+            'Roxo': 'from-purple-500/100 via-violet-500/60 to-indigo-600/60', // Roxo → violeta → índigo
+            'Rosa': 'from-pink-500/100 via-rose-500/60 to-red-600/60', // Rosa → rose → vermelho
+            'Vermelho': 'from-red-500/100 via-pink-500/60 to-rose-600/60', // Vermelho → rosa → rose
+            'Laranja': 'from-orange-500/100 via-amber-500/60 to-yellow-600/60', // Laranja → âmbar → amarelo
+            'Amarelo': 'from-yellow-500/100 via-amber-500/60 to-orange-600/60', // Amarelo → âmbar → laranja
+            'Ciano': 'from-cyan-500/100 via-sky-500/60 to-blue-600/60', // Ciano → sky → azul
+            'Indigo': 'from-indigo-500/100 via-purple-500/60 to-violet-600/60', // Índigo → roxo → violeta
+            'Cinza': 'from-gray-500/100 via-slate-500/60 to-zinc-600/60', // Cinza → slate → zinc
         };
 
         return colorMap[cor] || 'from-gray-600/60 via-slate-500/60 to-zinc-600/60';
@@ -145,8 +145,8 @@ const EnvioPage: React.FC = () => {
                                 <div
                                     key={lista.IdLista}
                                     className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${selectedLista === lista.IdLista
-                                            ? "border-purple-500 bg-purple-50 shadow-lg"
-                                            : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
+                                        ? "border-purple-500 bg-purple-50 shadow-lg"
+                                        : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
                                         }`}
                                     onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
                                 >
@@ -196,35 +196,28 @@ const EnvioPage: React.FC = () => {
                                             ? "border-white/80 shadow-xl ring-2 ring-blue-400"
                                             : "border-white/50 hover:border-white/80"
                                         }`}
-                                    onClick={() => {
-                                        selectedCampanha == campanha.IdCampanha ?
-                                            (setSelectedCampanha(null))
-                                            :
-                                            (setSelectedCampanha(campanha.IdCampanha))
-                                        console.log(campanhas)
-                                    }}
+                                    onClick={() => setSelectedCampanha(prev => prev === campanha.IdCampanha ? null : campanha.IdCampanha)}
                                 >
-                                    {/* HTML Document Background - mais visível */}
                                     {campanha.Documento && (
-                                        <div
-                                            className="absolute inset-0 overflow-hidden text-gray-800/60 bg-white/20"
-                                            dangerouslySetInnerHTML={{ __html: campanha.Documento }}
-                                            style={{
-                                                fontSize: '8px',
-                                                lineHeight: '1.2',
-                                                transform: 'scale(0.85)',
-                                                transformOrigin: 'top left',
-                                                padding: '6px',
-                                                filter: 'blur(0.5px)',
-                                                backdropFilter: 'blur(1px)'
-                                            }}
-                                        />
+                                        <div className="absolute inset-0 overflow-hidden bg-white/20 pointer-events-none">
+                                            <iframe
+                                                srcDoc={campanha.Documento}
+                                                className="w-[640px] h-[850px] border-none"
+                                                style={{
+                                                    marginTop: '50px',
+                                                    transformOrigin: 'top left',
+                                                    transform: 'scale(0.47)',
+                                                    filter: 'blur(0.5px)',
+                                                }}
+                                                frameBorder="0"
+                                                scrolling="no"
+                                                title={`preview-${campanha.IdCampanha}`}
+                                            />
+                                        </div>
                                     )}
 
-                                    {/* Overlay gradiente baseado na cor da campanha - mais transparente */}
                                     <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
 
-                                    {/* Conteúdo do card */}
                                     <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
@@ -235,6 +228,7 @@ const EnvioPage: React.FC = () => {
                                                     <FaStar className="text-yellow-300 drop-shadow-lg" />
                                                 )}
                                             </div>
+
                                             {selectedCampanha === campanha.IdCampanha && (
                                                 <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50">
                                                     <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -262,8 +256,8 @@ const EnvioPage: React.FC = () => {
                             disabled={!selectedLista || !selectedCampanha}
                             onClick={handleEnvio}
                             className={`px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${!selectedLista || !selectedCampanha
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-700"
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-700"
                                 }`}
                         >
                             <FaPaperPlane className="mr-2" />
