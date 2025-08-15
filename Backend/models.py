@@ -43,6 +43,10 @@ class Envio(Base):
     IdEnvio = Column(Integer, primary_key=True, nullable=False, index=True)
     Dt_Envio = Column(Date, nullable=False, default=func.now())
 
+    #Chaves estrangeiras
+    Lista = Column(Integer, ForeignKey("lista.IdLista"))
+    Campanha = Column(Integer, ForeignKey("campanha.IdCampanha"))
+
     # Relacionamento com Detalhe (um envio tem muitos detalhes)
     detalhes = relationship("Detalhe", back_populates="envio_pai")
 
