@@ -18,19 +18,19 @@ def create_campanha(campanha_data: schemas_campanha.CampanhaCreate, db: Session 
      
     return response_campain
 
-@router.get("/all_campanha/", response_model=list[schemas_campanha.Campanha])
+@router.get("/all_campanha/", response_model=list[schemas_campanha.CampanhaBase])
 def get_all_campanhas(db: Session = Depends(get_db)):
     """
     Retorna todas as campanhas cadastradas.
     """
-    campanhas = crud_campanha.get_all_campanhas(db=db)
+    campanhas = crud_campanha.get_all_campanha(db=db)
     return campanhas
 
 
-@router.get("/campanha/", response_model=list[schemas_campanha.Campanha])
+@router.get("/campanha/", response_model=list[schemas_campanha.CampanhaBase])
 def get_all_campanhas(db: Session = Depends(get_db)):
     """
     Retorna todas as campanhas cadastradas.
     """
-    campanhas = crud_campanha.get_all_campanhas(db=db)
+    campanhas = crud_campanha.get_all_campanha(db=db)
     return campanhas

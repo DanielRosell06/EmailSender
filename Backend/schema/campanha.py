@@ -9,10 +9,18 @@ class CampanhaCreate(BaseModel):
     Cor: str
     Documento: str
 
-class CampanhaGet(BaseModel):
-    IdCampanha: int
-
-class Campanha(BaseModel):
+class Campanha(BaseModel): #Usada em create
     Titulo: str
     Cor: str
     Documento: str
+
+class CampanhaGet(BaseModel):
+    IdCampanha: int
+
+class CampanhaBase(BaseModel): #Geral
+    IdCampanha: int
+    Titulo: str
+    Cor: str
+    Documento: str
+    Ultimo_Uso: date
+

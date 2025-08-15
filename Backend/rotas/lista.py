@@ -26,7 +26,7 @@ def get_all_listas(db: Session = Depends(get_db)):
     """
     Retorna todas as listas cadastradas.
     """
-    listas = crud_lista.get_all_listas(db=db)
+    listas = crud_lista.get_all_lista(db=db)
     return listas
 
 
@@ -35,5 +35,5 @@ def get_all_listas(db: Session = Depends(get_db)):
     """
     Retorna todas as listas cadastradas.
     """
-    listas = crud_lista.get_all_listas(db=db)
+    listas = crud_lista.get_all_lista(db=db)
     return listas

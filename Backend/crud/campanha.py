@@ -17,4 +17,4 @@ def get_all_campanha(db: Session):
     return db.query(models.Campanha).all()
 
 def get_campanha(db: Session, id_campanha: int):
-    return db.query(models.Campanha).filter(models.Campanha.id == id_campanha).first()
+    return db.query(models.Campanha).filter(models.Campanha.IdCampanha == id_campanha).first()
