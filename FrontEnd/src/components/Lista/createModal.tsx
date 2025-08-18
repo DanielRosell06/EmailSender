@@ -77,7 +77,10 @@ const CreateListModal = () => {
           buttonTitle='Criar Lista'
           buttonClassName='bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-medium items-center gap-2 hover:opacity-90 transition-opacity'
           modalTitle='Criar Lista'
-          onClose={() => setEmails([])}
+          onClose={() => {
+            setEmails([])
+            setIsModalOpen(false)
+          }}
           isModalOpen={isModalOpen}
           openModal={() => setIsModalOpen(true)}
         >

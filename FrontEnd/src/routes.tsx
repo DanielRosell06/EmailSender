@@ -3,7 +3,9 @@ import { createBrowserRouter } from "react-router-dom";
 
 // Importe seus componentes de página .tsx
 import Layout from './Layout.tsx'
-import EnvioPage from './pages/EnvioPage.tsx';
+import CreateEnvioPage from './pages/Envio/CreateEnvioPage.tsx';
+import CreateCampanhaPage from "./pages/Campanha/CreateCampanhaPage.tsx";
+import ListPage from "./pages/Lista/ListPage.tsx";
 
 
 const router = createBrowserRouter([
@@ -12,9 +14,18 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
             {
-                path: "envio",
-                element: <EnvioPage />,
+                path: "create_envio",
+                element: <CreateEnvioPage />,
             },
+            {
+                path: "create_campanha",
+                element: <CreateCampanhaPage />,
+            },
+            {
+                path: "lista",
+                element: <ListPage />,
+            },
+            
         ],
     },
 ]);

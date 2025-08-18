@@ -61,9 +61,6 @@ function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose, is
 
                             <FaTimes className='h-6 w-6 cursor-pointer text-white'
                                 onClick={() => {
-                                    if (onClose != undefined){
-                                        onClose()
-                                    }
                                     closeModal()
                                 }}
                             >
