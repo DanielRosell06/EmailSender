@@ -1,6 +1,6 @@
 // src/components/layout/Layout.tsx
 import React, { useState } from 'react';
-import { FaEnvelope, FaPaperPlane, FaUsers, FaChevronDown, FaChevronRight } from 'react-icons/fa';
+import { FaEnvelope, FaPaperPlane, FaUsers, FaChevronDown, FaChevronRight, FaHome } from 'react-icons/fa';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 const Layout: React.FC = () => {
@@ -119,30 +119,37 @@ const Layout: React.FC = () => {
           </div>
 
           <div className='flex flex-col gap-2'>
-            {/* Botão Listas */}
+            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
+              }`}
+              onClick={() => {
+                handleNavigate('/')
+              }}
+            >
+              <FaHome className='w-[20px] h-[20px] mr-3' />
+              <h1 className='text-[18px]'>Home</h1>
+            </button>
             <div className='flex flex-col'>
               <div
                 onClick={() => handleNavigate('/lista')}
-                className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${
-                  activePath === '/lista' ? 'bg-gray-200' : 'hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 hover:text-white'
-                }`}
+                className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/lista' ? 'bg-gray-200' : 'hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 hover:text-white'
+                  }`}
               >
                 <div className='flex flex-row items-center'>
                   <FaUsers className='w-[20px] h-[20px] mr-3' />
                   <h1 className='text-[18px]'>Listas</h1>
                 </div>
                 <button
-                    onClick={toggleListas}
-                    className="p-1 rounded-full hover:bg-gray-300/50"
-                    aria-label="Expandir listas"
+                  onClick={toggleListas}
+                  className="p-1 rounded-full hover:bg-gray-300/50"
+                  aria-label="Expandir listas"
                 >
-                    {listasExpanded ?
-                      <FaChevronDown className='w-[12px] h-[12px]' /> :
-                      <FaChevronRight className='w-[12px] h-[12px]' />
-                    }
+                  {listasExpanded ?
+                    <FaChevronDown className='w-[12px] h-[12px]' /> :
+                    <FaChevronRight className='w-[12px] h-[12px]' />
+                  }
                 </button>
               </div>
-              
+
               {/* Submenu de Listas */}
               <div className={`overflow-hidden transition-all duration-300 ${listasExpanded ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}`}>
                 <div className="pl-8 pt-2">
@@ -162,23 +169,22 @@ const Layout: React.FC = () => {
             <div className='flex flex-col'>
               <div
                 onClick={() => handleNavigate('/create_campanha')}
-                className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${
-                  activePath === '/create_campanha' ? 'bg-gray-200' : 'hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-blue-600/60 via-indigo-500 to-cyan-500/60 hover:text-white'
-                }`}
+                className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/create_campanha' ? 'bg-gray-200' : 'hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-blue-600/60 via-indigo-500 to-cyan-500/60 hover:text-white'
+                  }`}
               >
                 <div className='flex flex-row items-center'>
                   <FaEnvelope className='w-[20px] h-[20px] mr-3' />
                   <h1 className='text-[18px]'>Campanhas</h1>
                 </div>
                 <button
-                    onClick={toggleCampanhas}
-                    className="p-1 rounded-full hover:bg-gray-300/50"
-                    aria-label="Expandir campanhas"
+                  onClick={toggleCampanhas}
+                  className="p-1 rounded-full hover:bg-gray-300/50"
+                  aria-label="Expandir campanhas"
                 >
-                    {campanhasExpanded ?
-                      <FaChevronDown className='w-[12px] h-[12px]' /> :
-                      <FaChevronRight className='w-[12px] h-[12px]' />
-                    }
+                  {campanhasExpanded ?
+                    <FaChevronDown className='w-[12px] h-[12px]' /> :
+                    <FaChevronRight className='w-[12px] h-[12px]' />
+                  }
                 </button>
               </div>
 
@@ -198,9 +204,8 @@ const Layout: React.FC = () => {
             </div>
 
             {/* Botão Enviar (sem submenu) */}
-            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${
-              activePath === '/create_envio' ? 'bg-gray-200' : ''
-            }`}
+            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
+              }`}
               onClick={() => {
                 handleNavigate('/create_envio')
               }}
