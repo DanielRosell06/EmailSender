@@ -18,7 +18,7 @@ interface Campanha {
     Favorita: boolean;
 }
 
-const EnvioPage: React.FC = () => {
+const EnvioPageComp: React.FC = () => {
     const [listas, setListas] = useState<Lista[]>([]);
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [selectedLista, setSelectedLista] = useState<number | null>(null);
@@ -280,4 +280,4 @@ const EnvioPage: React.FC = () => {
     );
 };
 
-export default EnvioPage;
+export default EnvioPageComp;
