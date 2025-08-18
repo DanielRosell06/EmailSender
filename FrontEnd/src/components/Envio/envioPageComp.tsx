@@ -102,7 +102,7 @@ const CreateEnvioPageComp: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6">
+            <div className="min-h-screen p-6">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-8">
                         <Skeleton className="h-12 w-64 mx-auto mb-4" />
@@ -118,7 +118,7 @@ const CreateEnvioPageComp: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6">
+        <div className="min-h-screen ">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-12">
