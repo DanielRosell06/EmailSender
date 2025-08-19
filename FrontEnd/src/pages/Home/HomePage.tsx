@@ -18,16 +18,30 @@ interface Campanha {
     Favorita: boolean;
 }
 
+interface DetalheEnvio {
+  IdDetalhe: number;
+  Conteudo: string;
+}
+
+interface CampanhaEnvio {
+  IdCampanha: number;
+  Titulo: string;
+  Cor: string;
+}
+
+interface ListaEnvio {
+  IdLista: number;
+  Titulo: string;
+}
+
 interface Envio {
-    id: string;
-    dataEnvio: string;
-    detalhes: {
-        aberturas: number;
-        entregues: number;
-    };
-    campanha: string;
-    lista: string;
-    erros?: string[];
+  IdEnvio: number;
+  Dt_Envio: string; // Ou Date, dependendo de como você processa a resposta
+  Detalhes: DetalheEnvio[];
+  Campanha: CampanhaEnvio;
+  Lista: ListaEnvio;
+  // Propriedades como `aberturas`, `entregues` e `erros` não parecem estar na nova estrutura da sua API.
+  // Se elas ainda existem, você precisa adicioná-las.
 }
 
 const HomePage: React.FC = () => {
@@ -37,65 +51,25 @@ const HomePage: React.FC = () => {
     const [enviosRecentes, setEnviosRecentes] = useState<Envio[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const mockEnviosRecentes: Envio[] = [
-        {
-            id: 'envio-1',
-            dataEnvio: '2025-08-18T10:00:00Z',
-            detalhes: { aberturas: 120, entregues: 500 },
-            campanha: 'Promoção de Verão',
-            lista: 'Clientes VIP',
-            erros: ["Falha no envio para 'email_invalido@teste.com'. Motivo: endereço de e-mail inválido.", "Servidor de destino não respondeu para 12 e-mails."]
-        },
-        {
-            id: 'envio-2',
-            dataEnvio: '2025-08-17T15:30:00Z',
-            detalhes: { aberturas: 35, entregues: 150 },
-            campanha: 'Novidades de Agosto',
-            lista: 'Assinantes Newsletter'
-        },
-        {
-            id: 'envio-3',
-            dataEnvio: '2025-08-16T09:00:00Z',
-            detalhes: { aberturas: 80, entregues: 230 },
-            campanha: 'Lançamento de Produto',
-            lista: 'Leads Qualificados',
-            erros: ["E-mail 'bounce@empresa.com' devolvido permanentemente.", "Servidor de destino 'mail.org' rejeitou a conexão."]
-        },
-        {
-            id: 'envio-4',
-            dataEnvio: '2025-08-15T11:00:00Z',
-            detalhes: { aberturas: 250, entregues: 800 },
-            campanha: 'Black Friday Antecipada',
-            lista: 'Todos os Clientes'
-        },
-        {
-            id: 'envio-5',
-            dataEnvio: '2025-08-14T14:00:00Z',
-            detalhes: { aberturas: 15, entregues: 60 },
-            campanha: 'Boas Vindas',
-            lista: 'Novos Cadastros'
-        }
-    ];
-
     useEffect(() => {
         setLoading(true);
-
-        setEnviosRecentes(mockEnviosRecentes.slice(0, 5));
-
         Promise.all([
             fetch("http://127.0.0.1:8000/all_lista").then(res => res.json()),
-            fetch("http://127.0.0.1:8000/all_campanha").then(res => res.json())
+            fetch("http://127.0.0.1:8000/all_campanha").then(res => res.json()),
+            fetch("http://127.0.0.1:8000/get_all_envio").then(res => res.json())
         ])
-            .then(([listasData, campanhasData]) => {
+            .then(([listasData, campanhasData, enviosData]) => {
                 const sortedCampanhas = campanhasData
                     .sort((a: Campanha, b: Campanha) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime())
                     .slice(0, 4);
                 const sortedListas = listasData
                     .sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime())
                     .slice(0, 6);
+                const sortedEnvios = enviosData.slice(0, 5);
 
                 setListas(sortedListas);
                 setCampanhas(sortedCampanhas);
+                setEnviosRecentes(sortedEnvios);
             })
             .catch(() => {
                 setListas([]);
@@ -329,7 +303,7 @@ const HomePage: React.FC = () => {
                         <div className="space-y-4">
                             {enviosRecentes.length > 0 ? (
                                 enviosRecentes.map((envio) => (
-                                    <div key={envio.id}>
+                                    <div key={envio.IdEnvio}>
                                         <div
                                             className="p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm hover:border-green-400 cursor-pointer"
                                         >
@@ -340,33 +314,27 @@ const HomePage: React.FC = () => {
                                                     </div>
                                                     <div>
                                                         <p className="font-semibold text-gray-800">
-                                                            Envio da campanha **{envio.campanha}**
+                                                            Envio da campanha {envio.Campanha.Titulo}
                                                         </p>
                                                         <p className="text-sm text-gray-500">
-                                                            para a lista **{envio.lista}**
+                                                            para a lista {envio.Lista.Titulo}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right text-gray-600">
                                                     <p className="text-sm font-medium">
-                                                        {formatDate(envio.dataEnvio)}
+                                                        {formatDate(envio.Dt_Envio)}
                                                     </p>
-                                                    {envio.erros && envio.erros.length > 0 && (
-                                                        <div className="mt-1 flex items-center justify-end gap-1 text-red-500 text-sm font-semibold">
-                                                            <FaExclamationTriangle className="text-red-400" />
-                                                            <span>{envio.erros.length} Erros</span>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
                                             <div className="flex justify-start gap-8 mt-4 pl-12 text-gray-600">
                                                 <div className="flex items-center gap-2 text-sm">
                                                     <FaChartBar className="text-gray-400" />
-                                                    <span>Entregues: <span className="font-semibold text-green-700">{envio.detalhes.entregues}</span></span>
+                                                    <span>Entregues: <span className="font-semibold text-green-700">{/* ACRESCENTAR ENTREGAS */}</span></span>
                                                 </div>
                                                 <div className="flex items-center gap-2 text-sm">
                                                     <FaUserShield className="text-gray-400" />
-                                                    <span>Aberturas: <span className="font-semibold text-blue-700">{envio.detalhes.aberturas}</span></span>
+                                                    <span>Aberturas: <span className="font-semibold text-blue-700">{/* ACRESCENTAR ABERTURAS*/}</span></span>
                                                 </div>
                                             </div>
                                         </div>

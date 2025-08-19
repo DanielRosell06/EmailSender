@@ -1,8 +1,6 @@
-# schemas/envio.py
-
 from pydantic import BaseModel
-from typing import List
 from datetime import date
+from typing import List, Optional
 
 class EnvioCreate(BaseModel):
     Campanha: int
@@ -11,18 +9,31 @@ class EnvioCreate(BaseModel):
 class Detalhe(BaseModel):
     IdDetalhe: int
     Conteudo: str
-    Envio: int
-
+    
     class Config:
         from_attributes = True
 
+class ListaSchema(BaseModel):
+    IdLista: int
+    Titulo: str
+    
+    class Config:
+        from_attributes = True
+
+class CampanhaSchema(BaseModel):
+    IdCampanha: int
+    Titulo: str
+    Cor: str
+    
+    class Config:
+        from_attributes = True
 
 class Envio(BaseModel):
     IdEnvio: int
-    Campanha: int
-    Lista: int
+    Campanha: Optional[CampanhaSchema] = None
+    Lista: Optional[ListaSchema] = None
     Dt_Envio: date
-    Detalhes: List[Detalhe] = []
-
+    Detalhes: List[Detalhe]
+    
     class Config:
         from_attributes = True

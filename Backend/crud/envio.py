@@ -9,6 +9,7 @@ import smtplib
 from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from sqlalchemy import desc
 
 #Pegando variaveis de ambiente
 load_dotenv()
@@ -58,3 +59,37 @@ def create_envio(db: Session, envio: schemas_envio.EnvioCreate):
     db.commit()
     db.refresh(db_envio)
     return db_envio
+
+
+def get_all_envio(db: Session):
+    envios = db.query(models.Envio).order_by(desc(models.Envio.Dt_Envio)).all()
+    
+    resultados_finais = []
+    
+    for envio in envios:
+        detalhes = db.query(models.Detalhe).filter(models.Detalhe.Envio == envio.IdEnvio).all()
+        lista = db.query(models.Lista).filter(models.Lista.IdLista == envio.Lista).first()
+        campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == envio.Campanha).first()
+        
+        # Constrói o dicionário de forma que o FastAPI possa validar
+        resultado_envio = {
+            "IdEnvio": envio.IdEnvio,
+            "Dt_Envio": envio.Dt_Envio,
+            "Campanha": {
+                "IdCampanha": campanha.IdCampanha,
+                "Titulo": campanha.Titulo,
+                "Cor": campanha.Cor
+            } if campanha else None,
+            "Lista": {
+                "IdLista": lista.IdLista,
+                "Titulo": lista.Titulo
+            } if lista else None,
+            "Detalhes": [{
+                "IdDetalhe": detalhe.IdDetalhe,
+                "Conteudo": detalhe.Conteudo
+            } for detalhe in detalhes]
+        }
+        
+        resultados_finais.append(resultado_envio)
+        
+    return resultados_finais
