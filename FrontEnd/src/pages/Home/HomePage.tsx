@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importe useNavigate
 import { FaPlus, FaPaperPlane, FaCalendarAlt, FaStar, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaExclamationTriangle } from "react-icons/fa";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
 interface Lista {
@@ -27,15 +27,15 @@ interface Envio {
     };
     campanha: string;
     lista: string;
-    erros?: string[]; // Adicionei a propriedade de erros para simular o caso de detalhes
+    erros?: string[];
 }
 
 const HomePage: React.FC = () => {
+    const navigate = useNavigate(); // Inicialize o hook de navegação
     const [listas, setListas] = useState<Lista[]>([]);
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [enviosRecentes, setEnviosRecentes] = useState<Envio[]>([]);
     const [loading, setLoading] = useState(true);
-    const [expandedEnvioId, setExpandedEnvioId] = useState<string | null>(null);
 
     const mockEnviosRecentes: Envio[] = [
         {
@@ -125,27 +125,65 @@ const HomePage: React.FC = () => {
         return date.toLocaleDateString('pt-BR');
     };
 
-    const toggleEnvioDetails = (id: string) => {
-        setExpandedEnvioId(expandedEnvioId === id ? null : id);
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-screen p-6 bg-white">
-                <div className="max-w-7xl mx-auto space-y-12">
-                    <Skeleton className="h-64 w-full" />
-                    <Skeleton className="h-96 w-full" />
-                    <Skeleton className="h-64 w-full" />
+    const renderSkeletons = () => (
+        <>
+            <div className="pt-30 pb-8 bg-slate-200 -mt-24">
+                <div className="max-w-7xl mx-auto px-8">
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="h-8 bg-gray-300 rounded w-64 animate-pulse"></div>
+                        <div className="h-8 bg-gray-300 rounded w-24 animate-pulse"></div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="h-48 rounded-xl bg-gray-300 animate-pulse"></div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        );
+
+            <div className="bg-white/70 backdrop-blur-sm">
+                <div className="max-w-7xl mx-auto px-8 py-8 space-y-12">
+                    <div className="py-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <div className="h-8 bg-gray-300 rounded w-56 animate-pulse"></div>
+                            <div className="h-8 bg-gray-300 rounded w-24 animate-pulse"></div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="h-24 rounded-xl bg-gray-200 animate-pulse"></div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="py-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <div className="h-8 bg-gray-300 rounded w-48 animate-pulse"></div>
+                            <div className="h-8 bg-gray-300 rounded w-24 animate-pulse"></div>
+                        </div>
+                        <div className="space-y-4">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className="h-28 rounded-xl bg-gray-200 animate-pulse"></div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="text-center mt-12 pb-8">
+                        <div className="h-14 w-64 mx-auto rounded-2xl bg-gray-300 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+
+    if (loading) {
+        return renderSkeletons();
     }
 
     return (
         <div className="min-h-screen">
 
             {/* Seção Campanhas Recentes */}
-            <div className="pt-24 pb-8 bg-slate-100 -mt-24">
+            <div className="pt-30 pb-8 bg-slate-200 -mt-24">
                 <div className="max-w-7xl mx-auto px-8">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -154,7 +192,11 @@ const HomePage: React.FC = () => {
                             </span>
                             Campanhas Acessadas Recentemente
                         </h2>
-                        <Button variant="link" className="text-gray-600 hover:text-blue-500">
+                        <Button
+                            variant="link"
+                            className="text-gray-600 hover:text-blue-500"
+                            onClick={() => navigate('/campanhas')} // Rota de campanhas
+                        >
                             Ver Todas <FaArrowRight className="ml-2" />
                         </Button>
                     </div>
@@ -162,15 +204,16 @@ const HomePage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         {/* Botão para criar nova campanha */}
                         <div
-                            className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-300 transform hover:scale-105 hover:shadow-lg h-48 cursor-pointer flex items-center justify-center p-4
-                                border-white/50 bg-white/80 hover:border-blue-400`}
+                            className={`group relative overflow-hidden rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg h-48 cursor-pointer flex items-center justify-center p-4
+                                 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-blue-600/60 via-indigo-500 to-cyan-500/60 text-white `}
+                            onClick={() => navigate('/create_campanha')}
                         >
                             <div className="bg-gradient-to-br from-blue-600/50 via-indigo-500/50 to-cyan-500/50 absolute inset-0 opacity-10"></div>
-                            <div className="relative z-10 flex flex-col items-center justify-center h-full">
+                            <div className="relative flex flex-col items-center justify-center h-full">
                                 <div className="p-4 rounded-full bg-blue-500/20 backdrop-blur-sm border border-white/50 mb-2 transition-all duration-300 group-hover:bg-blue-500/60">
-                                    <FaPlus className="text-blue-500 text-3xl group-hover:text-white transition-all duration-300" />
+                                    <FaPlus className="text-3xl text-white transition-all duration-300" />
                                 </div>
-                                <span className="text-gray-700 font-semibold text-center transition-colors group-hover:text-blue-700">Criar Nova Campanha</span>
+                                <span className=" font-semibold text-center transition-colors">Criar Nova Campanha</span>
                             </div>
                         </div>
 
@@ -185,9 +228,9 @@ const HomePage: React.FC = () => {
                                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
                                         <iframe
                                             srcDoc={campanha.Documento}
-                                            className="w-[640px] h-[850px] border-none scale-[0.47] origin-top-left"
+                                            className="w-[640px] h-[850px] border-none scale-[0.359] origin-top-left"
                                             style={{
-                                                marginTop: '50px',
+                                                marginTop: '0px',
                                                 filter: 'blur(0.5px)',
                                             }}
                                             frameBorder="0"
@@ -234,7 +277,11 @@ const HomePage: React.FC = () => {
                                 </span>
                                 Listas Acessadas Recentemente
                             </h2>
-                            <Button variant="link" className="text-gray-600 hover:text-purple-500">
+                            <Button
+                                variant="link"
+                                className="text-gray-600 hover:text-purple-500"
+                                onClick={() => navigate('/lista')} // Rota de listas
+                            >
                                 Ver Todas <FaArrowRight className="ml-2" />
                             </Button>
                         </div>
@@ -271,7 +318,11 @@ const HomePage: React.FC = () => {
                                 </span>
                                 Últimos Envios
                             </h2>
-                            <Button variant="link" className="text-gray-600 hover:text-green-500">
+                            <Button
+                                variant="link"
+                                className="text-gray-600 hover:text-green-500"
+                                onClick={() => navigate('/envios')} // Rota de envios
+                            >
                                 Ver Todos <FaArrowRight className="ml-2" />
                             </Button>
                         </div>
@@ -281,7 +332,6 @@ const HomePage: React.FC = () => {
                                     <div key={envio.id}>
                                         <div
                                             className="p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm hover:border-green-400 cursor-pointer"
-                                            onClick={() => toggleEnvioDetails(envio.id)}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
@@ -320,23 +370,6 @@ const HomePage: React.FC = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        {expandedEnvioId === envio.id && (
-                                            <div className="mt-2 p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
-                                                <h4 className="font-semibold text-gray-700 mb-2">Detalhes do Envio:</h4>
-                                                {envio.erros && envio.erros.length > 0 ? (
-                                                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                                                        {envio.erros.map((erro, index) => (
-                                                            <li key={index} className="flex items-start gap-2">
-                                                                <FaExclamationTriangle className="text-red-500 mt-1" />
-                                                                <span>{erro}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                ) : (
-                                                    <p className="text-sm text-gray-600">Nenhum problema encontrado neste envio.</p>
-                                                )}
-                                            </div>
-                                        )}
                                     </div>
                                 ))
                             ) : (
@@ -347,8 +380,8 @@ const HomePage: React.FC = () => {
 
                     {/* Botão Realizar Envio */}
                     <div className="text-center mt-12 pb-8">
-                        <a
-                            href="/criar-envio"
+                        <Button
+                            onClick={() => navigate('/create_envio')} // Rota de envio
                             className={`inline-flex items-center justify-center
                                 px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105
                                 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))]
@@ -357,7 +390,7 @@ const HomePage: React.FC = () => {
                             <FaPaperPlane className="mr-3 text-2xl" />
                             Realizar Envio
                             <FaArrowRight className="ml-3 transition-transform group-hover:translate-x-1" />
-                        </a>
+                        </Button>
                     </div>
                 </div>
             </div>

@@ -54,11 +54,11 @@ const Layout: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Navbar */}
-      <nav className="bg-blue-600 text-white p-4 shadow-lg relative z-50">
+      <nav className="bg-white/85 text-slate-700 p-4 shadow-lg fixed z-10 w-[100vw] top-0 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <button
             onClick={toggleSidebar}
-            className="p-2 hover:bg-blue-700 rounded-md transition-colors duration-200"
+            className="p-2 hover:bg-slate-200 rounded-md transition-colors duration-200"
             aria-label="Abrir menu"
           >
             <svg
@@ -85,13 +85,13 @@ const Layout: React.FC = () => {
         className={`transition-opacity duration-300 ${sidebarOpen
           ? "opacity-100 pointer-events-auto"
           : "opacity-0 pointer-events-none"
-          } backdrop-blur-[5px] fixed inset-0 bg-black/10 z-50`}
+          } backdrop-blur-[5px] fixed inset-0 bg-black/10 z-15`}
         onClick={closeSidebar}
       ></div>
 
       {/* Sidebar */}
       <div
-        className={`rounded-2xl bg-white/85 fixed top-0 mt-[2.5vh] left-0 h-[95vh] w-[300px] shadow-lg transform transition-transform duration-300 z-50 overflow-y-auto ${sidebarOpen ? 'translate-x-[20px]' : '-translate-x-full'
+        className={`rounded-2xl bg-white/90 fixed top-0 mt-[2.5vh] left-0 h-[95vh] w-[300px] shadow-lg transform transition-transform duration-300 z-20 overflow-y-auto ${sidebarOpen ? 'translate-x-[20px]' : '-translate-x-full'
           }`}
       >
         <div className="p-4">
@@ -218,8 +218,10 @@ const Layout: React.FC = () => {
       </div>
 
       {/* Conteúdo principal */}
-      <main className="p-4">
-        <Outlet />
+      <main>
+        <div className='mt-20'>
+          <Outlet />
+        </div>
       </main>
 
       {/* Footer */}

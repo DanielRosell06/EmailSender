@@ -1,10 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { FaTimes } from 'react-icons/fa'
 
 // Crie uma interface para tipar os props do componente
 interface ModalProps {
     buttonClassName?: string;
-    buttonTitle?: string;
+    buttonTitle?: ReactNode;
     modalTitle?: string;
     onClose?: Function;
     width?: number;
@@ -32,14 +32,12 @@ function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose, is
             </button>
 
             {isModalOpen && (
-                // A classe dinâmica de width foi removida daqui
-                <div className={`fixed inset-0 z-[100] flex flex-col items-center justify-center p-4`}>
+                <div className={`w-[100vw] h-[100vh] fixed inset-0 z-50 flex flex-col items-center justify-center p-4`}>
 
-                    <div className="absolute inset-0 bg-stone-900/30 backdrop-blur-sm"></div>
+                    <div className="z-40 absolute inset-0 bg-stone-900/30 backdrop-blur-sm"></div>
 
-                    {/* E a lógica do width foi movida para o atributo 'style' aqui */}
                     <div
-                        className='relative w-auto min-w-96 z-10'
+                        className='relative w-auto min-w-96 z-50'
                         style={{ width: width ? `${width}px` : undefined }}
                     >
                         <div
