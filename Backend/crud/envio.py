@@ -53,13 +53,8 @@ def create_envio(db: Session, envio: schemas_envio.EnvioCreate):
     campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == envio.Campanha).first()
     lista = db.query(models.Email).filter(models.Email.Lista == envio.Lista).all()
 
-    documento_com_tag = campanha.Documento + ' <img src="http://127.0.0.1:8000/envio_update_detalhes">'
 
-    msg = MIMEMultipart()
-    msg['From'] = SMTP_USER
-    msg['Subject'] = campanha.Titulo
-
-    msg.attach(MIMEText(documento_com_tag, 'html', 'utf-8'))
+    
 
     db_envio = models.Envio(
         Lista = envio.Lista,
@@ -78,6 +73,14 @@ def create_envio(db: Session, envio: schemas_envio.EnvioCreate):
             for email_obj in lista:
                 email = email_obj.Conteudo
                 token = generate_token(email, db_envio.IdEnvio)
+                documento_com_tag = campanha.Documento + f' <img src="http://127.0.0.1:8000/envio_update_detalhes?token={token}">'
+
+                # Criando a mensagem de email
+                msg = MIMEMultipart()
+                msg['From'] = SMTP_USER
+                msg['Subject'] = campanha.Titulo
+                msg.attach(MIMEText(documento_com_tag, 'html', 'utf-8'))
+
                 db_status = models.StatusEnvio(
                     IdEnvio = db_envio.IdEnvio,
                     IdEmail = email_obj.IdEmail,
