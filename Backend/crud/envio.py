@@ -60,8 +60,7 @@ def create_envio(db: Session, envio: schemas_envio.EnvioCreate):
     db.refresh(db_envio)
     return db_envio
 
-
-def get_all_envio(db: Session):
+def get_all_envio_com_lista_campanha_detalhe(db: Session):
     envios = db.query(models.Envio).order_by(desc(models.Envio.Dt_Envio)).all()
     
     resultados_finais = []

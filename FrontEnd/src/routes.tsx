@@ -7,6 +7,7 @@ import CreateEnvioPage from './pages/Envio/CreateEnvioPage.tsx';
 import CreateCampanhaPage from "./pages/Campanha/CreateCampanhaPage.tsx";
 import ListPage from "./pages/Lista/ListPage.tsx";
 import HomePage from "./pages/Home/HomePage.tsx";
+import CampanhaPage from "./pages/Campanha/CampanhaPage.tsx";
 
 
 const router = createBrowserRouter([
@@ -23,6 +24,9 @@ const router = createBrowserRouter([
                 element: <CreateEnvioPage />,
             },
             {
+                path: "campanha",
+                element: <CampanhaPage />,
+            },{
                 path: "create_campanha",
                 element: <CreateCampanhaPage />,
             },

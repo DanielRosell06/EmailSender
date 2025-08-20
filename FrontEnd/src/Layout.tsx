@@ -168,7 +168,7 @@ const Layout: React.FC = () => {
             {/* Botão Campanhas */}
             <div className='flex flex-col'>
               <div
-                onClick={() => handleNavigate('/create_campanha')}
+                onClick={() => handleNavigate('/campanha')}
                 className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/create_campanha' ? 'bg-gray-200' : 'hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-blue-600/60 via-indigo-500 to-cyan-500/60 hover:text-white'
                   }`}
               >
