@@ -65,3 +65,22 @@ class Detalhe(Base):
     
     # Relacionamento de volta para Envio
     envio_pai = relationship("Envio", back_populates="detalhes")
+
+class StatusEnvio(Base):
+    __tablename__ = "status_envio"
+
+    IdStatusEnvio = Column(Integer, primary_key=True, nullable=False, index=True)
+    
+    # Chaves estrangeiras
+    IdEnvio = Column(Integer, ForeignKey("envio.IdEnvio"), nullable=False)
+    IdEmail = Column(Integer, ForeignKey("email.IdEmail"), nullable=False)
+    
+    # Coluna para o token
+    Token = Column(String, unique=True, index=True)
+    
+    # Coluna para o status
+    Visto = Column(Boolean, default=False)
+    
+    # Relacionamentos
+    envio_pai = relationship("Envio")
+    email_pai = relationship("Email")
