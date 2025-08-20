@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 
 #Pegando variaveis de ambiente
 load_dotenv()
@@ -61,16 +62,24 @@ def create_envio(db: Session, envio: schemas_envio.EnvioCreate):
     return db_envio
 
 def get_all_envio_com_lista_campanha_detalhe(db: Session):
-    envios = db.query(models.Envio).order_by(desc(models.Envio.Dt_Envio)).all()
+    envios_com_relacoes = (
+        db.query(models.Envio)
+        .options(
+            joinedload(models.Envio.detalhes),
+            joinedload(models.Envio.lista_pai),   # Alterado de .Lista para .lista_pai
+            joinedload(models.Envio.campanha_pai) # Alterado de .Campanha para .campanha_pai
+        )
+        .order_by(desc(models.Envio.Dt_Envio))
+        .all()
+    )
     
     resultados_finais = []
     
-    for envio in envios:
-        detalhes = db.query(models.Detalhe).filter(models.Detalhe.Envio == envio.IdEnvio).all()
-        lista = db.query(models.Lista).filter(models.Lista.IdLista == envio.Lista).first()
-        campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == envio.Campanha).first()
+    for envio in envios_com_relacoes:
+        campanha = envio.campanha_pai
+        lista = envio.lista_pai
+        detalhes = envio.detalhes
         
-        # Constrói o dicionário de forma que o FastAPI possa validar
         resultado_envio = {
             "IdEnvio": envio.IdEnvio,
             "Dt_Envio": envio.Dt_Envio,

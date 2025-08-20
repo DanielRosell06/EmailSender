@@ -47,6 +47,10 @@ class Envio(Base):
     Lista = Column(Integer, ForeignKey("lista.IdLista"))
     Campanha = Column(Integer, ForeignKey("campanha.IdCampanha"))
 
+    # Relacionamento com lista e campanha
+    lista_pai = relationship("Lista")
+    campanha_pai = relationship("Campanha")
+
     # Relacionamento com Detalhe (um envio tem muitos detalhes)
     detalhes = relationship("Detalhe", back_populates="envio_pai")
 
