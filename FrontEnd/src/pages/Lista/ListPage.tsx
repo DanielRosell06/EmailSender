@@ -42,10 +42,13 @@ const ListasPage: React.FC = () => {
     const [loadingListas, setLoadingListas] = useState(true);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
 
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
     // Efeito para buscar Listas
     useEffect(() => {
         setLoadingListas(true);
-        fetch("http://127.0.0.1:8000/all_lista")
+        fetch(`${backendUrl}/all_lista`)
             .then(res => res.json())
             .then(data => {
                 const sortedListas = data.sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime()).slice(0, 5);
@@ -60,7 +63,7 @@ const ListasPage: React.FC = () => {
     // Efeito para buscar Envios
     useEffect(() => {
         setLoadingEnvios(true);
-        fetch("http://127.0.0.1:8000/get_all_envio_com_lista_campanha_detalhe")
+        fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`)
             .then(res => res.json())
             .then(data => {
                 const sortedEnvios = data.slice(0, 5);

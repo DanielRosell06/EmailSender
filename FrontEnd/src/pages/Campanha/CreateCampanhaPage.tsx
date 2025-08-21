@@ -61,6 +61,8 @@ export default function CreateCampanhaPage() {
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false)
     const navigate = useNavigate();
 
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
     const copyToClipboard = () => {
         navigator.clipboard.writeText(htmlCode)
     }
@@ -73,7 +75,7 @@ export default function CreateCampanhaPage() {
                 Documento: htmlCode
             }
 
-            const response = await fetch('http://127.0.0.1:8000/campanhas', {
+            const response = await fetch(`${backendUrl}/campanhas`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -25,12 +25,15 @@ const CreateEnvioPage: React.FC = () => {
     const [selectedCampanha, setSelectedCampanha] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
+
     useEffect(() => {
         setLoading(true);
 
         Promise.all([
-            fetch("http://127.0.0.1:8000/all_lista").then(res => res.json()),
-            fetch("http://127.0.0.1:8000/all_campanha").then(res => res.json())
+            fetch(`${backendUrl}/all_lista`).then(res => res.json()),
+            fetch(`${backendUrl}/all_campanha`).then(res => res.json())
         ])
             .then(([listasData, campanhasData]) => {
                 setListas(listasData);
@@ -52,7 +55,7 @@ const CreateEnvioPage: React.FC = () => {
             };
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/envio', {
+                const response = await fetch(`${backendUrl}/envio`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

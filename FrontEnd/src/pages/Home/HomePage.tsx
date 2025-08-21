@@ -52,11 +52,14 @@ const HomePage: React.FC = () => {
     const [loadingCampanhas, setLoadingCampanhas] = useState(true);
     const [loadingListas, setLoadingListas] = useState(true);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     // Efeito para buscar Campanhas
     useEffect(() => {
         setLoadingCampanhas(true);
-        fetch("http://127.0.0.1:8000/all_campanha")
+        console.log("Backend =" + backendUrl)
+        
+        fetch(`${backendUrl}/all_campanha`)
             .then(res => res.json())
             .then(data => {
                 const sortedCampanhas = data
@@ -71,7 +74,7 @@ const HomePage: React.FC = () => {
     // Efeito para buscar Listas
     useEffect(() => {
         setLoadingListas(true);
-        fetch("http://127.0.0.1:8000/all_lista")
+        fetch(`${backendUrl}/all_lista`)
             .then(res => res.json())
             .then(data => {
                 const sortedListas = data
@@ -86,7 +89,7 @@ const HomePage: React.FC = () => {
     // Efeito para buscar Envios
     useEffect(() => {
         setLoadingEnvios(true);
-        fetch("http://127.0.0.1:8000/get_all_envio_com_lista_campanha_detalhe")
+        fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`)
             .then(res => res.json())
             .then(data => {
                 const sortedEnvios = data.slice(0, 5);

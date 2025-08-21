@@ -18,10 +18,12 @@ const CampanhasPage: React.FC = () => {
     const [selectedCampanha, setSelectedCampanha] = useState<Campanha | null>(null);
     const navigate = useNavigate();
 
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
     useEffect(() => {
         setLoading(true);
 
-        fetch("http://127.0.0.1:8000/all_campanha")
+        fetch(`${backendUrl}/all_campanha`)
             .then(res => res.json())
             .then(data => {
                 setCampanhas(data);

@@ -16,13 +16,15 @@ import {
 } from "@/components/ui/table";
 
 // URL da sua API
-const API_URL = "http://127.0.0.1:8000";
+
 
 const CreateListModal = () => {
   const [listaTitle, setListaTitle] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
   // Função para adicionar um e-mail ao estado
   const handleAddEmail = () => {
@@ -45,7 +47,7 @@ const CreateListModal = () => {
         Emails: emails
       };
 
-      const response = await fetch(`${API_URL}/listas/`, {
+      const response = await fetch(`${backendUrl}/listas/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
