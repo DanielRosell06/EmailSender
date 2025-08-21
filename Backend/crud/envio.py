@@ -74,7 +74,7 @@ def create_envio(db: Session, envio: schemas_envio.EnvioCreate):
             for email_obj in lista:
                 email = email_obj.Conteudo
                 token = generate_token(email, db_envio.IdEnvio)
-                documento_com_tag = campanha.Documento + f' <img src="http://{SERVER_URL}/envio_update_detalhes?token={token}">'
+                documento_com_tag = campanha.Documento + f' <img src="http://{SERVER_URL}/update_status_envio?token={token}">'
 
                 # Criando a mensagem de email
                 msg = MIMEMultipart()
