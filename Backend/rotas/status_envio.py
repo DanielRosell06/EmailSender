@@ -7,6 +7,8 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 import io
 
+from schema import status_envio as schema_status_envio
+
 from crud import status_envio as crud_status_envio
 
 router = APIRouter()
@@ -23,3 +25,12 @@ def update_status_envio(token: Optional[str] = None, db: Session = Depends(get_d
     crud_status_envio.update_status_envio(db, token)
 
     return StreamingResponse(io.BytesIO(TRANSPARENT_GIF_DATA), media_type="image/png")
+
+@router.get("/get_status_envio_by_envio/", response_model=list[schema_status_envio.Status])
+def get_status_envio_by_envio(id_envio: Optional[int] = None, db: Session = Depends(get_db),):
+    """
+    Rota para contagem de abertura dos emails, retornando uma imagem transparente de 1x1.
+    """
+    status = crud_status_envio.get_status_envio_by_envio(db, id_envio)
+
+    return status
