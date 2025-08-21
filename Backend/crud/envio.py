@@ -21,6 +21,7 @@ SMTP_DOMAIN = os.getenv("SMTP_DOMAIN")
 SMTP_USER = os.getenv("SMTP_USER")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 578))
+SERVER_URL = os.getenv("SERVER_URL")
 
 def generate_token(original_string, user_number):
     """
@@ -73,7 +74,7 @@ def create_envio(db: Session, envio: schemas_envio.EnvioCreate):
             for email_obj in lista:
                 email = email_obj.Conteudo
                 token = generate_token(email, db_envio.IdEnvio)
-                documento_com_tag = campanha.Documento + f' <img src="http://127.0.0.1:8000/envio_update_detalhes?token={token}">'
+                documento_com_tag = campanha.Documento + f' <img src="http://{SERVER_URL}/envio_update_detalhes?token={token}">'
 
                 # Criando a mensagem de email
                 msg = MIMEMultipart()
