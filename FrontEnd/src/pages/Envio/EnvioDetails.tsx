@@ -34,7 +34,8 @@ const EnvioDetailsPage = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`http://127.0.0.1:8000/get_status_envio_by_envio?id_envio=${idEnvio}`);
+                // AQUI A MUDANÇA: Usando a variável de ambiente
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/get_status_envio_by_envio?id_envio=${idEnvio}`);
                 
                 if (!response.ok) {
                     throw new Error("Falha ao buscar dados do servidor.");

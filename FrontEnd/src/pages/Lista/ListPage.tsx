@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaPaperPlane, FaArrowRight } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import CreateListModal from "@/components/Lista/createModal";
+import { useNavigate } from "react-router-dom";
 
 // Interface para as Listas e Envios
 interface Lista {
@@ -42,8 +43,8 @@ const ListasPage: React.FC = () => {
     const [loadingListas, setLoadingListas] = useState(true);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
 
-
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const navigate = useNavigate();
 
     // Efeito para buscar Listas
     useEffect(() => {
@@ -58,7 +59,7 @@ const ListasPage: React.FC = () => {
                 setListas([]);
             })
             .finally(() => setLoadingListas(false));
-    }, []);
+    }, [backendUrl]);
 
     // Efeito para buscar Envios
     useEffect(() => {
@@ -71,11 +72,15 @@ const ListasPage: React.FC = () => {
             })
             .catch(() => setEnviosRecentes([]))
             .finally(() => setLoadingEnvios(false));
-    }, []);
+    }, [backendUrl]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('pt-BR');
+    };
+
+    const handleEnvioClick = (idEnvio: number) => {
+        navigate(`/envio_detail/${idEnvio}`);
     };
 
     // Função de renderização para a seção de Listas
@@ -139,6 +144,7 @@ const ListasPage: React.FC = () => {
                     enviosRecentes.map((envio) => (
                         <div
                             key={envio.IdEnvio}
+                            onClick={() => handleEnvioClick(envio.IdEnvio)} // Adicionado onClick para navegação
                             className="p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm hover:border-green-400 cursor-pointer"
                         >
                             <div className="flex items-center gap-3">

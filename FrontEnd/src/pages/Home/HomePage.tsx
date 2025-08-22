@@ -48,13 +48,11 @@ const HomePage: React.FC = () => {
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [enviosRecentes, setEnviosRecentes] = useState<Envio[]>([]);
 
-    // Estados de carregamento individuais
     const [loadingCampanhas, setLoadingCampanhas] = useState(true);
     const [loadingListas, setLoadingListas] = useState(true);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
-    // Efeito para buscar Campanhas
     useEffect(() => {
         setLoadingCampanhas(true);
         console.log("Backend =" + backendUrl)
@@ -71,7 +69,6 @@ const HomePage: React.FC = () => {
             .finally(() => setLoadingCampanhas(false));
     }, []);
 
-    // Efeito para buscar Listas
     useEffect(() => {
         setLoadingListas(true);
         fetch(`${backendUrl}/all_lista`)
@@ -86,7 +83,6 @@ const HomePage: React.FC = () => {
             .finally(() => setLoadingListas(false));
     }, []);
 
-    // Efeito para buscar Envios
     useEffect(() => {
         setLoadingEnvios(true);
         fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`)
@@ -118,6 +114,11 @@ const HomePage: React.FC = () => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('pt-BR');
+    };
+    
+    // Função para navegar para a página de detalhes do envio
+    const handleEnvioClick = (idEnvio: number) => {
+        navigate(`/envio_detail/${idEnvio}`);
     };
 
     const renderCampanhas = () => {
@@ -245,7 +246,7 @@ const HomePage: React.FC = () => {
             <div className="space-y-4">
                 {enviosRecentes.length > 0 ? (
                     enviosRecentes.map((envio) => (
-                        <div key={envio.IdEnvio}>
+                        <div key={envio.IdEnvio} onClick={() => handleEnvioClick(envio.IdEnvio)}>
                             <div
                                 className="p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 hover:scale-[1.01] hover:shadow-sm hover:border-green-400 cursor-pointer"
                             >
@@ -289,11 +290,8 @@ const HomePage: React.FC = () => {
         );
     };
 
-    // A renderização principal agora não tem mais a verificação `if (loading)`.
-    // Cada seção se renderiza com seu próprio estado de carregamento.
     return (
         <div className="min-h-screen">
-
             {/* Seção Campanhas Recentes */}
             <div className="pt-30 pb-8 bg-slate-200 -mt-24">
                 <div className="max-w-7xl mx-auto px-8">
@@ -315,7 +313,6 @@ const HomePage: React.FC = () => {
                     {renderCampanhas()}
                 </div>
             </div>
-
             <div className="bg-white/70 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-8 py-8 space-y-12">
                     {/* Seção Listas Recentes */}
@@ -337,7 +334,6 @@ const HomePage: React.FC = () => {
                         </div>
                         {renderListas()}
                     </div>
-
                     {/* Seção Últimos Envios */}
                     <div className="py-6">
                         <div className="flex justify-between items-center mb-6">
@@ -357,7 +353,6 @@ const HomePage: React.FC = () => {
                         </div>
                         {renderEnvios()}
                     </div>
-
                     {/* Botão Realizar Envio */}
                     <div className="text-center mt-12 pb-8">
                         <Button
