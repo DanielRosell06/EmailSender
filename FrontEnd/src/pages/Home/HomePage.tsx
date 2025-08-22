@@ -34,12 +34,21 @@ interface ListaEnvio {
   Titulo: string;
 }
 
+// Nova interface para o status do envio
+interface StatusEnvio {
+    IdEmail: string;
+    Visto: boolean;
+}
+
+// Modificamos a interface de Envio para incluir as contagens
 interface Envio {
-  IdEnvio: number;
-  Dt_Envio: string;
-  Detalhes: DetalheEnvio[];
-  Campanha: CampanhaEnvio;
-  Lista: ListaEnvio;
+    IdEnvio: number;
+    Dt_Envio: string;
+    Detalhes: DetalheEnvio[];
+    Campanha: CampanhaEnvio;
+    Lista: ListaEnvio;
+    aberturas?: number;
+    entregas?: number;
 }
 
 const HomePage: React.FC = () => {
@@ -84,16 +93,41 @@ const HomePage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        setLoadingEnvios(true);
-        fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`)
-            .then(res => res.json())
-            .then(data => {
-                const sortedEnvios = data.slice(0, 5);
-                setEnviosRecentes(sortedEnvios);
-            })
-            .catch(() => setEnviosRecentes([]))
-            .finally(() => setLoadingEnvios(false));
-    }, []);
+        const fetchEnviosData = async () => {
+            setLoadingEnvios(true);
+            try {
+                const res = await fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`);
+                const envios: Envio[] = await res.json();
+                const sortedEnvios = envios.slice(0, 5);
+
+                const enviosComContagem = await Promise.all(
+                    sortedEnvios.map(async (envio) => {
+                        try {
+                            const statusRes = await fetch(`${backendUrl}/get_status_envio_by_envio?id_envio=${envio.IdEnvio}`);
+                            const statusData: { Status: StatusEnvio[] } = await statusRes.json();
+                            
+                            const entregues = statusData.Status.length;
+                            const aberturas = statusData.Status.filter(s => s.Visto).length;
+                            
+                            return { ...envio, entregas: entregues, aberturas: aberturas };
+                        } catch (error) {
+                            console.error(`Erro ao buscar status para o envio ${envio.IdEnvio}:`, error);
+                            return { ...envio, entregas: 0, aberturas: 0 };
+                        }
+                    })
+                );
+                
+                setEnviosRecentes(enviosComContagem);
+            } catch (error) {
+                console.error("Erro ao carregar envios recentes:", error);
+                setEnviosRecentes([]);
+            } finally {
+                setLoadingEnvios(false);
+            }
+        };
+
+        fetchEnviosData();
+    }, [backendUrl]);
 
     const getGradientFromColor = (cor: string) => {
         const colorMap: { [key: string]: string } = {
@@ -273,11 +307,11 @@ const HomePage: React.FC = () => {
                                 <div className="flex justify-start gap-8 mt-4 pl-12 text-gray-600">
                                     <div className="flex items-center gap-2 text-sm">
                                         <FaChartBar className="text-gray-400" />
-                                        <span>Entregues: <span className="font-semibold text-green-700">{/* ACRESCENTAR ENTREGAS */}</span></span>
+                                        <span>Entregues: <span className="font-semibold text-green-700">{envio.entregas !== undefined ? envio.entregas : '...'}</span></span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm">
                                         <FaUserShield className="text-gray-400" />
-                                        <span>Aberturas: <span className="font-semibold text-blue-700">{/* ACRESCENTAR ABERTURAS*/}</span></span>
+                                        <span>Aberturas: <span className="font-semibold text-blue-700">{envio.aberturas !== undefined ? envio.aberturas : '...'}</span></span>
                                     </div>
                                 </div>
                             </div>
