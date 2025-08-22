@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 interface Lista {
     IdLista: number;
@@ -24,13 +25,12 @@ const CreateEnvioPage: React.FC = () => {
     const [selectedLista, setSelectedLista] = useState<number | null>(null);
     const [selectedCampanha, setSelectedCampanha] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
-
     useEffect(() => {
         setLoading(true);
-
         Promise.all([
             fetch(`${backendUrl}/all_lista`).then(res => res.json()),
             fetch(`${backendUrl}/all_campanha`).then(res => res.json())
@@ -44,38 +44,17 @@ const CreateEnvioPage: React.FC = () => {
                 setCampanhas([]);
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [backendUrl]);
 
-    const handleEnvio = async () => {
+    const handleEnvio = () => {
         if (selectedLista && selectedCampanha) {
-
-            const payload = {
+            const envioData = {
                 Lista: selectedLista,
                 Campanha: selectedCampanha
             };
 
-            try {
-                const response = await fetch(`${backendUrl}/envio`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                console.log('Resposta do servidor:', result);
-
-                alert(`Campanha "${selectedCampanha}" enviada com sucesso para a lista "${selectedLista}"!`);
-
-            } catch (error) {
-                console.error('Falha ao enviar os dados:', error);
-                alert('Ocorreu um erro ao tentar enviar os dados. Verifique o console para mais detalhes.');
-            }
+            // Redireciona para a página de carregamento, passando os dados de envio no estado
+            navigate('/envio_progress', { state: { envioData } });
         } else {
             alert('Por favor, selecione uma lista e uma campanha antes de enviar.');
         }
@@ -83,18 +62,17 @@ const CreateEnvioPage: React.FC = () => {
 
     const getGradientFromColor = (cor: string) => {
         const colorMap: { [key: string]: string } = {
-            'Azul': 'from-blue-500/100 via-indigo-500/60 to-purple-600/60', // Azul → índigo → roxo
-            'Verde': 'from-green-500/100 via-emerald-500/60 to-teal-600/60', // Verde → esmeralda → teal
-            'Roxo': 'from-purple-500/100 via-violet-500/60 to-indigo-600/60', // Roxo → violeta → índigo
-            'Rosa': 'from-pink-500/100 via-rose-500/60 to-red-600/60', // Rosa → rose → vermelho
-            'Vermelho': 'from-red-500/100 via-pink-500/60 to-rose-600/60', // Vermelho → rosa → rose
-            'Laranja': 'from-orange-500/100 via-amber-500/60 to-yellow-600/60', // Laranja → âmbar → amarelo
-            'Amarelo': 'from-yellow-500/100 via-amber-500/60 to-orange-600/60', // Amarelo → âmbar → laranja
-            'Ciano': 'from-cyan-500/100 via-sky-500/60 to-blue-600/60', // Ciano → sky → azul
-            'Indigo': 'from-indigo-500/100 via-purple-500/60 to-violet-600/60', // Índigo → roxo → violeta
-            'Cinza': 'from-gray-500/100 via-slate-500/60 to-zinc-600/60', // Cinza → slate → zinc
+            'Azul': 'from-blue-500/100 via-indigo-500/60 to-purple-600/60',
+            'Verde': 'from-green-500/100 via-emerald-500/60 to-teal-600/60',
+            'Roxo': 'from-purple-500/100 via-violet-500/60 to-indigo-600/60',
+            'Rosa': 'from-pink-500/100 via-rose-500/60 to-red-600/60',
+            'Vermelho': 'from-red-500/100 via-pink-500/60 to-rose-600/60',
+            'Laranja': 'from-orange-500/100 via-amber-500/60 to-yellow-600/60',
+            'Amarelo': 'from-yellow-500/100 via-amber-500/60 to-orange-600/60',
+            'Ciano': 'from-cyan-500/100 via-sky-500/60 to-blue-600/60',
+            'Indigo': 'from-indigo-500/100 via-purple-500/60 to-violet-600/60',
+            'Cinza': 'from-gray-500/100 via-slate-500/60 to-zinc-600/60',
         };
-
         return colorMap[cor] || 'from-gray-600/60 via-slate-500/60 to-zinc-600/60';
     };
 
@@ -121,9 +99,8 @@ const CreateEnvioPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen ">
+        <div className="min-h-screen">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-gray-800 mb-4">
                         Envio de Campanhas
@@ -132,9 +109,7 @@ const CreateEnvioPage: React.FC = () => {
                         Selecione uma lista e uma campanha para realizar o envio
                     </p>
                 </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    {/* Seção de Listas */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
@@ -142,7 +117,6 @@ const CreateEnvioPage: React.FC = () => {
                             </div>
                             <h2 className="text-2xl font-semibold text-gray-800">Listas de E-mails</h2>
                         </div>
-
                         <div className="grid gap-4">
                             {listas.map((lista) => (
                                 <div
@@ -153,7 +127,6 @@ const CreateEnvioPage: React.FC = () => {
                                         }`}
                                     onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
                                 >
-                                    {/* Header com gradiente sutil */}
                                     <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 p-4 border-b border-purple-100">
                                         <div className="flex items-center justify-between">
                                             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -167,8 +140,6 @@ const CreateEnvioPage: React.FC = () => {
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Conteúdo */}
                                     <div className="p-4">
                                         <div className="flex items-center justify-between text-sm text-gray-600">
                                             <div className="flex items-center gap-2">
@@ -181,8 +152,6 @@ const CreateEnvioPage: React.FC = () => {
                             ))}
                         </div>
                     </div>
-
-                    {/* Seção de Campanhas */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -190,7 +159,6 @@ const CreateEnvioPage: React.FC = () => {
                             </div>
                             <h2 className="text-2xl font-semibold text-gray-800">Campanhas</h2>
                         </div>
-
                         <div className="grid grid-cols-2 gap-4">
                             {campanhas.map((campanha) => (
                                 <div
@@ -218,9 +186,7 @@ const CreateEnvioPage: React.FC = () => {
                                             />
                                         </div>
                                     )}
-
                                     <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
-
                                     <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
@@ -231,14 +197,12 @@ const CreateEnvioPage: React.FC = () => {
                                                     <FaStar className="text-yellow-300 drop-shadow-lg" />
                                                 )}
                                             </div>
-
                                             {selectedCampanha === campanha.IdCampanha && (
                                                 <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50">
                                                     <div className="w-2 h-2 bg-white rounded-full"></div>
                                                 </div>
                                             )}
                                         </div>
-
                                         <div className="mt-auto">
                                             <div className="flex items-center gap-2 text-sm text-white/90">
                                                 <FaCalendarAlt className="text-white/70" />
@@ -251,8 +215,6 @@ const CreateEnvioPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Botão de Envio */}
                 <div className="text-center mt-12">
                     <div className="inline-block">
                         <Button
@@ -269,7 +231,6 @@ const CreateEnvioPage: React.FC = () => {
                                 : "Enviar Campanha"}
                         </Button>
                     </div>
-
                     {(selectedLista || selectedCampanha) && (
                         <div className="mt-4 text-sm text-gray-600">
                             {selectedLista && !selectedCampanha && "✓ Lista selecionada - Escolha uma campanha"}

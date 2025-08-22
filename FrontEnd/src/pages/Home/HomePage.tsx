@@ -339,7 +339,7 @@ const HomePage: React.FC = () => {
                         <Button
                             variant="link"
                             className="text-gray-600 hover:text-blue-500"
-                            onClick={() => navigate('/campanhas')}
+                            onClick={() => navigate('/campanha')}
                         >
                             Ver Todas <FaArrowRight className="ml-2" />
                         </Button>
