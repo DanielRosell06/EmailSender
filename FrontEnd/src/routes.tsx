@@ -8,6 +8,7 @@ import CreateCampanhaPage from "./pages/Campanha/CreateCampanhaPage.tsx";
 import ListPage from "./pages/Lista/ListPage.tsx";
 import HomePage from "./pages/Home/HomePage.tsx";
 import CampanhaPage from "./pages/Campanha/CampanhaPage.tsx";
+import EnvioDetailsPage from "./pages/Envio/EnvioDetails.tsx";
 
 
 const router = createBrowserRouter([
@@ -20,13 +21,19 @@ const router = createBrowserRouter([
                 element: <HomePage />,
             },
             {
+                path: "envio_detail/:id_envio",
+                element: <EnvioDetailsPage />,
+                loader: ({ params }) => ({ IdEnvio: params.id_envio }),
+            },
+            {
                 path: "create_envio",
                 element: <CreateEnvioPage />,
             },
             {
                 path: "campanha",
                 element: <CampanhaPage />,
-            },{
+            },
+            {
                 path: "create_campanha",
                 element: <CreateCampanhaPage />,
             },
@@ -34,7 +41,6 @@ const router = createBrowserRouter([
                 path: "lista",
                 element: <ListPage />,
             },
-            
         ],
     },
 ]);

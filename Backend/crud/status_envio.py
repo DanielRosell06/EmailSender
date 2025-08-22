@@ -14,11 +14,42 @@ def update_status_envio(db: Session, token: str):
 
 
 def get_status_envio_by_envio(db: Session, id_envio: int):
-    # Faz join com a tabela Email para pegar o Conteudo (email)
-    status = (
+    # 1. Busca o IdCampanha do envio.
+    id_campanha = db.query(models.Envio.Campanha).filter(models.Envio.IdEnvio == id_envio).scalar()
+
+    # 2. Busca os detalhes da campanha associada, se um IdCampanha foi encontrado.
+    campanha_data = None
+    if id_campanha:
+        campanha_data = db.query(models.Campanha.Titulo, models.Campanha.Documento).filter(models.Campanha.IdCampanha == id_campanha).first()
+    
+    # 3. Se a campanha não for encontrada, retorna uma resposta vazia ou um erro.
+    if not campanha_data:
+        return None
+    
+    campanha_schema = schema_status_envio.Campanha(
+        Titulo=campanha_data.Titulo,
+        Documento=campanha_data.Documento
+    )
+
+    # 4. Busca todos os status de envio em uma única consulta
+    status_db = (
         db.query(models.Email.Conteudo, models.StatusEnvio.Visto)
         .join(models.Email, models.Email.IdEmail == models.StatusEnvio.IdEmail)
         .filter(models.StatusEnvio.IdEnvio == id_envio)
         .all()
     )
-    return [schema_status_envio.Status(IdEmail=s.Conteudo, Visto=s.Visto) for s in status]
+
+    # 5. Cria a lista de StatusBase
+    status_list = [
+        schema_status_envio.StatusBase(
+            IdEmail=s.Conteudo,
+            Visto=s.Visto
+        )
+        for s in status_db
+    ]
+    
+    # 6. Retorna o objeto Status, contendo a lista de StatusBase e a Campanha
+    return {
+        "Status": status_list,
+        "Campanha": campanha_schema
+    }

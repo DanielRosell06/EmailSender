@@ -26,7 +26,7 @@ def update_status_envio(token: Optional[str] = None, db: Session = Depends(get_d
 
     return StreamingResponse(io.BytesIO(TRANSPARENT_GIF_DATA), media_type="image/png")
 
-@router.get("/get_status_envio_by_envio/", response_model=list[schema_status_envio.Status])
+@router.get("/get_status_envio_by_envio/", response_model=schema_status_envio.Status)
 def get_status_envio_by_envio(id_envio: Optional[int] = None, db: Session = Depends(get_db),):
     """
     Rota para contagem de abertura dos emails, retornando uma imagem transparente de 1x1.
