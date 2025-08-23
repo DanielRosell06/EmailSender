@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane } from "react-icons/fa";
+import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { Input } from "@/components/ui/input";
 
 interface Lista {
     IdLista: number;
@@ -22,29 +23,59 @@ interface Campanha {
 const CreateEnvioPage: React.FC = () => {
     const [listas, setListas] = useState<Lista[]>([]);
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
+    const [filteredListas, setFilteredListas] = useState<Lista[]>([]);
+    const [filteredCampanhas, setFilteredCampanhas] = useState<Campanha[]>([]);
+    const [searchTermLista, setSearchTermLista] = useState("");
+    const [searchTermCampanha, setSearchTermCampanha] = useState("");
     const [selectedLista, setSelectedLista] = useState<number | null>(null);
     const [selectedCampanha, setSelectedCampanha] = useState<number | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loadingListas, setLoadingListas] = useState(true);
+    const [loadingCampanhas, setLoadingCampanhas] = useState(true);
     const navigate = useNavigate();
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
-        setLoading(true);
-        Promise.all([
-            fetch(`${backendUrl}/all_lista`).then(res => res.json()),
-            fetch(`${backendUrl}/all_campanha`).then(res => res.json())
-        ])
-            .then(([listasData, campanhasData]) => {
-                setListas(listasData);
-                setCampanhas(campanhasData);
+        setLoadingListas(true);
+        fetch(`${backendUrl}/all_lista`)
+            .then(res => res.json())
+            .then(listasData => {
+                const sortedListas = listasData.sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime()).slice(0, 6);
+                setListas(sortedListas);
+                setFilteredListas(sortedListas);
             })
-            .catch(() => {
-                setListas([]);
-                setCampanhas([]);
-            })
-            .finally(() => setLoading(false));
+            .catch(() => setListas([]))
+            .finally(() => setLoadingListas(false));
     }, [backendUrl]);
+
+    useEffect(() => {
+        setLoadingCampanhas(true);
+        fetch(`${backendUrl}/all_campanha`)
+            .then(res => res.json())
+            .then(campanhasData => {
+                const sortedCampanhas = campanhasData.sort((a: Campanha, b: Campanha) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime()).slice(0, 8);
+                setCampanhas(sortedCampanhas);
+                setFilteredCampanhas(sortedCampanhas);
+            })
+            .catch(() => setCampanhas([]))
+            .finally(() => setLoadingCampanhas(false));
+    }, [backendUrl]);
+
+    useEffect(() => {
+        setFilteredListas(
+            listas.filter(lista =>
+                lista.Titulo.toLowerCase().includes(searchTermLista.toLowerCase())
+            )
+        );
+    }, [searchTermLista, listas]);
+
+    useEffect(() => {
+        setFilteredCampanhas(
+            campanhas.filter(campanha =>
+                campanha.Titulo.toLowerCase().includes(searchTermCampanha.toLowerCase())
+            )
+        );
+    }, [searchTermCampanha, campanhas]);
 
     const handleEnvio = () => {
         if (selectedLista && selectedCampanha) {
@@ -52,8 +83,6 @@ const CreateEnvioPage: React.FC = () => {
                 Lista: selectedLista,
                 Campanha: selectedCampanha
             };
-
-            // Redireciona para a página de carregamento, passando os dados de envio no estado
             navigate('/envio_progress', { state: { envioData } });
         } else {
             alert('Por favor, selecione uma lista e uma campanha antes de enviar.');
@@ -81,23 +110,156 @@ const CreateEnvioPage: React.FC = () => {
         return date.toLocaleDateString('pt-BR');
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen p-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-8">
-                        <Skeleton className="h-12 w-64 mx-auto mb-4" />
-                        <Skeleton className="h-6 w-96 mx-auto" />
+    const renderListas = () => (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between gap-3 mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
+                        <FaUsers className="text-white text-sm" />
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <Skeleton className="h-96 w-full" />
-                        <Skeleton className="h-96 w-full" />
-                    </div>
+                    <h2 className="text-2xl font-semibold text-gray-800">Listas de E-mails</h2>
+                </div>
+                <div className="w-1/2 relative">
+                    <Input
+                        type="text"
+                        placeholder="Pesquisar lista..."
+                        value={searchTermLista}
+                        onChange={(e) => setSearchTermLista(e.target.value)}
+                        className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors"
+                    />
+                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 </div>
             </div>
-        );
-    }
+            <div className="grid gap-4">
+                {loadingListas ? (
+                    [...Array(6)].map((_, i) => (
+                        <Skeleton key={i} className="h-28 w-full bg-gray-200" />
+                    ))
+                ) : filteredListas.length > 0 ? (
+                    filteredListas.map((lista) => (
+                        <div
+                            key={lista.IdLista}
+                            className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${selectedLista === lista.IdLista
+                                ? "border-purple-500 bg-purple-50 shadow-lg"
+                                : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
+                                }`}
+                            onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
+                        >
+                            <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 p-4 border-b border-purple-100">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                        <FaEnvelope className="text-purple-500" />
+                                        {lista.Titulo}
+                                    </h3>
+                                    {selectedLista === lista.IdLista && (
+                                        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="p-4">
+                                <div className="flex items-center justify-between text-sm text-gray-600">
+                                    <div className="flex items-center gap-2">
+                                        <FaCalendarAlt className="text-gray-400" />
+                                        <span>Último uso: {formatDate(lista.Ultimo_Uso)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500">Nenhuma lista encontrada.</p>
+                )}
+            </div>
+        </div>
+    );
 
+    const renderCampanhas = () => (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between gap-3 mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                        <FaPaperPlane className="text-white text-sm" />
+                    </div>
+                    <h2 className="text-2xl font-semibold text-gray-800">Campanhas</h2>
+                </div>
+                <div className="w-1/2 relative">
+                    <Input
+                        type="text"
+                        placeholder="Pesquisar campanha..."
+                        value={searchTermCampanha}
+                        onChange={(e) => setSearchTermCampanha(e.target.value)}
+                        className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors"
+                    />
+                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                {loadingCampanhas ? (
+                    [...Array(8)].map((_, i) => (
+                        <Skeleton key={i} className="h-48 w-full bg-gray-200" />
+                    ))
+                ) : filteredCampanhas.length > 0 ? (
+                    filteredCampanhas.map((campanha) => (
+                        <div
+                            key={campanha.IdCampanha}
+                            className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg h-48 ${selectedCampanha === campanha.IdCampanha
+                                ? "border-white/80 shadow-xl ring-2 ring-blue-400"
+                                : "border-white/50 hover:border-white/80"
+                                }`}
+                            onClick={() => setSelectedCampanha(prev => prev === campanha.IdCampanha ? null : campanha.IdCampanha)}
+                        >
+                            {campanha.Documento && (
+                                <div className="absolute inset-0 overflow-hidden bg-white/20 pointer-events-none">
+                                    <iframe
+                                        srcDoc={campanha.Documento}
+                                        className="w-[640px] h-[850px] border-none"
+                                        style={{
+                                            marginTop: '50px',
+                                            transformOrigin: 'top left',
+                                            transform: 'scale(0.47)',
+                                            filter: 'blur(0.5px)',
+                                        }}
+                                        frameBorder="0"
+                                        scrolling="no"
+                                        title={`preview-${campanha.IdCampanha}`}
+                                    />
+                                </div>
+                            )}
+                            <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
+                            <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <h3 className="text-lg font-bold leading-tight mb-1 text-white drop-shadow-lg">
+                                            {campanha.Titulo}
+                                        </h3>
+                                        {campanha.Favorita && (
+                                            <FaStar className="text-yellow-300 drop-shadow-lg" />
+                                        )}
+                                    </div>
+                                    {selectedCampanha === campanha.IdCampanha && (
+                                        <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50">
+                                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mt-auto">
+                                    <div className="flex items-center gap-2 text-sm text-white/90">
+                                        <FaCalendarAlt className="text-white/70" />
+                                        <span className="drop-shadow-lg">{formatDate(campanha.Ultimo_Uso)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500">Nenhuma campanha encontrada.</p>
+                )}
+            </div>
+        </div>
+    );
+    
     return (
         <div className="min-h-screen">
             <div className="max-w-7xl mx-auto">
@@ -110,117 +272,15 @@ const CreateEnvioPage: React.FC = () => {
                     </p>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
-                                <FaUsers className="text-white text-sm" />
-                            </div>
-                            <h2 className="text-2xl font-semibold text-gray-800">Listas de E-mails</h2>
-                        </div>
-                        <div className="grid gap-4">
-                            {listas.map((lista) => (
-                                <div
-                                    key={lista.IdLista}
-                                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${selectedLista === lista.IdLista
-                                        ? "border-purple-500 bg-purple-50 shadow-lg"
-                                        : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
-                                        }`}
-                                    onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
-                                >
-                                    <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 p-4 border-b border-purple-100">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                                                <FaEnvelope className="text-purple-500" />
-                                                {lista.Titulo}
-                                            </h3>
-                                            {selectedLista === lista.IdLista && (
-                                                <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                                                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="p-4">
-                                        <div className="flex items-center justify-between text-sm text-gray-600">
-                                            <div className="flex items-center gap-2">
-                                                <FaCalendarAlt className="text-gray-400" />
-                                                <span>Último uso: {formatDate(lista.Ultimo_Uso)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                                <FaPaperPlane className="text-white text-sm" />
-                            </div>
-                            <h2 className="text-2xl font-semibold text-gray-800">Campanhas</h2>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            {campanhas.map((campanha) => (
-                                <div
-                                    key={campanha.IdCampanha}
-                                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg h-48 ${selectedCampanha === campanha.IdCampanha
-                                            ? "border-white/80 shadow-xl ring-2 ring-blue-400"
-                                            : "border-white/50 hover:border-white/80"
-                                        }`}
-                                    onClick={() => setSelectedCampanha(prev => prev === campanha.IdCampanha ? null : campanha.IdCampanha)}
-                                >
-                                    {campanha.Documento && (
-                                        <div className="absolute inset-0 overflow-hidden bg-white/20 pointer-events-none">
-                                            <iframe
-                                                srcDoc={campanha.Documento}
-                                                className="w-[640px] h-[850px] border-none"
-                                                style={{
-                                                    marginTop: '50px',
-                                                    transformOrigin: 'top left',
-                                                    transform: 'scale(0.47)',
-                                                    filter: 'blur(0.5px)',
-                                                }}
-                                                frameBorder="0"
-                                                scrolling="no"
-                                                title={`preview-${campanha.IdCampanha}`}
-                                            />
-                                        </div>
-                                    )}
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
-                                    <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <h3 className="text-lg font-bold leading-tight mb-1 text-white drop-shadow-lg">
-                                                    {campanha.Titulo}
-                                                </h3>
-                                                {campanha.Favorita && (
-                                                    <FaStar className="text-yellow-300 drop-shadow-lg" />
-                                                )}
-                                            </div>
-                                            {selectedCampanha === campanha.IdCampanha && (
-                                                <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50">
-                                                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="mt-auto">
-                                            <div className="flex items-center gap-2 text-sm text-white/90">
-                                                <FaCalendarAlt className="text-white/70" />
-                                                <span className="drop-shadow-lg">{formatDate(campanha.Ultimo_Uso)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    {renderListas()}
+                    {renderCampanhas()}
                 </div>
                 <div className="text-center mt-12">
                     <div className="inline-block">
                         <Button
                             disabled={!selectedLista || !selectedCampanha}
                             onClick={handleEnvio}
-                            className={`px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${!selectedLista || !selectedCampanha
+                            className={`mb-4 px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${!selectedLista || !selectedCampanha
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                 : "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-700"
                                 }`}
@@ -232,7 +292,7 @@ const CreateEnvioPage: React.FC = () => {
                         </Button>
                     </div>
                     {(selectedLista || selectedCampanha) && (
-                        <div className="mt-4 text-sm text-gray-600">
+                        <div className="mb-12 mt-4 text-sm text-gray-600">
                             {selectedLista && !selectedCampanha && "✓ Lista selecionada - Escolha uma campanha"}
                             {!selectedLista && selectedCampanha && "✓ Campanha selecionada - Escolha uma lista"}
                             {selectedLista && selectedCampanha && "✓ Pronto para envio!"}
