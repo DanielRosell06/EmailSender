@@ -27,12 +27,12 @@ def get_all_campanhas(db: Session = Depends(get_db)):
     return campanhas
 
 
-@router.get("/campanha/", response_model=list[schemas_campanha.CampanhaBase])
-def get_all_campanhas(db: Session = Depends(get_db)):
+@router.get("/campanha_by_id/", response_model=schemas_campanha.CampanhaBase)
+def get_campanha_by_id(id_campanha: int, db: Session = Depends(get_db)):
     """
     Retorna todas as campanhas cadastradas.
     """
-    campanhas = crud_campanha.get_all_campanha(db=db)
+    campanhas = crud_campanha.get_campanha_by_id(db=db, id_campanha=id_campanha)
     return campanhas
 
 @router.put("/edit_campanha/", response_model=schemas_campanha.Campanha)

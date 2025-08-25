@@ -13,11 +13,14 @@ def create_campanha(db: Session, campanha: schemas_campanha.CampanhaCreate):
     db.refresh(db_campanha)
     return db_campanha
 
+
 def get_all_campanha(db: Session):
     return db.query(models.Campanha).all()
 
-def get_campanha(db: Session, id_campanha: int):
+
+def get_campanha_by_id(db: Session, id_campanha: int):
     return db.query(models.Campanha).filter(models.Campanha.IdCampanha == id_campanha).first()
+
 
 def edit_campanha(db: Session, id_campanha: int, new_campanha: schemas_campanha.Campanha):
     Campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == id_campanha).first()
