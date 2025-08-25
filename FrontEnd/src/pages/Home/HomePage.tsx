@@ -1,7 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaStar, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaExclamationTriangle } from "react-icons/fa";
+import { FaPlus, FaPaperPlane, FaCalendarAlt, FaStar, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaExclamationTriangle, FaEllipsisV } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface Lista {
     IdLista: number;
@@ -19,19 +39,19 @@ interface Campanha {
 }
 
 interface DetalheEnvio {
-  IdDetalhe: number;
-  Conteudo: string;
+    IdDetalhe: number;
+    Conteudo: string;
 }
 
 interface CampanhaEnvio {
-  IdCampanha: number;
-  Titulo: string;
-  Cor: string;
+    IdCampanha: number;
+    Titulo: string;
+    Cor: string;
 }
 
 interface ListaEnvio {
-  IdLista: number;
-  Titulo: string;
+    IdLista: number;
+    Titulo: string;
 }
 
 // Nova interface para o status do envio
@@ -65,7 +85,7 @@ const HomePage: React.FC = () => {
     useEffect(() => {
         setLoadingCampanhas(true);
         console.log("Backend =" + backendUrl)
-        
+
         fetch(`${backendUrl}/all_campanha`)
             .then(res => res.json())
             .then(data => {
@@ -105,10 +125,10 @@ const HomePage: React.FC = () => {
                         try {
                             const statusRes = await fetch(`${backendUrl}/get_status_envio_by_envio?id_envio=${envio.IdEnvio}`);
                             const statusData: { Status: StatusEnvio[] } = await statusRes.json();
-                            
+
                             const entregues = statusData.Status.length;
                             const aberturas = statusData.Status.filter(s => s.Visto).length;
-                            
+
                             return { ...envio, entregas: entregues, aberturas: aberturas };
                         } catch (error) {
                             console.error(`Erro ao buscar status para o envio ${envio.IdEnvio}:`, error);
@@ -116,7 +136,7 @@ const HomePage: React.FC = () => {
                         }
                     })
                 );
-                
+
                 setEnviosRecentes(enviosComContagem);
             } catch (error) {
                 console.error("Erro ao carregar envios recentes:", error);
@@ -149,7 +169,7 @@ const HomePage: React.FC = () => {
         const date = new Date(dateString);
         return date.toLocaleDateString('pt-BR');
     };
-    
+
     // Função para navegar para a página de detalhes do envio
     const handleEnvioClick = (idEnvio: number) => {
         navigate(`/envio_detail/${idEnvio}`);
@@ -205,15 +225,64 @@ const HomePage: React.FC = () => {
                         )}
                         <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
 
-                        <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
+                        <div className="w-full relative z-10 h-full flex flex-col justify-between p-4 text-white">
                             <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-bold leading-tight mb-1 drop-shadow-lg">
+                                <div className="flex flex-row w-full justify-between">
+                                    <h3 className="w-[90%] text-lg font-bold leading-tight mb-1 drop-shadow-lg">
                                         {campanha.Titulo}
                                     </h3>
-                                    {campanha.Favorita && (
-                                        <FaStar className="text-yellow-300 drop-shadow-lg" />
-                                    )}
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger className=" transition-all ease-in-out flex items-center justify-center w-[16px] h-[16px] rounded-full hover:cursor-pointer hover:text-xl">
+                                            <FaEllipsisV />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg p-2 min-w-[120px]">
+                                            <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem className="hover:bg-slate-200"
+                                                onClick={() => navigate(`/edit_campanha/${campanha.IdCampanha}`)}
+                                            >
+                                                Editar
+                                            </DropdownMenuItem>
+                                            <Dialog>
+                                                <DialogTrigger className="w-full focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-slate-200">Ver</DialogTrigger>
+                                                <DialogContent className="max-w-lg bg-white/90 rounded-xl shadow-xl p-6 border-none">
+                                                    <DialogHeader>
+                                                        <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
+                                                            Visualizar Campanha
+                                                        </DialogTitle>
+                                                        <DialogDescription className="text-gray-600 mb-4">
+                                                            Veja uma prévia do conteúdo da campanha <span className="font-semibold">{campanha.Titulo}</span>.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 p-4 mb-4">
+                                                        {campanha.Documento ? (
+                                                            <iframe
+                                                                srcDoc={campanha.Documento}
+                                                                className="w-full h-[400px] border-none rounded-lg"
+                                                                style={{ background: "white" }}
+                                                                frameBorder="0"
+                                                                scrolling="auto"
+                                                                title={`preview-dialog-${campanha.IdCampanha}`}
+                                                            />
+                                                        ) : (
+                                                            <div className="text-center text-gray-400 py-16">
+                                                                Nenhum conteúdo disponível para esta campanha.
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <DialogFooter>
+                                                        <DialogClose asChild>
+                                                            <Button
+                                                                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl shadow hover:from-blue-600 hover:to-cyan-600 transition-all"
+                                                            >
+                                                                Fechar
+                                                            </Button>
+                                                        </DialogClose>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </div>
 

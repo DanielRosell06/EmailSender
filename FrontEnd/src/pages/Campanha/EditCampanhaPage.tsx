@@ -178,7 +178,7 @@ export default function EditCampanhaPage() {
                 {/* Header da Página */}
                 <div className="flex items-center justify-between mb-8">
                     <Button
-                        onClick={() => navigate('/campanha')}
+                        onClick={() => navigate(-1)}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700
                                    hover:bg-gray-200 transition-colors duration-200"
                     >

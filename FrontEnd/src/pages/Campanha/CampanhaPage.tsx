@@ -12,6 +12,18 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+
+
 interface Campanha {
     IdCampanha: number;
     Titulo: string;
@@ -171,7 +183,44 @@ const CampanhasPage: React.FC = () => {
                                                         >
                                                             Editar
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="hover:bg-slate-200">Enviar</DropdownMenuItem>
+                                                        <Dialog>
+                                                            <DialogTrigger className="w-full focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-slate-200">Ver</DialogTrigger>
+                                                            <DialogContent className="max-w-lg bg-white/90 rounded-xl shadow-xl p-6 border-none">
+                                                                <DialogHeader>
+                                                                    <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
+                                                                        Visualizar Campanha
+                                                                    </DialogTitle>
+                                                                    <DialogDescription className="text-gray-600 mb-4">
+                                                                        Veja uma prévia do conteúdo da campanha <span className="font-semibold">{campanha.Titulo}</span>.
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 p-4 mb-4">
+                                                                    {campanha.Documento ? (
+                                                                        <iframe
+                                                                            srcDoc={campanha.Documento}
+                                                                            className="w-full h-[400px] border-none rounded-lg"
+                                                                            style={{ background: "white" }}
+                                                                            frameBorder="0"
+                                                                            scrolling="auto"
+                                                                            title={`preview-dialog-${campanha.IdCampanha}`}
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="text-center text-gray-400 py-16">
+                                                                            Nenhum conteúdo disponível para esta campanha.
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                <DialogFooter>
+                                                                    <DialogClose asChild>
+                                                                        <Button
+                                                                            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl shadow hover:from-blue-600 hover:to-cyan-600 transition-all"
+                                                                        >
+                                                                            Fechar
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
