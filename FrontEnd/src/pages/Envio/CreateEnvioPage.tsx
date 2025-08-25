@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaChevronLeft } from "react-icons/fa";
+import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaChevronLeft, FaExpand } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
+
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+
 
 interface Lista {
     IdLista: number;
@@ -234,6 +246,7 @@ const CreateEnvioPage: React.FC = () => {
                                         <h3 className="text-lg font-bold leading-tight mb-1 text-white drop-shadow-lg">
                                             {campanha.Titulo}
                                         </h3>
+
                                         {campanha.Favorita && (
                                             <FaStar className="text-yellow-300 drop-shadow-lg" />
                                         )}
@@ -244,11 +257,51 @@ const CreateEnvioPage: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
-                                <div className="mt-auto">
+                                <div className="mt-auto justify-between flex">
                                     <div className="flex items-center gap-2 text-sm text-white/90">
                                         <FaCalendarAlt className="text-white/70" />
                                         <span className="drop-shadow-lg">{formatDate(campanha.Ultimo_Uso)}</span>
                                     </div>
+                                    <Dialog>
+                                        <DialogTrigger className=" transition-all ease-in-out flex items-center justify-center w-[16px] h-[16px] rounded-full hover:cursor-pointer hover:text-xl">
+                                            <FaExpand></FaExpand>
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-lg bg-white/90 rounded-xl shadow-xl p-6 border-none">
+                                            <DialogHeader>
+                                                <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
+                                                    Visualizar Campanha
+                                                </DialogTitle>
+                                                <DialogDescription className="text-gray-600 mb-4">
+                                                    Veja uma prévia do conteúdo da campanha <span className="font-semibold">{campanha.Titulo}</span>.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 p-4 mb-4">
+                                                {campanha.Documento ? (
+                                                    <iframe
+                                                        srcDoc={campanha.Documento}
+                                                        className="w-full h-[400px] border-none rounded-lg"
+                                                        style={{ background: "white" }}
+                                                        frameBorder="0"
+                                                        scrolling="auto"
+                                                        title={`preview-dialog-${campanha.IdCampanha}`}
+                                                    />
+                                                ) : (
+                                                    <div className="text-center text-gray-400 py-16">
+                                                        Nenhum conteúdo disponível para esta campanha.
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <DialogFooter>
+                                                <DialogClose asChild>
+                                                    <Button
+                                                        className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl shadow hover:from-blue-600 hover:to-cyan-600 transition-all"
+                                                    >
+                                                        Fechar
+                                                    </Button>
+                                                </DialogClose>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                             </div>
                         </div>
@@ -259,7 +312,7 @@ const CreateEnvioPage: React.FC = () => {
             </div>
         </div>
     );
-    
+
     return (
         <div className="min-h-screen">
             <div className="max-w-7xl mx-auto">
