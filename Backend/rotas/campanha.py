@@ -34,3 +34,11 @@ def get_all_campanhas(db: Session = Depends(get_db)):
     """
     campanhas = crud_campanha.get_all_campanha(db=db)
     return campanhas
+
+@router.put("/edit_campanha/", response_model=schemas_campanha.Campanha)
+def edit_campanha( id_campanha: int, new_campanha: schemas_campanha.Campanha, db: Session = Depends(get_db)):
+    """
+    Edita a campanha do id_campanha, inserindo os dados de new_campanha
+    """
+    campanha = crud_campanha.edit_campanha(db, id_campanha, new_campanha)
+    return campanha
