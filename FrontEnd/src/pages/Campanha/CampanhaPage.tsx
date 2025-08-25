@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaStar, FaArrowRight } from "react-icons/fa";
+import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface Campanha {
     IdCampanha: number;
@@ -101,7 +110,7 @@ const CampanhasPage: React.FC = () => {
                         Ver Todas <FaArrowRight className="ml-2" />
                     </Button>
                 </div>
-                
+
                 <div
                     onClick={() => navigate('/create_campanha')}
                     className="group relative overflow-hidden rounded-xl w-full h-40 cursor-pointer flex items-center justify-center p-4
@@ -133,7 +142,7 @@ const CampanhasPage: React.FC = () => {
                                                 srcDoc={campanha.Documento}
                                                 className="w-[640px] h-[850px] border-none scale-[0.47] origin-top-left"
                                                 style={{
-                                                    marginTop: '50px',
+                                                    marginTop: '0px',
                                                     filter: 'blur(0.5px)',
                                                 }}
                                                 frameBorder="0"
@@ -145,14 +154,26 @@ const CampanhasPage: React.FC = () => {
                                     <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
 
                                     <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <h3 className="text-lg font-bold leading-tight mb-1 drop-shadow-lg">
+                                        <div className="flex items-start justify-between w-full">
+                                            <div className="flex flex-row justify-between w-full">
+                                                <h3 className="w-[90%] text-lg font-bold leading-tight mb-1 drop-shadow-lg">
                                                     {campanha.Titulo}
                                                 </h3>
-                                                {campanha.Favorita && (
-                                                    <FaStar className="text-yellow-300 drop-shadow-lg" />
-                                                )}
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger className=" transition-all ease-in-out flex items-center justify-center w-[16px] h-[16px] rounded-full hover:cursor-pointer hover:text-xl">
+                                                        <FaEllipsisV />
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg p-2 min-w-[120px]">
+                                                        <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem className="hover:bg-slate-200"
+                                                            onClick={() => navigate(`/edit_campanha/${campanha.IdCampanha}`)}
+                                                        >
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem className="hover:bg-slate-200">Enviar</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </div>
                                         </div>
                                         <div className="mt-auto">
@@ -168,7 +189,7 @@ const CampanhasPage: React.FC = () => {
                             <p className="text-center text-gray-500 mt-4">Nenhuma campanha encontrada.</p>
                         )}
                     </div>
-                    
+
                     {/* Painel de Visualização */}
                     <div className="w-1/3 h-[500px] p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg overflow-hidden">
                         {selectedCampanha ? (
