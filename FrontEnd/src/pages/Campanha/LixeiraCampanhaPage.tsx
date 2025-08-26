@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV } from "react-icons/fa";
+import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -35,7 +35,7 @@ interface Campanha {
     Lixeira: boolean;
 }
 
-const CampanhasPage: React.FC = () => {
+const LixeiraCampanhasPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [loading, setLoading] = useState(true);
@@ -101,9 +101,7 @@ const CampanhasPage: React.FC = () => {
             <div className="max-w-7xl mx-auto space-y-8">
                 <div className="flex justify-between items-center">
                     <div className="h-8 w-64 bg-gray-300 rounded animate-pulse"></div>
-                    <div className="h-8 w-24 bg-gray-300 rounded animate-pulse"></div>
                 </div>
-                <div className="h-40 rounded-xl bg-gray-300 animate-pulse"></div>
                 <div className="flex gap-8">
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[...Array(6)].map((_, i) => (
@@ -123,42 +121,36 @@ const CampanhasPage: React.FC = () => {
     return (
         <div className="min-h-screen p-8 bg-white/70 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto space-y-8">
-                <div className="flex justify-between items-center">
+                <div className="flex">
+                    <Button
+                        onClick={() => {
+                            navigate(-1);
+                            setTimeout(() => {
+                                if (window.location.pathname === "/envio_progress") {
+                                    navigate("/");
+                                }
+                            }, 100);
+                        }}
+                        className="mr-12 flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700
+                                                       hover:bg-gray-200 transition-colors duration-200"
+                    >
+                        <FaChevronLeft className="w-4 h-4" />
+                        Voltar
+                    </Button>
                     <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
                         <span className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500">
                             <FaPaperPlane className="text-white text-lg" />
                         </span>
-                        Minhas Campanhas
+                        Campanhas na Lixeira
                     </h1>
-                    <Button
-                        variant="link"
-                        className="text-gray-600 hover:text-blue-500"
-                        onClick={() => {navigate('/lixeira_campanha')}}
-                    >
-                        Ver Lixeira <FaArrowRight className="ml-2" />
-                    </Button>
                 </div>
-
-                <div
-                    onClick={() => navigate('/create_campanha')}
-                    className="group relative overflow-hidden rounded-xl w-full h-40 cursor-pointer flex items-center justify-center p-4
-                               border-2 border-gray-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg
-                               hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-blue-600/60 via-indigo-500 to-cyan-500/60"
-                >
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <div className="p-4 rounded-full bg-blue-500/20 backdrop-blur-sm border border-white/50 mb-2 transition-all duration-300 group-hover:bg-blue-500/60">
-                            <FaPlus className="text-blue-500 text-3xl group-hover:text-white transition-all duration-300" />
-                        </div>
-                        <span className="text-gray-700 font-semibold text-center transition-colors group-hover:text-white">Criar Nova Campanha</span>
-                    </div>
-                </div>
-
                 <div className="flex gap-8">
+
                     {/* Grid de Campanhas */}
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {campanhas.length > 0 ? (
                             campanhas.map((campanha) => (
-                                campanha.Lixeira == false &&
+                                campanha.Lixeira == true &&
                                 (
                                     <div
                                         key={campanha.IdCampanha}
@@ -313,4 +305,4 @@ const CampanhasPage: React.FC = () => {
     );
 };
 
-export default CampanhasPage;
+export default LixeiraCampanhasPage;
