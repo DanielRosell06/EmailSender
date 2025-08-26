@@ -23,4 +23,5 @@ class CampanhaBase(BaseModel): #Geral
     Cor: str
     Documento: str
     Ultimo_Uso: date
+    Lixeira: bool
 

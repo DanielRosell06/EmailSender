@@ -31,3 +31,12 @@ def edit_campanha(db: Session, id_campanha: int, new_campanha: schemas_campanha.
     db.commit()
     db.refresh(Campanha)
     return Campanha
+
+def delete_campanha(db: Session, id_campanha: int):
+    campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == id_campanha).first()
+    if campanha:
+        campanha.Lixeira = True
+        db.add(campanha)
+        db.commit()
+        return True
+    return False

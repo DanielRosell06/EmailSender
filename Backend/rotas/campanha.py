@@ -42,3 +42,11 @@ def edit_campanha( id_campanha: int, new_campanha: schemas_campanha.Campanha, db
     """
     campanha = crud_campanha.edit_campanha(db, id_campanha, new_campanha)
     return campanha
+
+@router.delete("/delete_campanha/", response_model=bool)
+def delete_campanha( id_campanha: int, db: Session = Depends(get_db)):
+    """
+    Deleta a campanha de id = id_campanha
+    """
+    deleted = crud_campanha.delete_campanha(db, id_campanha)
+    return deleted

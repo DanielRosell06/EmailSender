@@ -24,6 +24,7 @@ class Campanha(Base):
     Documento = Column(Text)
     Ultimo_Uso = Column(Date, default=func.now())
     Favorita = Column(Boolean, default=False)
+    Lixeira = Column(Boolean, default=False)
 
 class Email(Base):
     __tablename__ = "email"
