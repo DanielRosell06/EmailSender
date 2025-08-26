@@ -40,3 +40,12 @@ def delete_campanha(db: Session, id_campanha: int):
         db.commit()
         return True
     return False
+
+def undelete_campanha(db: Session, id_campanha: int):
+    campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == id_campanha).first()
+    if campanha:
+        campanha.Lixeira = False
+        db.add(campanha)
+        db.commit()
+        return True
+    return False

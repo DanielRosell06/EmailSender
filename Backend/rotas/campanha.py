@@ -50,3 +50,11 @@ def delete_campanha( id_campanha: int, db: Session = Depends(get_db)):
     """
     deleted = crud_campanha.delete_campanha(db, id_campanha)
     return deleted
+
+@router.delete("/undelete_campanha/", response_model=bool)
+def delete_campanha( id_campanha: int, db: Session = Depends(get_db)):
+    """
+    Retira a campanha de id = id_campanha da lixeira
+    """
+    undeleted = crud_campanha.undelete_campanha(db, id_campanha)
+    return undeleted

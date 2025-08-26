@@ -83,8 +83,8 @@ const LixeiraCampanhasPage: React.FC = () => {
         setSelectedCampanha(campanha);
     };
 
-    const handleDeleteCampanha = (id_campanha: number) => {
-        fetch(`${backendUrl}/delete_campanha/?id_campanha=${id_campanha}`, { method: "DELETE" })
+    const handleUndeleteCampanha = (id_campanha: number) => {
+        fetch(`${backendUrl}/undelete_campanha/?id_campanha=${id_campanha}`, { method: "DELETE" })
             .then(res => res.json())
             .then((deleted) => {
                 if (deleted) {
@@ -233,15 +233,15 @@ const LixeiraCampanhasPage: React.FC = () => {
                                                             </Dialog>
                                                             <Dialog>
                                                                 <DialogTrigger className="text-red-600 w-full focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-slate-200">
-                                                                    Mover para a lixeira
+                                                                    Remover da lixeira
                                                                 </DialogTrigger>
                                                                 <DialogContent className="max-w-lg bg-white/90 rounded-xl shadow-xl p-6 border-none">
                                                                     <DialogHeader>
                                                                         <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
-                                                                            Mover Campanha para a lixeira
+                                                                            Remover Campanha da lixeira
                                                                         </DialogTitle>
                                                                         <DialogDescription className="text-gray-600 mb-4">
-                                                                            Você tem certeza que deseja mover a campanha <span className="font-semibold">{campanha.Titulo}</span> para a lixeira?
+                                                                            Você tem certeza que deseja remover a campanha <span className="font-semibold">{campanha.Titulo}</span> da lixeira?
                                                                         </DialogDescription>
                                                                     </DialogHeader>
                                                                     <DialogFooter className="flex gap-2">
@@ -254,9 +254,9 @@ const LixeiraCampanhasPage: React.FC = () => {
                                                                         </DialogClose>
                                                                         <DialogClose asChild>
                                                                             <Button
-                                                                                className=" hover:cursor-pointer bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold rounded-xl shadow hover:from-red-600 hover:to-pink-600 transition-all"
+                                                                                className=" hover:cursor-pointer bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-xl shadow hover:from-blue-600 hover:to-green-600 transition-all"
                                                                                 onClick={() => {
-                                                                                    handleDeleteCampanha(campanha.IdCampanha)
+                                                                                    handleUndeleteCampanha(campanha.IdCampanha)
                                                                                 }}
                                                                             >
                                                                                 Confirmar
