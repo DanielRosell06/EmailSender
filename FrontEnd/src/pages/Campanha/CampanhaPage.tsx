@@ -28,6 +28,7 @@ interface Campanha {
     IdCampanha: number;
     Titulo: string;
     Cor: string;
+    Assunto: string;
     Documento: string;
     Ultimo_Uso: string;
     Favorita: boolean;
@@ -132,7 +133,7 @@ const CampanhasPage: React.FC = () => {
                     <Button
                         variant="link"
                         className="text-gray-600 hover:text-blue-500"
-                        onClick={() => {navigate('/lixeira_campanha')}}
+                        onClick={() => { navigate('/lixeira_campanha') }}
                     >
                         Ver Lixeira <FaArrowRight className="ml-2" />
                     </Button>
@@ -211,6 +212,7 @@ const CampanhasPage: React.FC = () => {
                                                                             Veja uma prévia do conteúdo da campanha <span className="font-semibold">{campanha.Titulo}</span>.
                                                                         </DialogDescription>
                                                                     </DialogHeader>
+                                                                    <h1 className="font-bold">Assunto: <span className="font-normal">{campanha.Assunto}</span></h1>
                                                                     <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 p-4 mb-4">
                                                                         {campanha.Documento ? (
                                                                             <iframe

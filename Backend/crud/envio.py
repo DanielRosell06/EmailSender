@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 import hashlib
+from datetime import datetime
 
 # Importa a instância do servidor SocketIO.
 # Isso geralmente é feito em um arquivo principal, como main.py, e a instância é passada aqui.
@@ -73,7 +74,9 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
         Lista = envio.Lista,
         Campanha = envio.Campanha
     )
+    campanha.Ultimo_Uso = datetime.now()
     db.add(db_envio)
+    db.add(campanha)
     db.commit()
 
     # --- ETAPA 1: INÍCIO DO PROCESSO (10% DA BARRA) ---

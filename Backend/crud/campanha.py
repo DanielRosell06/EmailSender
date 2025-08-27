@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from datetime import datetime
 import models  # Acessa a pasta acima para importar models.py
 from schema import campanha as schemas_campanha  # Acessa a pasta acima para importar schemas/campanha.py
 
@@ -29,6 +30,7 @@ def edit_campanha(db: Session, id_campanha: int, new_campanha: schemas_campanha.
     Campanha.Cor = new_campanha.Cor
     Campanha.Assunto = new_campanha.Assunto
     Campanha.Documento = new_campanha.Documento
+    Campanha.Ultimo_Uso = datetime.now()
     db.add(Campanha)
     db.commit()
     db.refresh(Campanha)
@@ -46,6 +48,7 @@ def delete_campanha(db: Session, id_campanha: int):
 def undelete_campanha(db: Session, id_campanha: int):
     campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == id_campanha).first()
     if campanha:
+        campanha.Ultimo_Uso = datetime.now()
         campanha.Lixeira = False
         db.add(campanha)
         db.commit()

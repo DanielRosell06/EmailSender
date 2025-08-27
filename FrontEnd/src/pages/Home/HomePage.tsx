@@ -33,8 +33,10 @@ interface Campanha {
     IdCampanha: number;
     Titulo: string;
     Cor: string;
+    Assunto: string;
     Documento: string;
     Ultimo_Uso: string;
+    Lixeira: boolean;
     Favorita: boolean;
 }
 
@@ -91,6 +93,7 @@ const HomePage: React.FC = () => {
             .then(data => {
                 const sortedCampanhas = data
                     .sort((a: Campanha, b: Campanha) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime())
+                    .filter((campanha: Campanha) => campanha.Lixeira === false)
                     .slice(0, 4);
                 setCampanhas(sortedCampanhas);
             })
@@ -254,6 +257,7 @@ const HomePage: React.FC = () => {
                                                             Veja uma prévia do conteúdo da campanha <span className="font-semibold">{campanha.Titulo}</span>.
                                                         </DialogDescription>
                                                     </DialogHeader>
+                                                    <h1 className="font-bold">Assunto: <span className="font-normal">{campanha.Assunto}</span></h1>
                                                     <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 p-4 mb-4">
                                                         {campanha.Documento ? (
                                                             <iframe
