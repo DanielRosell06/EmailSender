@@ -12,7 +12,7 @@ def create_lista(db: Session, lista: schemas_lista.ListaCreate):
     return db_lista
 
 def get_all_lista(db: Session):
-    return db.query(models.Lista.IdLista, models.Lista.Titulo, models.Lista.Ultimo_Uso).all()
+    return db.query(models.Lista.IdLista, models.Lista.Titulo, models.Lista.Lixeira, models.Lista.Ultimo_Uso).all()
 
 def get_lista_com_emails(db: Session, id_lista: int):
     lista = db.query(models.Lista).filter(models.Lista.IdLista == id_lista).first()

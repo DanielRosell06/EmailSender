@@ -14,5 +14,6 @@ class Lista(BaseModel):
     IdLista: int
     Titulo: str
     Ultimo_Uso: date | None = None
+    Lixeira: bool
     
     model_config = ConfigDict(from_attributes=True)

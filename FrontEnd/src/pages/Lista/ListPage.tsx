@@ -1,38 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaPaperPlane, FaArrowRight } from "react-icons/fa";
+import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaPaperPlane, FaArrowRight, FaEllipsisV } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import CreateListModal from "@/components/Lista/createModal";
 import { useNavigate } from "react-router-dom";
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 // Interface para as Listas e Envios
 interface Lista {
     IdLista: number;
     Titulo: string;
     Ultimo_Uso: string;
+    Lixeira: boolean;
 }
 
 interface DetalheEnvio {
-  IdDetalhe: number;
-  Conteudo: string;
+    IdDetalhe: number;
+    Conteudo: string;
 }
 
 interface CampanhaEnvio {
-  IdCampanha: number;
-  Titulo: string;
-  Cor: string;
+    IdCampanha: number;
+    Titulo: string;
+    Cor: string;
 }
 
 interface ListaEnvio {
-  IdLista: number;
-  Titulo: string;
+    IdLista: number;
+    Titulo: string;
 }
 
 interface Envio {
-  IdEnvio: number;
-  Dt_Envio: string;
-  Detalhes: DetalheEnvio[];
-  Campanha: CampanhaEnvio;
-  Lista: ListaEnvio;
+    IdEnvio: number;
+    Dt_Envio: string;
+    Detalhes: DetalheEnvio[];
+    Campanha: CampanhaEnvio;
+    Lista: ListaEnvio;
 }
 
 const ListasPage: React.FC = () => {
@@ -52,7 +73,7 @@ const ListasPage: React.FC = () => {
         fetch(`${backendUrl}/all_lista`)
             .then(res => res.json())
             .then(data => {
-                const sortedListas = data.sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime()).slice(0, 5);
+                const sortedListas = data.sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime());
                 setListas(sortedListas);
             })
             .catch(() => {
@@ -83,6 +104,16 @@ const ListasPage: React.FC = () => {
         navigate(`/envio_detail/${idEnvio}`);
     };
 
+    const handleDeleteLista = (idLista: number) => {
+        fetch(`http://127.0.0.1:8000/delete_lista?id_lista=${idLista}`, { method: "DELETE" })
+            .then(() => {
+                setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
+            })
+            .catch(() => {
+                alert('Não foi possivel mover a lista para a lixeira, tente novamente mais tarde!')
+            });
+    }
+
     // Função de renderização para a seção de Listas
     const renderListasSection = () => {
         if (loadingListas) {
@@ -94,30 +125,80 @@ const ListasPage: React.FC = () => {
                 </div>
             );
         }
-        
+
         return (
             <div className="space-y-4">
                 <CreateListModal />
                 {listas.length > 0 ? (
                     listas.map((lista) => (
-                        <div
-                            key={lista.IdLista}
-                            className={`p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg cursor-pointer hover:border-fuchsia-500`}
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 rounded-lg flex items-center justify-center border border-white/50">
-                                        <FaEnvelopeOpenText className="text-white text-lg" />
+                        lista.Lixeira == false && (
+                            <div
+                                key={lista.IdLista}
+                                className={`p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg cursor-pointer hover:border-fuchsia-500`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 rounded-lg flex items-center justify-center border border-white/50">
+                                            <FaEnvelopeOpenText className="text-white text-lg" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-800">{lista.Titulo}</h3>
+                                            <p className="text-sm text-gray-500 flex items-center gap-1">
+                                                <FaCalendarAlt className="text-xs" /> Último uso: {formatDate(lista.Ultimo_Uso)}
+                                            </p>
+                                        </div>
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-semibold text-gray-800">{lista.Titulo}</h3>
-                                        <p className="text-sm text-gray-500 flex items-center gap-1">
-                                            <FaCalendarAlt className="text-xs" /> Último uso: {formatDate(lista.Ultimo_Uso)}
-                                        </p>
+                                        <div className="flex items-center justify-center h-10 w-10">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger className=" transition-all ease-in-out flex items-center justify-center w-[16px] h-[16px] rounded-full hover:cursor-pointer hover:text-xl">
+                                                    <FaEllipsisV className="text-slate-600 transition-all duration-300 hover:text-slate-700 hover:text-xl" />
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg p-2 min-w-[120px]">
+                                                    <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <Dialog>
+                                                        <DialogTrigger className="text-red-600 w-full focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-slate-200">
+                                                            Mover para a lixeira
+                                                        </DialogTrigger>
+                                                        <DialogContent className="max-w-lg bg-white/90 rounded-xl shadow-xl p-6 border-none">
+                                                            <DialogHeader>
+                                                                <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
+                                                                    Mover Campanha para a lixeira
+                                                                </DialogTitle>
+                                                                <DialogDescription className="text-gray-600 mb-4">
+                                                                    Você tem certeza que deseja mover a campanha <span className="font-semibold">{lista.Titulo}</span> para a lixeira?
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                            <DialogFooter className="flex gap-2">
+                                                                <DialogClose asChild>
+                                                                    <Button
+                                                                        className="bg-slate-200 hover:bg-slate-300 hover:cursor-pointer rounded-xl"
+                                                                    >
+                                                                        Cancelar
+                                                                    </Button>
+                                                                </DialogClose>
+                                                                <DialogClose asChild>
+                                                                    <Button
+                                                                        className=" hover:cursor-pointer bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold rounded-xl shadow hover:from-red-600 hover:to-pink-600 transition-all"
+                                                                        onClick={() => {
+                                                                            handleDeleteLista(lista.IdLista)
+                                                                        }}
+                                                                    >
+                                                                        Confirmar
+                                                                    </Button>
+                                                                </DialogClose>
+                                                            </DialogFooter>
+                                                        </DialogContent>
+                                                    </Dialog>
+
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        )
                     ))
                 ) : (
                     <p className="text-center text-gray-500 mt-4">Nenhuma lista encontrada.</p>
@@ -137,7 +218,7 @@ const ListasPage: React.FC = () => {
                 </div>
             );
         }
-        
+
         return (
             <div className="space-y-4">
                 {enviosRecentes.length > 0 ? (
