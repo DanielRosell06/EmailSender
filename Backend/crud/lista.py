@@ -25,3 +25,21 @@ def get_lista_com_emails(db: Session, id_lista: int):
         "emails": emails
     }
     return resultado
+
+def delete_lista(db: Session, id_lista: int):
+    lista = db.query(models.Lista).filter(models.Lista.IdLista == id_lista).first()
+    if lista:
+        lista.Lixeira = True
+        db.add(lista)
+        db.commit()
+        return True
+    return False
+
+def undelete_lista(db: Session, id_lista: int):
+    lista = db.query(models.Lista).filter(models.Lista.IdLista == id_lista).first()
+    if lista:
+        lista.Lixeira = False
+        db.add(lista)
+        db.commit()
+        return True
+    return False

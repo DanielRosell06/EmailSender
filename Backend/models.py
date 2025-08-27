@@ -11,6 +11,7 @@ class Lista(Base):
     IdLista = Column(Integer, primary_key=True, nullable=False, index=True)
     Titulo = Column(String, nullable=False)
     Ultimo_Uso = Column(Date, default=func.now())
+    Lixeira = Column(Boolean, default=False)
     
     # Relacionamento com Email (uma lista tem muitos emails)
     emails = relationship("Email", back_populates="lista_pai")

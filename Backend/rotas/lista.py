@@ -37,3 +37,19 @@ def get_all_listas(db: Session = Depends(get_db)):
     """
     listas = crud_lista.get_all_lista(db=db)
     return listas
+
+@router.delete("/delete_lista/", response_model=bool)
+def delete_lista( id_lista: int, db: Session = Depends(get_db)):
+    """
+    Deleta a lista de id = id_lista
+    """
+    deleted = crud_lista.delete_lista(db, id_lista)
+    return deleted
+
+@router.delete("/undelete_lista/", response_model=bool)
+def delete_lista( id_lista: int, db: Session = Depends(get_db)):
+    """
+    Retira a lista de id = id_lista da lixeira
+    """
+    undeleted = crud_lista.undelete_lista(db, id_lista)
+    return undeleted
