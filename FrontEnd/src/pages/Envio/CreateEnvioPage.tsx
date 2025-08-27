@@ -28,6 +28,7 @@ interface Campanha {
     IdCampanha: number;
     Titulo: string;
     Cor: string;
+    Assunto: string;
     Documento: string;
     Ultimo_Uso: string;
     Favorita: boolean;
@@ -218,101 +219,102 @@ const CreateEnvioPage: React.FC = () => {
                     ))
                 ) : filteredCampanhas.length > 0 ? (
                     filteredCampanhas.
-                    filter(campanha => campanha.Lixeira === false)
-                    .slice(0, 8)
-                    .map((campanha) => (
-                        <div
-                            key={campanha.IdCampanha}
-                            className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg h-48 ${selectedCampanha === campanha.IdCampanha
-                                ? "border-white/80 shadow-xl ring-2 ring-blue-400"
-                                : "border-white/50 hover:border-white/80"
-                                }`}
-                            onClick={() => setSelectedCampanha(prev => prev === campanha.IdCampanha ? null : campanha.IdCampanha)}
-                        >
-                            {campanha.Documento && (
-                                <div className="absolute inset-0 overflow-hidden bg-white/20 pointer-events-none">
-                                    <iframe
-                                        srcDoc={campanha.Documento}
-                                        className="w-[640px] h-[850px] border-none"
-                                        style={{
-                                            marginTop: '50px',
-                                            transformOrigin: 'top left',
-                                            transform: 'scale(0.47)',
-                                            filter: 'blur(0.5px)',
-                                        }}
-                                        frameBorder="0"
-                                        scrolling="no"
-                                        title={`preview-${campanha.IdCampanha}`}
-                                    />
-                                </div>
-                            )}
-                            <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
-                            <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <h3 className="text-lg font-bold leading-tight mb-1 text-white drop-shadow-lg">
-                                            {campanha.Titulo}
-                                        </h3>
+                        filter(campanha => campanha.Lixeira === false)
+                        .slice(0, 8)
+                        .map((campanha) => (
+                            <div
+                                key={campanha.IdCampanha}
+                                className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg h-48 ${selectedCampanha === campanha.IdCampanha
+                                    ? "border-white/80 shadow-xl ring-2 ring-blue-400"
+                                    : "border-white/50 hover:border-white/80"
+                                    }`}
+                                onClick={() => setSelectedCampanha(prev => prev === campanha.IdCampanha ? null : campanha.IdCampanha)}
+                            >
+                                {campanha.Documento && (
+                                    <div className="absolute inset-0 overflow-hidden bg-white/20 pointer-events-none">
+                                        <iframe
+                                            srcDoc={campanha.Documento}
+                                            className="w-[640px] h-[850px] border-none"
+                                            style={{
+                                                marginTop: '50px',
+                                                transformOrigin: 'top left',
+                                                transform: 'scale(0.47)',
+                                                filter: 'blur(0.5px)',
+                                            }}
+                                            frameBorder="0"
+                                            scrolling="no"
+                                            title={`preview-${campanha.IdCampanha}`}
+                                        />
+                                    </div>
+                                )}
+                                <div className={`absolute inset-0 bg-gradient-to-br ${getGradientFromColor(campanha.Cor)} opacity-85`}></div>
+                                <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-bold leading-tight mb-1 text-white drop-shadow-lg">
+                                                {campanha.Titulo}
+                                            </h3>
 
-                                        {campanha.Favorita && (
-                                            <FaStar className="text-yellow-300 drop-shadow-lg" />
+                                            {campanha.Favorita && (
+                                                <FaStar className="text-yellow-300 drop-shadow-lg" />
+                                            )}
+                                        </div>
+                                        {selectedCampanha === campanha.IdCampanha && (
+                                            <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50">
+                                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                                            </div>
                                         )}
                                     </div>
-                                    {selectedCampanha === campanha.IdCampanha && (
-                                        <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50">
-                                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                                    <div className="mt-auto justify-between flex">
+                                        <div className="flex items-center gap-2 text-sm text-white/90">
+                                            <FaCalendarAlt className="text-white/70" />
+                                            <span className="drop-shadow-lg">{formatDate(campanha.Ultimo_Uso)}</span>
                                         </div>
-                                    )}
-                                </div>
-                                <div className="mt-auto justify-between flex">
-                                    <div className="flex items-center gap-2 text-sm text-white/90">
-                                        <FaCalendarAlt className="text-white/70" />
-                                        <span className="drop-shadow-lg">{formatDate(campanha.Ultimo_Uso)}</span>
+                                        <Dialog>
+                                            <DialogTrigger className=" transition-all ease-in-out flex items-center justify-center w-[16px] h-[16px] rounded-full hover:cursor-pointer hover:text-xl">
+                                                <FaExpand></FaExpand>
+                                            </DialogTrigger>
+                                            <DialogContent className="max-w-lg bg-white/90 rounded-xl shadow-xl p-6 border-none">
+                                                <DialogHeader>
+                                                    <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
+                                                        Visualizar Campanha
+                                                    </DialogTitle>
+                                                    <DialogDescription className="text-gray-600 mb-4">
+                                                        Veja uma prévia do conteúdo da campanha <span className="font-semibold">{campanha.Titulo}</span>.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <h1 className="font-bold">Assunto: <span className="font-normal">{campanha.Assunto}</span></h1>
+                                                <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 p-4 mb-4">
+                                                    {campanha.Documento ? (
+                                                        <iframe
+                                                            srcDoc={campanha.Documento}
+                                                            className="w-full h-[400px] border-none rounded-lg"
+                                                            style={{ background: "white" }}
+                                                            frameBorder="0"
+                                                            scrolling="auto"
+                                                            title={`preview-dialog-${campanha.IdCampanha}`}
+                                                        />
+                                                    ) : (
+                                                        <div className="text-center text-gray-400 py-16">
+                                                            Nenhum conteúdo disponível para esta campanha.
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <DialogFooter>
+                                                    <DialogClose asChild>
+                                                        <Button
+                                                            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl shadow hover:from-blue-600 hover:to-cyan-600 transition-all"
+                                                        >
+                                                            Fechar
+                                                        </Button>
+                                                    </DialogClose>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
-                                    <Dialog>
-                                        <DialogTrigger className=" transition-all ease-in-out flex items-center justify-center w-[16px] h-[16px] rounded-full hover:cursor-pointer hover:text-xl">
-                                            <FaExpand></FaExpand>
-                                        </DialogTrigger>
-                                        <DialogContent className="max-w-lg bg-white/90 rounded-xl shadow-xl p-6 border-none">
-                                            <DialogHeader>
-                                                <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
-                                                    Visualizar Campanha
-                                                </DialogTitle>
-                                                <DialogDescription className="text-gray-600 mb-4">
-                                                    Veja uma prévia do conteúdo da campanha <span className="font-semibold">{campanha.Titulo}</span>.
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 p-4 mb-4">
-                                                {campanha.Documento ? (
-                                                    <iframe
-                                                        srcDoc={campanha.Documento}
-                                                        className="w-full h-[400px] border-none rounded-lg"
-                                                        style={{ background: "white" }}
-                                                        frameBorder="0"
-                                                        scrolling="auto"
-                                                        title={`preview-dialog-${campanha.IdCampanha}`}
-                                                    />
-                                                ) : (
-                                                    <div className="text-center text-gray-400 py-16">
-                                                        Nenhum conteúdo disponível para esta campanha.
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <DialogFooter>
-                                                <DialogClose asChild>
-                                                    <Button
-                                                        className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl shadow hover:from-blue-600 hover:to-cyan-600 transition-all"
-                                                    >
-                                                        Fechar
-                                                    </Button>
-                                                </DialogClose>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        ))
                 ) : (
                     <p className="text-center text-gray-500">Nenhuma campanha encontrada.</p>
                 )}
