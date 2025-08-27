@@ -59,6 +59,7 @@ export default function EditCampanhaPage() {
     const { IdCampanha } = useLoaderData() as { IdCampanha: string };
     const [htmlCode, setHtmlCode] = useState(defaultHtml)
     const [campaignTitle, setCampaignTitle] = useState("")
+    const [campaignSubject, setCampaignSubject] = useState("")
     const [selectedColor, setSelectedColor] = useState(tailwindColors[0])
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true) // Novo estado de carregamento
@@ -85,6 +86,7 @@ export default function EditCampanhaPage() {
                 // Define os estados com os dados recebidos da API
                 setCampaignTitle(campanha.Titulo);
                 setHtmlCode(campanha.Documento);
+                setCampaignSubject(campanha.Assunto)
 
                 // Encontra a cor correspondente no array local
                 const foundColor = tailwindColors.find(c => c.name === campanha.Cor);
@@ -112,6 +114,7 @@ export default function EditCampanhaPage() {
             const campanha_data = {
                 Titulo: campaignTitle || "Campanha sem título",
                 Cor: selectedColor.name,
+                Assunto: campaignSubject,
                 Documento: htmlCode
             }
 
@@ -196,7 +199,7 @@ export default function EditCampanhaPage() {
 
                 {isLoading ? renderSkeletons() : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
                             <div className="space-y-2">
                                 <Label htmlFor="campaign-title" className="font-bold text-xl text-gray-700">Título da Campanha</Label>
                                 <Input
@@ -220,11 +223,10 @@ export default function EditCampanhaPage() {
                                         <button
                                             key={color.name}
                                             onClick={() => setSelectedColor(color)}
-                                            className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${color.class} ${
-                                                selectedColor.name === color.name
+                                            className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${color.class} ${selectedColor.name === color.name
                                                     ? "border-blue-700 scale-110 ring-2 ring-blue-300"
                                                     : "border-slate-300 hover:scale-105 hover:ring-1 hover:ring-blue-200"
-                                            }`}
+                                                }`}
                                             title={color.name}
                                         />
                                     ))}
@@ -233,6 +235,22 @@ export default function EditCampanhaPage() {
                                     Cor selecionada: {selectedColor.name}
                                 </p>
                             </div>
+                        </div>
+
+                        <div className="space-y-2 mb-4">
+                            <Label htmlFor="campaign-assunto" className="font-bold text-xl text-gray-700">Assunto da campanha</Label>
+                            <Input
+                                id="campaign-assunto"
+                                type="text"
+                                placeholder="Digite o assunto da sua campanha"
+                                value={campaignSubject}
+                                onChange={(e) => setCampaignSubject(e.target.value)}
+                                className="border-slate-300 placeholder:text-slate-400 
+                                transition-all ease-in-out duration-300
+                                focus:bg-slate-200 rounded-full
+                                focus:ring-0 focus:ring-offset-0 focus:ring-transparent 
+                                focus:border-none focus:outline-none"
+                            />
                         </div>
 
                         <div className="flex gap-4 mb-4 justify-end">

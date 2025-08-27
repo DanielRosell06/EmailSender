@@ -27,6 +27,7 @@ def edit_campanha(db: Session, id_campanha: int, new_campanha: schemas_campanha.
     Campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == id_campanha).first()
     Campanha.Titulo = new_campanha.Titulo
     Campanha.Cor = new_campanha.Cor
+    Campanha.Assunto = new_campanha.Assunto
     Campanha.Documento = new_campanha.Documento
     db.add(Campanha)
     db.commit()

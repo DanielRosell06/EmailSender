@@ -9,7 +9,7 @@ from crud import campanha as crud_campanha
 
 router = APIRouter()
 
-@router.post("/campanhas/", response_model=schemas_campanha.Campanha)
+@router.post("/create_campanha/", response_model=schemas_campanha.Campanha)
 def create_campanha(campanha_data: schemas_campanha.CampanhaCreate, db: Session = Depends(get_db)):
     """
     Cria uma nova campanha com os dados fornecidos.
