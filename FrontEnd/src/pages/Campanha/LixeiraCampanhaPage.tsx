@@ -125,11 +125,6 @@ const LixeiraCampanhasPage: React.FC = () => {
                     <Button
                         onClick={() => {
                             navigate(-1);
-                            setTimeout(() => {
-                                if (window.location.pathname === "/envio_progress") {
-                                    navigate("/");
-                                }
-                            }, 100);
                         }}
                         className="mr-12 flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700
                                                        hover:bg-gray-200 transition-colors duration-200"

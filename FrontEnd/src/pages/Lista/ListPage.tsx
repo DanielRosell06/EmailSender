@@ -272,9 +272,9 @@ const ListasPage: React.FC = () => {
                         <Button
                             variant="link"
                             className="text-gray-600 hover:text-purple-500"
-                            onClick={() => console.log('Navegar para a página de listas completas')}
+                            onClick={() => navigate('/lixeira_lista')}
                         >
-                            Ver Todas <FaArrowRight className="ml-2" />
+                            Ver Lixeira <FaArrowRight className="ml-2" />
                         </Button>
                     </div>
                     {renderListasSection()}
