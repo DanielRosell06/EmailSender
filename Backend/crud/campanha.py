@@ -6,6 +6,7 @@ def create_campanha(db: Session, campanha: schemas_campanha.CampanhaCreate):
     db_campanha = models.Campanha(
         Titulo=campanha.Titulo,
         Cor=campanha.Cor,
+        Assunto=campanha.Assunto,
         Documento=campanha.Documento
     )
     db.add(db_campanha)

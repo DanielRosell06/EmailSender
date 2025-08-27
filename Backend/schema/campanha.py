@@ -7,11 +7,13 @@ from schema.email import EmailCreate, EmailListCreate
 class CampanhaCreate(BaseModel):
     Titulo: str
     Cor: str
+    Assunto: str
     Documento: str
 
 class Campanha(BaseModel): #Usada em create
     Titulo: str
     Cor: str
+    Assunto: str
     Documento: str
 
 class CampanhaGet(BaseModel):
@@ -21,6 +23,7 @@ class CampanhaBase(BaseModel): #Geral
     IdCampanha: int
     Titulo: str
     Cor: str
+    Assunto: str
     Documento: str
     Ultimo_Uso: date
     Lixeira: bool

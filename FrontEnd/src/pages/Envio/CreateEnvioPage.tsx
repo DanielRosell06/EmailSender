@@ -150,7 +150,7 @@ const CreateEnvioPage: React.FC = () => {
                         <Skeleton key={i} className="h-28 w-full bg-gray-200" />
                     ))
                 ) : filteredListas.length > 0 ? (
-                    filteredListas.slice(0, 8).map((lista) => (
+                    filteredListas.slice(0, 5).map((lista) => (
                         lista.Lixeira == false && (
                             <div
                                 key={lista.IdLista}

@@ -96,7 +96,7 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
 
                 msg = MIMEMultipart()
                 msg['From'] = SMTP_USER
-                msg['Subject'] = campanha.Titulo
+                msg['Subject'] = campanha.Assunto
                 msg.attach(MIMEText(documento_com_tag, 'html', 'utf-8'))
 
                 db_status = models.StatusEnvio(

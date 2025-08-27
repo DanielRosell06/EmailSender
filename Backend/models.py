@@ -21,6 +21,7 @@ class Campanha(Base):
     
     IdCampanha = Column(Integer, primary_key=True, nullable=False, index=True)
     Titulo = Column(String, nullable=False)
+    Assunto = Column(String, nullable=False)
     Cor = Column(String, nullable=False)
     Documento = Column(Text)
     Ultimo_Uso = Column(Date, default=func.now())
