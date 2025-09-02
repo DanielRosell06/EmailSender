@@ -26,6 +26,17 @@ def get_lista_com_emails(db: Session, id_lista: int):
     }
     return resultado
 
+def edit_lista(db: Session, id_lista: int, new_titulo: str):
+    lista = db.query(models.Lista).filter(models.Lista.IdLista == id_lista).first()
+
+    lista.Titulo = new_titulo
+
+    db.add(lista)
+    db.commit()
+    db.refresh(lista)
+
+    return new_titulo
+
 def delete_lista(db: Session, id_lista: int):
     lista = db.query(models.Lista).filter(models.Lista.IdLista == id_lista).first()
     if lista:

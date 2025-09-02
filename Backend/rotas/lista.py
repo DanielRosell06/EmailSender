@@ -55,9 +55,17 @@ def delete_lista( id_lista: int, db: Session = Depends(get_db)):
     return deleted
 
 @router.delete("/undelete_lista/", response_model=bool)
-def delete_lista( id_lista: int, db: Session = Depends(get_db)):
+def undelete_lista( id_lista: int, db: Session = Depends(get_db)):
     """
     Retira a lista de id = id_lista da lixeira
     """
     undeleted = crud_lista.undelete_lista(db, id_lista)
     return undeleted
+
+@router.put("/edit_lista/", response_model=str)
+def edit_lista( id_lista: int, new_titulo: str, db: Session = Depends(get_db)):
+    """
+    Edita o título da lista
+    """
+    result = crud_lista.edit_lista(db=db, id_lista=id_lista, new_titulo=new_titulo)
+    return result
