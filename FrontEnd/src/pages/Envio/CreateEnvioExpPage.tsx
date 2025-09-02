@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaChevronLeft, FaExpand } from "react-icons/fa";
+import { FaEnvelope, FaUsers, FaPaperPlane, FaChevronLeft, FaSearch } from "react-icons/fa";
 import { useLoaderData, useNavigate } from 'react-router-dom';
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Lista {
     IdLista: number;
     Titulo: string;
     Ultimo_Uso: string;
-    Emails: { Conteudo: string }[]; // Adicionando a propriedade Emails
+    Emails: { Conteudo: string }[];
 }
 
 interface Campanha {
@@ -24,15 +26,15 @@ interface Campanha {
 const CreateEnvioExpPage: React.FC = () => {
     const { IdCampanha, IdLista } = useLoaderData() as { IdCampanha?: string; IdLista?: string };
 
-    const [lista, setLista] = useState<Lista | null>(null); // Tipando o estado
+    const [lista, setLista] = useState<Lista | null>(null);
     const [campanha, setCampanha] = useState<Campanha | null>(null)
-
-    const [selectedLista, setSelectedLista] = useState<number | null>(null);
-    const [selectedCampanha, setSelectedCampanha] = useState<number | null>(null);
-
     const [loadingLista, setLoadingLista] = useState(true);
     const [loadingCampanha, setLoadingCampanha] = useState(true);
     const navigate = useNavigate();
+
+    // Novo estado para o termo de pesquisa e a lista filtrada
+    const [searchTermLista, setSearchTermLista] = useState("");
+    const [filteredEmails, setFilteredEmails] = useState<{ Conteudo: string }[]>([]);
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
@@ -43,6 +45,10 @@ const CreateEnvioExpPage: React.FC = () => {
                 .then(res => res.json())
                 .then(listaData => {
                     setLista(listaData);
+                    // Inicializa a lista filtrada com todos os e-mails
+                    if (listaData && listaData.Emails) {
+                        setFilteredEmails(listaData.Emails);
+                    }
                 })
                 .catch(() => setLista(null))
                 .finally(() => {
@@ -68,6 +74,16 @@ const CreateEnvioExpPage: React.FC = () => {
         }
     }, [backendUrl, IdLista]);
 
+    // Novo useEffect para filtrar a lista de e-mails sempre que o termo de pesquisa ou a lista original mudar
+    useEffect(() => {
+        if (lista && lista.Emails) {
+            const filtered = lista.Emails.filter(email =>
+                email.Conteudo.toLowerCase().includes(searchTermLista.toLowerCase())
+            );
+            setFilteredEmails(filtered);
+        }
+    }, [searchTermLista, lista]);
+
     const handleEnvio = () => {
         const envioData = {
             Lista: IdLista,
@@ -89,7 +105,7 @@ const CreateEnvioExpPage: React.FC = () => {
                         </div>
                     </div>
                     {loadingLista ? (
-                        <p>Carregando lista...</p>
+                        <Skeleton className="bg-slate-200 w-full h-128"></Skeleton>
                     ) : (
                         <p>Não foi possível carregar a lista. Verifique o ID da lista.</p>
                     )}
@@ -114,18 +130,32 @@ const CreateEnvioExpPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="w-full h-80  rounded-lg bg-white ">
-                    <ul className="space-y-2">
-                        {lista.Emails.map((email, index) => (
-                            <li
-                                key={index}
-                                className="flex items-center p-2 rounded-lg bg-stone-100 bg-opacity-60 text-stone-800 shadow-sm transition-transform transform hover:scale-[1.01]"
-                            >
-                                <FaEnvelope className="text-purple-500 mr-3" />
-                                <span className="text-sm font-medium">{email.Conteudo}</span>
-                            </li>
-                        ))}
-                    </ul>
+                <div className="relative">
+                    <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Pesquisar e-mail..."
+                        value={searchTermLista}
+                        onChange={(e) => setSearchTermLista(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors"
+                    />
+                </div>
+                <div className="w-full h-96 rounded-lg bg-white overflow-y-auto">
+                    {filteredEmails.length > 0 ? (
+                        <ul className="space-y-2 p-2">
+                            {filteredEmails.slice(0, 100).map((email, index) => (
+                                <li
+                                    key={index}
+                                    className="flex items-center p-2 rounded-lg bg-stone-100 bg-opacity-60 text-stone-800 shadow-sm transition-transform transform hover:scale-[1.01]"
+                                >
+                                    <FaEnvelope className="text-purple-500 mr-3" />
+                                    <span className="text-sm font-medium">{email.Conteudo}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-center p-4 text-gray-500">Nenhum e-mail encontrado.</p>
+                    )}
                 </div>
             </div>
         );
@@ -144,7 +174,7 @@ const CreateEnvioExpPage: React.FC = () => {
                         </div>
                     </div>
                     {loadingCampanha ? (
-                        <p>Carregando campanha...</p>
+                        <Skeleton className="bg-slate-200 w-full h-128"></Skeleton>
                     ) : (
                         <p>Não foi possível carregar a campanha. Verifique o ID da campanha.</p>
                     )}
@@ -169,7 +199,7 @@ const CreateEnvioExpPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="w-full overflow-hidden rounded-lg bg-gray-100 p-2 shadow-inner h-96">
+                <div className="w-full overflow-hidden rounded-lg bg-gray-100 p-2 shadow-inner h-128">
                     <iframe
                         srcDoc={campanha.Documento}
                         className="w-[100%] h-full border-none"
