@@ -94,11 +94,7 @@ const CreateEnvioPage: React.FC = () => {
 
     const handleEnvio = () => {
         if (selectedLista && selectedCampanha) {
-            const envioData = {
-                Lista: selectedLista,
-                Campanha: selectedCampanha
-            };
-            navigate('/envio_progress', { state: { envioData } });
+            navigate(`/create_envio_exp/${selectedCampanha}/${selectedLista}`);
         } else {
             alert('Por favor, selecione uma lista e uma campanha antes de enviar.');
         }

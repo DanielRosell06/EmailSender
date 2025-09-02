@@ -29,6 +29,14 @@ def get_all_listas(db: Session = Depends(get_db)):
     listas = crud_lista.get_all_lista(db=db)
     return listas
 
+@router.get("/get_lista_by_id_com_email/", response_model=schemas_lista.ListaComEmail)
+def get_all_listas(id_lista = int, db: Session = Depends(get_db)):
+    """
+    Retorna a lista com IdLista = id_lista, e todos os seus emails
+    """
+    lista = crud_lista.get_lista_com_emails(id_lista=id_lista, db=db)
+    return lista
+
 
 @router.get("/lista/", response_model=list[schemas_lista.Lista])
 def get_all_listas(db: Session = Depends(get_db)):

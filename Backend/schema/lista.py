@@ -10,6 +10,17 @@ class ListaCreate(BaseModel):
 class ListaGet(BaseModel):
     IdLista: int
 
+class Email(BaseModel):
+    Conteudo: str
+
+class ListaComEmail(BaseModel):
+    IdLista: int
+    Titulo: str
+    Ultimo_Uso: date | None = None
+    Emails: list[Email]
+    
+    model_config = ConfigDict(from_attributes=True)
+
 class Lista(BaseModel):
     IdLista: int
     Titulo: str

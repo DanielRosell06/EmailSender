@@ -22,7 +22,7 @@ def get_lista_com_emails(db: Session, id_lista: int):
         "IdLista": lista.IdLista,
         "Titulo": lista.Titulo,
         "Ultimo_Uso": lista.Ultimo_Uso,
-        "emails": emails
+        "Emails": emails
     }
     return resultado
 
