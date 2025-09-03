@@ -11,6 +11,7 @@ class ListaGet(BaseModel):
     IdLista: int
 
 class Email(BaseModel):
+    IdEmail: int
     Conteudo: str
 
 class ListaComEmail(BaseModel):

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaPaperPlane, FaArrowRight, FaEllipsisV } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import CreateListModal from "@/components/Lista/createModal";
+import CreateListModal from "@/components/Lista/createListModal";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -23,6 +23,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import EditListModal from "@/components/Lista/editListModal";
 
 // Interface para as Listas e Envios
 interface Lista {
@@ -114,6 +115,19 @@ const ListasPage: React.FC = () => {
             });
     }
 
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [listToEditId, setListToEditId] = useState<number | null>(null);
+
+    const handleOpenEditModal = (id: number | null) => {
+        setListToEditId(id);
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setListToEditId(null);
+    };
+
     // Função de renderização para a seção de Listas
     const renderListasSection = () => {
         if (loadingListas) {
@@ -157,6 +171,9 @@ const ListasPage: React.FC = () => {
                                                 <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg rounded-lg p-2 min-w-[120px]">
                                                     <DropdownMenuLabel>Opções</DropdownMenuLabel>
                                                     <DropdownMenuSeparator />
+                                                    <DropdownMenuItem onSelect={() => handleOpenEditModal(lista.IdLista)} className=" w-full focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-slate-200">
+                                                        Editar
+                                                    </DropdownMenuItem>
                                                     <Dialog>
                                                         <DialogTrigger className="text-red-600 w-full focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-slate-200">
                                                             Mover para a lixeira
@@ -291,6 +308,12 @@ const ListasPage: React.FC = () => {
                     {renderEnviosSection()}
                 </div>
             </div>
+            <EditListModal
+                isModalOpen={isEditModalOpen}
+                openModal={() => handleOpenEditModal(listToEditId)} // Adicionado o openModal
+                onClose={handleCloseEditModal}
+                listaId={listToEditId}
+            />
         </div>
     );
 };
