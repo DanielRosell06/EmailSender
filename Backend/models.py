@@ -87,3 +87,16 @@ class StatusEnvio(Base):
     # Relacionamentos
     envio_pai = relationship("Envio")
     email_pai = relationship("Email")
+
+class UsuarioSmtp(Base):
+    __tablename__ = "usuario_smtp"
+
+    IdUsuarioSmtp = Column(Integer, primary_key=True, nullable=False, index=True)
+
+    #Colunas de conta do usuario
+    Usuario = Column(String, nullable=False)
+    Senha = Column(String, nullable=False)
+
+    #Colunas de configuracao do envio
+    Dominio = Column(String, nullable=False)
+    Porta = Column(String, nullable=False, default="587")
