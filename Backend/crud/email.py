@@ -4,15 +4,25 @@ from sqlalchemy.orm import Session
 import models # Acessa a pasta acima para importar models.py
 from schema import email as schemas_email # Acessa a pasta acima para importar schemas/lista.py
 
-def create_email(db: Session, email: list[schemas_email.EmailCreate], lista_id: int):
+def create_email(db: Session, emails: list[schemas_email.EmailCreate], lista_id: int):
     
-    for i in email:
+    for i in emails:
         db_email = models.Email(Conteudo=i, Lista=lista_id)
         db.add(db_email)
 
     db.commit()
     db.refresh(db_email)
-    return db_email
+    return True
+
+def create_email_sem_lista(db: Session, emails: list[str], lista_id: int):
+    
+    for email_data in emails:
+        db_email = models.Email(Conteudo=email_data, Lista=lista_id)
+        db.add(db_email)
+
+    db.commit()
+    db.refresh(db_email)
+    return True
 
 def edit_email(db: Session, emails: list[schemas_email.EmailEdit]):
     for email in emails:

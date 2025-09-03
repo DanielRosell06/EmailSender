@@ -33,71 +33,107 @@ interface EditListModalProps {
 
 const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, onClose, listaId }) => {
   const [listaTitle, setListaTitle] = useState('');
+  const [oldListaTitle, setOldListaTitle] = useState('');
   const [emailInput, setEmailInput] = useState('');
-  const [emails, setEmails] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true); // Adiciona o estado de loading
+  const [emails, setEmails] = useState<Email[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newEmails, setNewEmails] = useState<string[]>([]);
+  const [deletedEmails, setDeletedEmails] = useState<number[]>([]);
+  const [editedEmails, setEditedEmails] = useState<Email[]>([]);
 
-  // Use useEffect para carregar os dados da lista quando o modal abrir
   useEffect(() => {
     if (isModalOpen && listaId) {
-      setLoading(true); // Inicia o carregamento
+      setLoading(true);
       fetch(`${backendUrl}/get_lista_by_id_com_email?id_lista=${listaId}`)
         .then(response => response.json())
         .then(data => {
-          console.log(data)
           setListaTitle(data.Titulo);
-          const emailStrings = data.Emails.map((emailObj: { Conteudo: any; }) => emailObj.Conteudo);
-          setEmails(emailStrings);
+          setOldListaTitle(data.Titulo);
+          setEmails(data.Emails);
         })
         .finally(() => {
-          setLoading(false); // Finaliza o carregamento, independentemente do resultado
+          setLoading(false);
         });
     }
   }, [isModalOpen, listaId]);
 
-  // Função para adicionar um e-mail ao estado
   const handleAddEmail = () => {
-    if (emailInput && !emails.includes(emailInput)) {
-      setEmails([...emails, emailInput]);
+    if (emailInput && !emails.some(e => e.Conteudo === emailInput)) {
+      const newId = emails.length > 0 ? Math.max(...emails.map(e => e.IdEmail)) + 1 : 1;
+      const newEmail: Email = { IdEmail: newId, Conteudo: emailInput };
+      setEmails([...emails, newEmail]);
+      setNewEmails([...newEmails, emailInput])
       setEmailInput('');
     }
   };
 
-  // Função para remover um e-mail do estado
-  const handleRemoveEmail = (emailToRemove: string) => {
-    setEmails(emails.filter(email => email !== emailToRemove));
+  const handleRemoveEmail = (IdEmail: number) => {
+    const emailToRemove = emails.find(e => e.IdEmail === IdEmail);
+    if (emailToRemove) {
+      setEmails(emails.filter(email => email.IdEmail !== IdEmail));
+      setDeletedEmails([...deletedEmails, IdEmail]);
+    }
   };
 
-  // Função para salvar a lista (agora para editar)
   const handleSaveList = async () => {
+    const promises = [];
+
+    if (listaTitle !== oldListaTitle) {
+      const editTitlePromise = fetch(`${backendUrl}/edit_lista?id_lista=${listaId}&new_titulo=${listaTitle}`, { method: "PUT" })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao alterar o título da lista. Tente novamente mais tarde.');
+          }
+          return response.json();
+        });
+      promises.push(editTitlePromise);
+    }
+
+    if (newEmails.length > 0) {
+      const createEmailsPromise = fetch(`${backendUrl}/create_email?lista_id=${listaId}`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEmails)
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao tentar criar novos emails. Tente novamente mais tarde.');
+          }
+          return response.json();
+        });
+      promises.push(createEmailsPromise);
+    }
+
+    if (deletedEmails.length > 0) {
+      const deleteEmailsPromise = fetch(`${backendUrl}/delete_email`, {
+        method: "DELETE",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(deletedEmails)
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao tentar remover emails. Tente novamente mais tarde.');
+          }
+          return response.json();
+        });
+      promises.push(deleteEmailsPromise);
+    }
+
+    if (promises.length === 0) {
+      onClose();
+      return;
+    }
+
     try {
-      const updatedLista = {
-        Titulo: listaTitle,
-        Emails: emails
-      };
+      await Promise.all(promises);
 
-      // TODO: Altere o método para 'PUT' ou 'PATCH' para atualizar a lista
-      const response = await fetch(`${backendUrl}/listas/${listaId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedLista),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao salvar a lista.');
-      }
-
-      console.log('Lista salva com sucesso!');
-
-      // Limpa os estados e fecha o modal
-      setListaTitle('');
-      setEmails([]);
+      setOldListaTitle(listaTitle);
+      setDeletedEmails([]);
+      setNewEmails([]);
       onClose();
 
     } catch (error) {
-      console.error(error);
+      alert((error as Error).message);
     }
   };
 
@@ -105,14 +141,13 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
     <StrictMode>
       <div className='text-center'>
         <Modal
-          buttonTitle={"Editar"} // O botão de abrir o modal
+          buttonTitle={"Editar"}
           buttonClassName=" hidden"
           modalTitle='Editar Lista'
-          isModalOpen={isModalOpen} // Passa o estado de visibilidade
-          openModal={openModal} // Passa a função de abrir
-          onClose={onClose} // Passa a função de fechar
+          isModalOpen={isModalOpen}
+          openModal={openModal}
+          onClose={onClose}
         >
-          {/* Seção de Título */}
           <div className='flex h-10'>
             <h1 className='mt-auto mb-auto font-bold mr-2 text-xl'>Título:</h1>
             {loading ? (
@@ -131,7 +166,6 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
             )}
           </div>
 
-          {/* Seção de Adicionar E-mail */}
           <div className='flex text-left mt-4'>
             <div className='w-[300px] mr-6'>
               <h1 className='font-bold text-xl'>Adicionar E-mail</h1>
@@ -159,21 +193,20 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
               </div>
             </div>
 
-            {/* Seção de Arquivo .csv */}
             <CSVReader onLoadEmails={(e: any) => {
               if (Array.isArray(e.value)) {
-                setEmails(prev => [
-                  ...prev,
-                  ...e.value.filter(
-                    (email: string) => email && !prev.includes(email)
-                  ),
-                ]);
-                e.value = []
+                const emailsToAdd = e.value
+                  .filter((emailContent: string) => emailContent && !emails.some(e => e.Conteudo === emailContent))
+                  .map((emailContent: any) => ({
+                    IdEmail: 0, // Id temporário
+                    Conteudo: emailContent
+                  }));
+                setEmails(prev => [...prev, ...emailsToAdd]);
+                setNewEmails(prev => [...prev, ...emailsToAdd.map((e: { Conteudo: any; }) => e.Conteudo)]);
               }
             }}></CSVReader>
           </div>
 
-          {/* Seção de E-Mails */}
           <div className='text-left'>
             <h1 className='text-xl font-bold'>E-Mails</h1>
             <h3 className='text-slate-500'>E-Mails que estão na lista até agora</h3>
@@ -181,7 +214,6 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
               <Table className="border border-slate-200 rounded-lg overflow-hidden">
                 <TableBody>
                   {loading ? (
-                    // Exibe skeletons se estiver carregando
                     <>
                       <TableRow className="border-t border-slate-200">
                         <TableCell><Skeleton className="h-6 w-full bg-slate-200" /></TableCell>
@@ -200,19 +232,18 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
                       </TableRow>
                     </>
                   ) : (
-                    // Exibe os e-mails se o carregamento estiver completo
                     emails.slice(0, 50).map((email, index) => (
                       <TableRow
-                        key={index}
+                        key={email.IdEmail || index}
                         className="border-t border-slate-200 hover:bg-slate-300/50 transition-colors"
                       >
                         <TableCell className="font-medium text-stone-700">
-                          {email}
+                          {email.Conteudo}
                         </TableCell>
                         <TableCell className="text-center">
                           <button
                             className="text-orange-500 hover:text-orange-700 transition-colors hover:cursor-pointer w-2 h-2"
-                            onClick={() => handleRemoveEmail(email)}
+                            onClick={() => handleRemoveEmail(email.IdEmail)}
                           >
                             <FaTimes />
                           </button>
@@ -222,7 +253,6 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
                   )}
                 </TableBody>
               </Table>
-              {/* Mostre o contador de e-mails restantes se a lista original for maior que 50 */}
               {emails.length > 50 && (
                 <div className="p-4 text-center text-stone-700">
                   e outros {emails.length - 50} e-mails
@@ -231,7 +261,7 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
             </ScrollArea>
             <div className='w-full text-center mt-6'>
               {loading ? (
-                <Skeleton className="p-6 h-10 w-32 rounded-[12px] bg-slate-200"/>
+                <Skeleton className="p-6 h-10 w-32 rounded-[12px] bg-slate-200" />
               ) : (
                 <Button
                   className='p-6 hover:cursor-pointer mt-auto mb-auto ml-2 text-white text-xl font-bold h-10 rounded-[12px] hover:bg-slate-300 border 

@@ -64,9 +64,14 @@ const ListasPage: React.FC = () => {
     // Estados de carregamento individuais
     const [loadingListas, setLoadingListas] = useState(true);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
+    const [reload, setReload] = useState(-1)
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const navigate = useNavigate();
+
+    function reloadListas() {
+        setReload(reload*-1)
+    }
 
     // Efeito para buscar Listas
     useEffect(() => {
@@ -81,7 +86,7 @@ const ListasPage: React.FC = () => {
                 setListas([]);
             })
             .finally(() => setLoadingListas(false));
-    }, [backendUrl]);
+    }, [backendUrl,reload]);
 
     // Efeito para buscar Envios
     useEffect(() => {
@@ -126,6 +131,7 @@ const ListasPage: React.FC = () => {
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setListToEditId(null);
+        reloadListas();
     };
 
     // Função de renderização para a seção de Listas

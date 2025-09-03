@@ -17,7 +17,7 @@ def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(ge
     Cria uma nova lista com os dados fornecidos.
     """
     response_list = crud_lista.create_lista(db=db, lista=lista_data)
-    response_emails = crud_email.create_email(db=db, email=lista_data.Emails, lista_id=response_list.IdLista)
+    response_emails = crud_email.create_email(db=db, emails=lista_data.Emails, lista_id=response_list.IdLista)
      
     return response_list
 
