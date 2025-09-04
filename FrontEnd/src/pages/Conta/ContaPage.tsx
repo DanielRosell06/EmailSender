@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlus, FaEye, FaRegEnvelope, FaWrench } from 'react-icons/fa';
 
 import {
@@ -33,11 +33,8 @@ const ContaPage: React.FC = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     // Exemplo de estado com contas SMTP simuladas
-    const [accounts, setAccounts] = useState<SmtpAccountWithId[]>([
-        { IdUsuarioSmtp: 1, Dominio: 'smtp.gmail.com', Porta: '587', Usuario: 'usuario1@gmail.com', Senha: 'password123' },
-        { IdUsuarioSmtp: 2, Dominio: 'smtp.office365.com', Porta: '587', Usuario: 'usuario2@outlook.com', Senha: 'password456' },
-        { IdUsuarioSmtp: 3, Dominio: 'smtp.mail.yahoo.com', Porta: '465', Usuario: 'usuario3@yahoo.com', Senha: 'password789' },
-    ]);
+    const [accounts, setAccounts] = useState<SmtpAccountWithId[]>([]);
+    const [loadingAccounts, setLoadingAccounts] = useState<boolean>(true)
 
     const [newAccount, setNewAccount] = useState<Omit<SmtpAccount, 'id'>>({
         Usuario: '',
@@ -55,6 +52,17 @@ const ContaPage: React.FC = () => {
         // return data.Senha;
         alert(`Buscando senha para a conta com ID: ${accountId}`);
     };
+
+    useEffect(() => {
+            fetch(`${backendUrl}/get_all_user_smtp`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data)
+                    setAccounts(data);
+                })
+                .catch(() => setAccounts([]))
+                .finally(() => setLoadingAccounts(false));
+        }, [backendUrl]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;

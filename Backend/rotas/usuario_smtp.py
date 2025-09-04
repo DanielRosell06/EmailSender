@@ -23,7 +23,7 @@ def create_user_smtp(user_smtp: schema_usuario_smtp.UsuarioSmtp, db: Session = D
      
     return response
 
-@router.post("/get_all_user_smtp/", response_model=list[schema_usuario_smtp.UsuarioSmtpComIdUsuarioSmtpSemSenha])
+@router.get("/get_all_user_smtp/", response_model=list[schema_usuario_smtp.UsuarioSmtpComIdUsuarioSmtpSemSenha])
 def get_all_user_smtp(db: Session = Depends(get_db)):
     """
     Pega todos os UserSmtp sem a senha
