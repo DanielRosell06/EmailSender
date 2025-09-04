@@ -22,3 +22,12 @@ def create_user_smtp(user_smtp: schema_usuario_smtp.UsuarioSmtp, db: Session = D
     response = crud_usuario_smtp.create_user_smtp(db=db, new_usuario_smtp=user_smtp)
      
     return response
+
+@router.post("/get_all_user_smtp/", response_model=list[schema_usuario_smtp.UsuarioSmtpComIdUsuarioSmtpSemSenha])
+def get_all_user_smtp(db: Session = Depends(get_db)):
+    """
+    Pega todos os UserSmtp sem a senha
+    """
+    response = crud_usuario_smtp.get_user_smtp_sem_senha(db=db)
+     
+    return response

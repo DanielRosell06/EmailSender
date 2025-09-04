@@ -37,3 +37,13 @@ def create_user_smtp(db: Session, new_usuario_smtp: schema_usuario_smtp.UsuarioS
     db.commit()
     db.refresh(usuario)
     return usuario
+
+def get_user_smtp_sem_senha(db: Session):
+    usuario = db.query(
+        models.UsuarioSmtp.IdUsuarioSmtp,
+        models.UsuarioSmtp.Dominio,
+        models.UsuarioSmtp.Usuario,
+        models.UsuarioSmtp.Porta
+    ).all()
+
+    return usuario

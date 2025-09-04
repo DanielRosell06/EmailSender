@@ -7,3 +7,9 @@ class UsuarioSmtp(BaseModel):
     Senha: str
     Dominio: str
     Porta: str
+
+class UsuarioSmtpComIdUsuarioSmtpSemSenha(BaseModel):
+    IdUsuarioSmtp: int
+    Usuario: str
+    Dominio: str
+    Porta: str
