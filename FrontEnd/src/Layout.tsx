@@ -1,6 +1,6 @@
 // src/components/layout/Layout.tsx
 import React, { useState } from 'react';
-import { FaEnvelope, FaPaperPlane, FaUsers, FaChevronDown, FaChevronRight, FaHome } from 'react-icons/fa';
+import { FaEnvelope, FaPaperPlane, FaUsers, FaChevronDown, FaChevronRight, FaHome, FaPersonBooth } from 'react-icons/fa';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 const Layout: React.FC = () => {
@@ -212,6 +212,15 @@ const Layout: React.FC = () => {
             >
               <FaPaperPlane className='w-[20px] h-[20px] mr-3' />
               <h1 className='text-[18px]'>Enviar</h1>
+            </button>
+            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
+              }`}
+              onClick={() => {
+                handleNavigate('/conta_page')
+              }}
+            >
+              <FaPersonBooth className='w-[20px] h-[20px] mr-3' />
+              <h1 className='text-[18px]'>Contas</h1>
             </button>
           </div>
         </div>

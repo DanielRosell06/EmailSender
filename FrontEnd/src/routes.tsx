@@ -14,6 +14,7 @@ import EditCampanhaPage from "./pages/Campanha/EditCampanhaPage.tsx";
 import LixeiraCampanhasPage from "./pages/Campanha/LixeiraCampanhaPage.tsx";
 import LixeiraListasPage from "./pages/Lista/LixeiraListaPage.tsx";
 import CreateEnvioExpPage from "./pages/Envio/CreateEnvioExpPage.tsx";
+import ContaPage from "./pages/Conta/ContaPage.tsx";
 
 
 const router = createBrowserRouter([
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
             {
                 path: "lixeira_lista",
                 element: <LixeiraListasPage />,
+            },
+            {
+                path: "conta_page",
+                element: <ContaPage />,
             },
         ],
     },

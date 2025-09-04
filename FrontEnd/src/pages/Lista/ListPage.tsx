@@ -111,7 +111,7 @@ const ListasPage: React.FC = () => {
     };
 
     const handleDeleteLista = (idLista: number) => {
-        fetch(`http://127.0.0.1:8000/delete_lista?id_lista=${idLista}`, { method: "DELETE" })
+        fetch(`${backendUrl}/delete_lista?id_lista=${idLista}`, { method: "DELETE" })
             .then(() => {
                 setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
             })

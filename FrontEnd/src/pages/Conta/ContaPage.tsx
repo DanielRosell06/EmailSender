@@ -1,0 +1,249 @@
+import React, { useState } from 'react';
+import { FaPlus, FaEye, FaRegEnvelope, FaWrench } from 'react-icons/fa';
+
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+// Interface para a Conta SMTP
+interface SmtpAccount {
+    Usuario: string;
+    Senha?: string;
+    Dominio: string;
+    Porta: string;
+}
+
+interface SmtpAccountWithId {
+    IdUsuarioSmtp: number;
+    Usuario: string;
+    Senha?: string;
+    Dominio: string;
+    Porta: string;
+}
+
+const ContaPage: React.FC = () => {
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
+    // Exemplo de estado com contas SMTP simuladas
+    const [accounts, setAccounts] = useState<SmtpAccountWithId[]>([
+        { IdUsuarioSmtp: 1, Dominio: 'smtp.gmail.com', Porta: '587', Usuario: 'usuario1@gmail.com', Senha: 'password123' },
+        { IdUsuarioSmtp: 2, Dominio: 'smtp.office365.com', Porta: '587', Usuario: 'usuario2@outlook.com', Senha: 'password456' },
+        { IdUsuarioSmtp: 3, Dominio: 'smtp.mail.yahoo.com', Porta: '465', Usuario: 'usuario3@yahoo.com', Senha: 'password789' },
+    ]);
+
+    const [newAccount, setNewAccount] = useState<Omit<SmtpAccount, 'id'>>({
+        Usuario: '',
+        Senha: '',
+        Dominio: '',
+        Porta: '587',
+    });
+
+    // Função que você deve implementar para buscar a senha real
+    const handleGetSenha = async (accountId: number) => {
+        // Implementar a lógica de requisição à API para obter a senha
+        // Exemplo:
+        // const response = await fetch(`/api/get_password?id=${accountId}`);
+        // const data = await response.json();
+        // return data.Senha;
+        alert(`Buscando senha para a conta com ID: ${accountId}`);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setNewAccount({ ...newAccount, [name]: value });
+    };
+
+    const handleAddAccount = () => {
+        if (!newAccount.Dominio || !newAccount.Usuario || !newAccount.Senha || !newAccount.Porta) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+        console.log(newAccount)
+        fetch(`${backendUrl}/create_user_smtp`, {
+            method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(
+                newAccount
+            )
+        })
+            .then(res => res.json())
+            .then(data => {
+                const accountWithId = data;
+                setAccounts([...accounts, accountWithId]);
+                setNewAccount({ Dominio: '', Porta: '587', Usuario: '', Senha: '' });
+            })
+            .catch(() => {
+                alert('Não foi possivel adicionar conta, tente novamente mais tarde!')
+            });
+    };
+
+    const renderAddAccountSection = () => (
+        <Card className="bg-white/50 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg transition-all duration-300 transform">
+            <CardHeader className="flex flex-row items-center gap-4 p-6">
+                <div className="p-2 rounded-lg bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50">
+                    <FaPlus className="text-white text-lg" />
+                </div>
+                <div className='flex flex-col'>
+                    <CardTitle className="text-2xl font-bold text-gray-800">Adicionar Conta SMTP</CardTitle>
+                    <CardDescription className="text-sm text-gray-600 mt-1">Preencha os campos para adicionar uma nova conta.</CardDescription>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4 p-6 pt-0">
+                <div className="grid w-full items-center gap-2">
+                    <Label htmlFor="Dominio" className="text-sm text-gray-600">Servidor (Dominio)</Label>
+                    <Input
+                        id="Dominio"
+                        name="Dominio"
+                        value={newAccount.Dominio}
+                        onChange={handleInputChange}
+                        className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500"
+                        placeholder="Ex: smtp.gmail.com"
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="grid w-full items-center gap-2">
+                        <Label htmlFor="Porta" className="text-sm text-gray-600">Porta</Label>
+                        <Input
+                            id="Porta"
+                            name="Porta"
+                            type="number"
+                            value={newAccount.Porta}
+                            onChange={handleInputChange}
+                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500"
+                        />
+                    </div>
+                    <div className="grid w-full items-center gap-2">
+                        <Label htmlFor="Usuario" className="text-sm text-gray-600">Usuário (Email)</Label>
+                        <Input
+                            id="Usuario"
+                            name="Usuario"
+                            value={newAccount.Usuario}
+                            onChange={handleInputChange}
+                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500"
+                            placeholder="Ex: seuemail@dominio.com"
+                        />
+                    </div>
+                </div>
+                <div className="grid w-full items-center gap-2">
+                    <Label htmlFor="Senha" className="text-sm text-gray-600">Senha (App Password)</Label>
+                    <div className="relative">
+                        <Input
+                            id="Senha"
+                            name="Senha"
+                            type="Senha"
+                            value={newAccount.Senha}
+                            onChange={handleInputChange}
+                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500 pr-10"
+                            placeholder="******************"
+                        />
+                    </div>
+                </div>
+                <Button
+                    onClick={handleAddAccount}
+                    className="w-full bg-gradient-to-r from-indigo-500/80 via-purple-500/80 to-fuchsia-500/80 text-white font-semibold rounded-xl shadow hover:from-indigo-600 hover:via-purple-600 hover:to-fuchsia-600 transition-all"
+                >
+                    <FaWrench className="mr-2" />
+                    Adicionar Conta
+                </Button>
+            </CardContent>
+        </Card>
+    );
+
+    const renderAccountsList = () => (
+        <Card className="bg-white/50 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg mt-6">
+            <CardHeader>
+                <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50">
+                        <FaRegEnvelope className="text-white text-lg" />
+                    </div>
+                    Contas SMTP
+                </CardTitle>
+                <CardDescription className="text-gray-600">Gerencie suas contas de e-mail aqui.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 p-6 pt-0">
+                {accounts.length > 0 ? (
+                    accounts.map((account) => (
+                        <div
+                            key={account.IdUsuarioSmtp}
+                            className="flex items-center justify-between p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-sm hover:border-fuchsia-500"
+                        >
+                            <div className="flex flex-col">
+                                <span className="font-semibold text-gray-800">{account.Usuario}</span>
+                                <span className="text-sm text-gray-500">{account.Dominio}:{account.Porta}</span>
+                            </div>
+                            <div className="relative">
+                                <span className="text-2xl text-gray-400 select-none">••••••••</span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleGetSenha(account.IdUsuarioSmtp)}
+                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full text-gray-500 hover:text-indigo-600"
+                                >
+                                    <FaEye />
+                                </Button>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500">Nenhuma conta encontrada.</p>
+                )}
+            </CardContent>
+        </Card>
+    );
+
+    const renderRightPanel = () => (
+        <Card className="bg-white/50 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg p-6 flex flex-col justify-between h-140">
+            <div>
+                <CardHeader>
+                    <CardTitle className="text-xl font-bold text-gray-800">O que é uma Conta SMTP?</CardTitle>
+                </CardHeader>
+                <CardContent className="text-gray-600 space-y-4">
+                    <p>
+                        SMTP (Simple Mail Transfer Protocol) é o protocolo padrão para enviar e-mails. Quando você envia uma mensagem, ela é encaminhada de um servidor para outro através do SMTP até chegar ao destino final.
+                    </p>
+                    <p>
+                        A configuração de uma conta SMTP em um aplicativo como este é essencial para que o sistema possa enviar e-mails de forma confiável em seu nome, usando as credenciais do seu provedor de e-mail.
+                    </p>
+                    <p>
+                        Isso garante a autenticidade e a entrega das mensagens, evitando que sejam marcadas como spam.
+                    </p>
+                </CardContent>
+            </div>
+            <div className="p-6 pt-0">
+                <Button
+                    onClick={() => window.open('https://www.hostinger.com.br/tutoriais/o-que-e-smtp', '_blank')}
+                    className="w-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 text-white font-semibold rounded-xl shadow transition-all hover:from-purple-700 hover:via-pink-600 hover:to-orange-600"
+                >
+                    Veja um Tutorial para criar sua conta
+                </Button>
+            </div>
+        </Card>
+    );
+
+    return (
+        <div className="min-h-screen p-8 bg-white">
+            <div className="max-w-7xl mx-auto flex gap-8">
+                {/* Seção Esquerda (65%) */}
+                <div className="flex-1 w-[65%] space-y-8">
+                    {renderAddAccountSection()}
+                    {renderAccountsList()}
+                </div>
+
+                {/* Seção Direita (35%) */}
+                <div className="w-[35%]">
+                    {renderRightPanel()}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ContaPage;
