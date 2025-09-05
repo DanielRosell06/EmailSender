@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FaEnvelope, FaUsers, FaPaperPlane, FaChevronLeft, FaSearch } from "react-icons/fa";
+import { FaEnvelope, FaUsers, FaPaperPlane, FaChevronLeft, FaSearch, FaCheckCircle, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 
 interface Lista {
     IdLista: number;
@@ -23,6 +32,14 @@ interface Campanha {
     Lixeira: boolean;
 }
 
+interface SmtpAccount {
+    IdUsuarioSmtp: number;
+    Usuario: string;
+    Senha?: string;
+    Dominio: string;
+    Porta: string;
+}
+
 const CreateEnvioExpPage: React.FC = () => {
     const { IdCampanha, IdLista } = useLoaderData() as { IdCampanha?: string; IdLista?: string };
 
@@ -30,6 +47,8 @@ const CreateEnvioExpPage: React.FC = () => {
     const [campanha, setCampanha] = useState<Campanha | null>(null)
     const [loadingLista, setLoadingLista] = useState(true);
     const [loadingCampanha, setLoadingCampanha] = useState(true);
+    const [contas, setContas] = useState<SmtpAccount[]>([]);
+    const [selectedAccount, setSelectedAccount] = useState<SmtpAccount | null>(null);
     const navigate = useNavigate();
 
     // Novo estado para o termo de pesquisa e a lista filtrada
@@ -73,6 +92,17 @@ const CreateEnvioExpPage: React.FC = () => {
                 .finally(() => setLoadingCampanha(false));
         }
     }, [backendUrl, IdLista]);
+
+    useEffect(() => {
+        if (backendUrl != "") {
+            fetch(`${backendUrl}/get_all_user_smtp`)
+                .then(res => res.json())
+                .then(data_users => {
+                    setContas(data_users);
+                })
+                .catch(() => setContas([]))
+        }
+    }, [backendUrl]);
 
     // Novo useEffect para filtrar a lista de e-mails sempre que o termo de pesquisa ou a lista original mudar
     useEffect(() => {
@@ -241,6 +271,58 @@ const CreateEnvioExpPage: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     {renderLista()}
                     {renderCampanha()}
+                </div>
+                <div className="w-full text-center">
+                    <div className="mx-auto inline-flex items-center gap-4 p-6 rounded-2xl shadow-xl border border-slate-200">
+                        <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg flex items-center justify-center">
+                            <FaUsers className="text-white text-sm" />
+                        </div>
+                        <h1 className="text-xl font-bold ">Enviar com:</h1>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="flex items-center justify-between gap-2 px-4 py-2 bg-slate-200 rounded-full text-sm  transition-colors hover:bg-slate-300 ">
+                                    {selectedAccount ? (
+                                        <div className="flex items-center gap-2">
+                                            <FaEnvelope className="text-slate-600" />
+                                            <span>{selectedAccount.Usuario}</span>
+                                        </div>
+                                    ) : (
+                                        <span>Selecione uma conta</span>
+                                    )}
+                                    <FaChevronUp className="w-3 h-3 text-stone-400 ml-2" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="bg-white border-slate-200 rounded-lg shadow-lg">
+                                <DropdownMenuLabel className="p-3 text-sm font-semibold ">
+                                    Minhas Contas:
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {contas.length > 0 ? (
+                                    contas.map((conta) => (
+                                        <DropdownMenuItem
+                                            key={conta.Usuario}
+                                            onSelect={() => setSelectedAccount(conta)}
+                                            className="mb-2 p-3 cursor-pointer flex items-center justify-between hover:bg-slate-200"
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="font-medium ">{conta.Usuario}</span>
+                                                <span className="text-xs text-stone-400">
+                                                    {conta.Dominio}:{conta.Porta}
+                                                </span>
+                                            </div>
+                                            {selectedAccount && selectedAccount.Usuario === conta.Usuario && (
+                                                <FaCheckCircle className="text-green-500 ml-2" />
+                                            )}
+                                        </DropdownMenuItem>
+                                    ))
+                                ) : (
+                                    <DropdownMenuItem disabled className="text-stone-500">
+                                        Nenhuma conta encontrada.
+                                    </DropdownMenuItem>
+                                )}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
                 <div className="text-center mt-12">
                     <div className="inline-block">

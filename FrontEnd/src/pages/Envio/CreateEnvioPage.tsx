@@ -147,39 +147,37 @@ const CreateEnvioPage: React.FC = () => {
                         <Skeleton key={i} className="h-28 w-full bg-gray-200" />
                     ))
                 ) : filteredListas.length > 0 ? (
-                    filteredListas.slice(0, 6).map((lista) => (
-                        lista.Lixeira == false && (
-                            <div
-                                key={lista.IdLista}
-                                className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${selectedLista === lista.IdLista
-                                    ? "border-purple-500 bg-purple-50 shadow-lg"
-                                    : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
-                                    }`}
-                                onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
-                            >
-                                <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 p-4 border-b border-purple-100">
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                                            <FaEnvelope className="text-purple-500" />
-                                            {lista.Titulo}
-                                        </h3>
-                                        {selectedLista === lista.IdLista && (
-                                            <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                                                <div className="w-2 h-2 bg-white rounded-full"></div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="p-4">
-                                    <div className="flex items-center justify-between text-sm text-gray-600">
-                                        <div className="flex items-center gap-2">
-                                            <FaCalendarAlt className="text-gray-400" />
-                                            <span>Último uso: {formatDate(lista.Ultimo_Uso)}</span>
+                    filteredListas.filter(a => a.Lixeira == false).slice(0, 5).map((lista) => (
+                        <div
+                            key={lista.IdLista}
+                            className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${selectedLista === lista.IdLista
+                                ? "border-purple-500 bg-purple-50 shadow-lg"
+                                : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
+                                }`}
+                            onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
+                        >
+                            <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 p-4 border-b border-purple-100">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                        <FaEnvelope className="text-purple-500" />
+                                        {lista.Titulo}
+                                    </h3>
+                                    {selectedLista === lista.IdLista && (
+                                        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                            <div className="w-2 h-2 bg-white rounded-full"></div>
                                         </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="p-4">
+                                <div className="flex items-center justify-between text-sm text-gray-600">
+                                    <div className="flex items-center gap-2">
+                                        <FaCalendarAlt className="text-gray-400" />
+                                        <span>Último uso: {formatDate(lista.Ultimo_Uso)}</span>
                                     </div>
                                 </div>
                             </div>
-                        )
+                        </div>
                     ))
                 ) : (
                     <p className="text-center text-gray-500">Nenhuma lista encontrada.</p>
