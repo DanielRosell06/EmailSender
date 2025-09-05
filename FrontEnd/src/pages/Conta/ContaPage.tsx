@@ -127,7 +127,7 @@ const ContaPage: React.FC = () => {
     const renderAddAccountSection = () => (
         <Card className="bg-white/50 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg transition-all duration-300 transform">
             <CardHeader className="flex flex-row items-center gap-4 p-6">
-                <div className="p-2 rounded-lg bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50">
+                <div className="p-2 rounded-lg bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-orange-600/50 via-yellow-500 to-red-500/50">
                     <FaPlus className="text-white text-lg" />
                 </div>
                 <div className='flex flex-col'>
@@ -143,7 +143,7 @@ const ContaPage: React.FC = () => {
                         name="Dominio"
                         value={newAccount.Dominio}
                         onChange={handleInputChange}
-                        className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500"
+                        className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-yellow-500"
                         placeholder="Ex: smtp.gmail.com"
                     />
                 </div>
@@ -156,7 +156,7 @@ const ContaPage: React.FC = () => {
                             type="number"
                             value={newAccount.Porta}
                             onChange={handleInputChange}
-                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500"
+                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-yellow-500"
                         />
                     </div>
                     <div className="grid w-full items-center gap-2">
@@ -166,7 +166,7 @@ const ContaPage: React.FC = () => {
                             name="Usuario"
                             value={newAccount.Usuario}
                             onChange={handleInputChange}
-                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500"
+                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-yellow-500"
                             placeholder="Ex: seuemail@dominio.com"
                         />
                     </div>
@@ -180,14 +180,14 @@ const ContaPage: React.FC = () => {
                             type="Senha"
                             value={newAccount.Senha}
                             onChange={handleInputChange}
-                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-indigo-500 pr-10"
+                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-yellow-500 pr-10"
                             placeholder="******************"
                         />
                     </div>
                 </div>
                 <Button
                     onClick={handleAddAccount}
-                    className="w-full bg-gradient-to-r from-indigo-500/80 via-purple-500/80 to-fuchsia-500/80 text-white font-semibold rounded-xl shadow hover:from-indigo-600 hover:via-purple-600 hover:to-fuchsia-600 transition-all"
+                    className="w-full bg-gradient-to-r from-orange-500/80 via-yellow-500/80 to-red-500/80 text-white font-semibold rounded-xl shadow hover:from-orange-600 hover:via-yellow-600 hover:to-red-600 transition-all"
                 >
                     <FaWrench className="mr-2" />
                     Adicionar Conta
@@ -200,7 +200,7 @@ const ContaPage: React.FC = () => {
         <Card className="bg-white/50 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg mt-6">
             <CardHeader>
                 <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50">
+                    <div className="p-2 rounded-lg bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-orange-600/50 via-yellow-500 to-red-500/50">
                         <FaRegEnvelope className="text-white text-lg" />
                     </div>
                     Contas SMTP
@@ -212,7 +212,7 @@ const ContaPage: React.FC = () => {
                     accounts.map((account) => (
                         <div
                             key={account.IdUsuarioSmtp}
-                            className="flex items-center justify-between h-20 pr-4 pl-4 rounded-xl border-2 border-slate-200 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-sm hover:border-fuchsia-500"
+                            className="flex items-center justify-between h-20 pr-4 pl-4 rounded-xl border-2 border-slate-200 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-sm hover:border-yellow-500"
                         >
                             <div className="flex flex-col">
                                 <span className="font-semibold text-gray-800">{account.Usuario}</span>
@@ -223,7 +223,7 @@ const ContaPage: React.FC = () => {
                                     <Skeleton className='mt-auto mb-auto h-6 bg-slate-200 w-32'></Skeleton>
                                     <Button
                                         variant="ghost"
-                                        className=" rounded-full text-gray-500 hover:text-indigo-600"
+                                        className=" rounded-full text-gray-500 hover:text-yellow-600"
                                     >
                                         <FaEyeSlash />
                                     </Button>
@@ -236,7 +236,7 @@ const ContaPage: React.FC = () => {
                                             Senha: "",
                                             Loading: true
                                         })}
-                                        className=" rounded-full text-gray-500 hover:text-indigo-600"
+                                        className=" rounded-full text-gray-500 hover:text-yellow-600"
                                     >
                                         <FaEyeSlash />
                                     </Button>
@@ -245,7 +245,7 @@ const ContaPage: React.FC = () => {
                                     <Button
                                         variant="ghost"
                                         onClick={() => handleGetSenha(account.IdUsuarioSmtp)}
-                                        className=" rounded-full text-gray-500 hover:text-indigo-600"
+                                        className=" rounded-full text-gray-500 hover:text-yellow-600"
                                     >
                                         <FaEye />
                                     </Button>
@@ -282,7 +282,7 @@ const ContaPage: React.FC = () => {
             <div className="p-6 pt-0">
                 <Button
                     onClick={() => window.open('https://www.hostinger.com.br/tutoriais/o-que-e-smtp', '_blank')}
-                    className="w-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 text-white font-semibold rounded-xl shadow transition-all hover:from-purple-700 hover:via-pink-600 hover:to-orange-600"
+                    className="w-full bg-gradient-to-r from-orange-600 via-yellow-500 to-red-500 text-white font-semibold rounded-xl shadow transition-all hover:from-purple-700 hover:via-pink-600 hover:to-orange-600"
                 >
                     Veja um Tutorial para criar sua conta
                 </Button>
