@@ -115,9 +115,14 @@ const CreateEnvioExpPage: React.FC = () => {
     }, [searchTermLista, lista]);
 
     const handleEnvio = () => {
+        if (selectedAccount == null){
+            alert('Selecione qual conta irá enviar o email')
+            return
+        }
         const envioData = {
             Lista: IdLista,
-            Campanha: IdCampanha
+            Campanha: IdCampanha,
+            UsuarioSmtp: selectedAccount?.IdUsuarioSmtp
         };
         navigate('/envio_progress', { state: { envioData } });
     };
@@ -274,7 +279,7 @@ const CreateEnvioExpPage: React.FC = () => {
                 </div>
                 <div className="w-full text-center">
                     <div className="mx-auto inline-flex items-center gap-4 p-6 rounded-2xl shadow-xl border border-slate-200">
-                        <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-gradient-to-r from-orange-500/70 to-yellow-500 rounded-lg flex items-center justify-center">
                             <FaUsers className="text-white text-sm" />
                         </div>
                         <h1 className="text-xl font-bold ">Enviar com:</h1>
@@ -310,7 +315,7 @@ const CreateEnvioExpPage: React.FC = () => {
                                                     {conta.Dominio}:{conta.Porta}
                                                 </span>
                                             </div>
-                                            {selectedAccount && selectedAccount.Usuario === conta.Usuario && (
+                                            {selectedAccount && selectedAccount.IdUsuarioSmtp === conta.IdUsuarioSmtp && (
                                                 <FaCheckCircle className="text-green-500 ml-2" />
                                             )}
                                         </DropdownMenuItem>

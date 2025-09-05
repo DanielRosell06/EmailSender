@@ -5,6 +5,7 @@ from typing import List, Optional
 class EnvioCreate(BaseModel):
     Campanha: int
     Lista: int
+    UsuarioSmtp: int
 
 class Detalhe(BaseModel):
     IdDetalhe: int

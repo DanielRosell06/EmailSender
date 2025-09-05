@@ -13,6 +13,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 import hashlib
 from datetime import datetime
+from cryptography.fernet import Fernet
 
 # Importa a instância do servidor SocketIO.
 # Isso geralmente é feito em um arquivo principal, como main.py, e a instância é passada aqui.
@@ -23,10 +24,15 @@ sio = None # Substitua por `from your_main_app import sio`
 # Pegando variaveis de ambiente
 load_dotenv()
 
-SMTP_DOMAIN = os.getenv("SMTP_DOMAIN")
-SMTP_USER = os.getenv("SMTP_USER")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 578))
+key_string = os.getenv("SMTP_KEY")
+
+f = Fernet(key_string.encode())
+
+def decrypt_password(encrypted_password: str) -> str:
+    decrypted_password = f.decrypt(encrypted_password.encode())
+
+    return decrypted_password.decode()
+
 SERVER_URL = os.getenv("SERVER_URL")
 
 def set_socketio_server(socket_instance):
@@ -68,7 +74,19 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
 
     campanha = db.query(models.Campanha).filter(models.Campanha.IdCampanha == envio.Campanha).first()
     lista = db.query(models.Email).filter(models.Email.Lista == envio.Lista).all()
+    usuario_smtp = db.query(models.UsuarioSmtp).filter(models.UsuarioSmtp.IdUsuarioSmtp == envio.UsuarioSmtp).first()
     total_emails = len(lista)
+
+    smtp_user = usuario_smtp.Usuario
+    smtp_domain = usuario_smtp.Dominio
+    smtp_password = usuario_smtp.Senha
+    smtp_password = decrypt_password(usuario_smtp.Senha)
+    smtp_port = usuario_smtp.Porta
+
+    print("usuario: " + smtp_user)
+    print("senha: " + smtp_password)
+    print("porta: " + smtp_port)
+    print("dominio: " + smtp_domain)
 
     db_envio = models.Envio(
         Lista = envio.Lista,
@@ -84,9 +102,9 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
 
     try:
         contexto_ssl = ssl.create_default_context()
-        with smtplib.SMTP(SMTP_DOMAIN, SMTP_PORT) as server:
+        with smtplib.SMTP(smtp_domain, smtp_port) as server:
             server.starttls(context=contexto_ssl)
-            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.login(smtp_user, smtp_password)
             
             emails_enviados_count = 0
             progresso_anterior = 0
@@ -98,7 +116,7 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
                 documento_com_tag = campanha.Documento + f' <img src="http://{SERVER_URL}/update_status_envio?token={token}">'
 
                 msg = MIMEMultipart()
-                msg['From'] = SMTP_USER
+                msg['From'] = smtp_user
                 msg['Subject'] = campanha.Assunto
                 msg.attach(MIMEText(documento_com_tag, 'html', 'utf-8'))
 
@@ -111,7 +129,7 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
                 
                 del msg['To']
                 msg['To'] = email
-                server.sendmail(SMTP_USER, email, msg.as_string())
+                server.sendmail(smtp_user, email, msg.as_string())
                 
                 emails_enviados_count += 1
                 

@@ -213,7 +213,7 @@ const Layout: React.FC = () => {
               <FaPaperPlane className='w-[20px] h-[20px] mr-3' />
               <h1 className='text-[18px]'>Enviar</h1>
             </button>
-            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-lime-400 via-yellow-300/70 to-teal-400/40 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/conta_page' ? 'bg-gray-200' : ''
+            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-red-400/60 via-yellow-500 to-orange-400/40 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/conta_page' ? 'bg-gray-200' : ''
               }`}
               onClick={() => {
                 handleNavigate('/conta_page')

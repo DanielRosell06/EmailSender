@@ -42,6 +42,7 @@ const ContaPage: React.FC = () => {
     // Exemplo de estado com contas SMTP simuladas
     const [accounts, setAccounts] = useState<SmtpAccountWithId[]>([]);
     const [loadingAccounts, setLoadingAccounts] = useState<boolean>(true)
+    const [reloadAccountsVar, setReloadAccountsVar] = useState<number>(-1)
     const [loadingSenha, setLoadingSenha] = useState<LoadingSenha>({
         IdUserSmtp: -1,
         Senha: "",
@@ -54,6 +55,10 @@ const ContaPage: React.FC = () => {
         Dominio: '',
         Porta: '587',
     });
+
+    function reloadAccounts () {
+        setReloadAccountsVar(reloadAccountsVar*-1)
+    }
 
     // Função que você deve implementar para buscar a senha real
     const handleGetSenha = async (accountId: number) => {
@@ -88,7 +93,7 @@ const ContaPage: React.FC = () => {
             })
             .catch(() => setAccounts([]))
             .finally(() => setLoadingAccounts(false));
-    }, [backendUrl]);
+    }, [backendUrl, reloadAccountsVar]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -111,7 +116,7 @@ const ContaPage: React.FC = () => {
             .then(res => res.json())
             .then(data => {
                 const accountWithId = data;
-                setAccounts([...accounts, accountWithId]);
+                reloadAccounts()
                 setNewAccount({ Dominio: '', Porta: '587', Usuario: '', Senha: '' });
             })
             .catch(() => {
