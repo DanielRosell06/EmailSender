@@ -31,3 +31,12 @@ def get_all_user_smtp(db: Session = Depends(get_db)):
     response = crud_usuario_smtp.get_user_smtp_sem_senha(db=db)
      
     return response
+
+@router.get("/get_user_password/", response_model=str)
+def get_all_user_smtp(id_user_smtp: int, db: Session = Depends(get_db)):
+    """
+    Pega a senha descriptografada do usuario 
+    """
+    response = crud_usuario_smtp.get_user_smtp_senha(id_user_smtp=id_user_smtp, db=db)
+     
+    return response

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaEye, FaRegEnvelope, FaWrench } from 'react-icons/fa';
+import { FaPlus, FaEye, FaRegEnvelope, FaWrench, FaEyeSlash } from 'react-icons/fa';
 
 import {
     Card,
@@ -11,6 +11,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+
+interface LoadingSenha {
+    IdUserSmtp: number;
+    Senha: string;
+    Loading: boolean;
+}
 
 // Interface para a Conta SMTP
 interface SmtpAccount {
@@ -35,6 +42,11 @@ const ContaPage: React.FC = () => {
     // Exemplo de estado com contas SMTP simuladas
     const [accounts, setAccounts] = useState<SmtpAccountWithId[]>([]);
     const [loadingAccounts, setLoadingAccounts] = useState<boolean>(true)
+    const [loadingSenha, setLoadingSenha] = useState<LoadingSenha>({
+        IdUserSmtp: -1,
+        Senha: "",
+        Loading: true
+    })
 
     const [newAccount, setNewAccount] = useState<Omit<SmtpAccount, 'id'>>({
         Usuario: '',
@@ -45,24 +57,38 @@ const ContaPage: React.FC = () => {
 
     // Função que você deve implementar para buscar a senha real
     const handleGetSenha = async (accountId: number) => {
-        // Implementar a lógica de requisição à API para obter a senha
-        // Exemplo:
-        // const response = await fetch(`/api/get_password?id=${accountId}`);
-        // const data = await response.json();
-        // return data.Senha;
-        alert(`Buscando senha para a conta com ID: ${accountId}`);
+        setLoadingSenha({
+            IdUserSmtp: accountId,
+            Senha: "",
+            Loading: true
+        })
+        fetch(`${backendUrl}/get_user_password?id_user_smtp=${accountId}`)
+            .then(res => res.json())
+            .then(data => {
+                setLoadingSenha({
+                    IdUserSmtp: accountId,
+                    Senha: data,
+                    Loading: false
+                })
+            })
+            .catch(() => setLoadingSenha({
+                IdUserSmtp: -1,
+                Senha: "",
+                Loading: true
+            }))
+            .finally(() => setLoadingAccounts(false));
     };
 
     useEffect(() => {
-            fetch(`${backendUrl}/get_all_user_smtp`)
-                .then(res => res.json())
-                .then(data => {
-                    console.log(data)
-                    setAccounts(data);
-                })
-                .catch(() => setAccounts([]))
-                .finally(() => setLoadingAccounts(false));
-        }, [backendUrl]);
+        fetch(`${backendUrl}/get_all_user_smtp`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setAccounts(data);
+            })
+            .catch(() => setAccounts([]))
+            .finally(() => setLoadingAccounts(false));
+    }, [backendUrl]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -77,7 +103,7 @@ const ContaPage: React.FC = () => {
         console.log(newAccount)
         fetch(`${backendUrl}/create_user_smtp`, {
             method: "POST",
-        headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(
                 newAccount
             )
@@ -181,22 +207,45 @@ const ContaPage: React.FC = () => {
                     accounts.map((account) => (
                         <div
                             key={account.IdUsuarioSmtp}
-                            className="flex items-center justify-between p-4 rounded-xl border-2 border-gray-100 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-sm hover:border-fuchsia-500"
+                            className="flex items-center justify-between h-20 pr-4 pl-4 rounded-xl border-2 border-slate-200 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-sm hover:border-fuchsia-500"
                         >
                             <div className="flex flex-col">
                                 <span className="font-semibold text-gray-800">{account.Usuario}</span>
                                 <span className="text-sm text-gray-500">{account.Dominio}:{account.Porta}</span>
                             </div>
-                            <div className="relative">
-                                <span className="text-2xl text-gray-400 select-none">••••••••</span>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleGetSenha(account.IdUsuarioSmtp)}
-                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full text-gray-500 hover:text-indigo-600"
-                                >
-                                    <FaEye />
-                                </Button>
+                            <div className="flex flex-row">
+                                {loadingSenha.IdUserSmtp == account.IdUsuarioSmtp ? (loadingSenha.Loading == true ? <>
+                                    <Skeleton className='mt-auto mb-auto h-6 bg-slate-200 w-32'></Skeleton>
+                                    <Button
+                                        variant="ghost"
+                                        className=" rounded-full text-gray-500 hover:text-indigo-600"
+                                    >
+                                        <FaEyeSlash />
+                                    </Button>
+                                </> : <>
+                                    <span className=" font-mono text-slate-700 text-sm mt-auto mb-auto select-none">{loadingSenha.Senha}</span>
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => setLoadingSenha({
+                                            IdUserSmtp: -1,
+                                            Senha: "",
+                                            Loading: true
+                                        })}
+                                        className=" rounded-full text-gray-500 hover:text-indigo-600"
+                                    >
+                                        <FaEyeSlash />
+                                    </Button>
+                                </>) : <>
+                                    <span className=" mt-auto mb-auto text-2xl text-gray-400 select-none">••••••••••••••</span>
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => handleGetSenha(account.IdUsuarioSmtp)}
+                                        className=" rounded-full text-gray-500 hover:text-indigo-600"
+                                    >
+                                        <FaEye />
+                                    </Button>
+                                </>
+                                }
                             </div>
                         </div>
                     ))

@@ -47,3 +47,13 @@ def get_user_smtp_sem_senha(db: Session):
     ).all()
 
     return usuario
+
+def get_user_smtp_senha(id_user_smtp: int, db: Session):
+    print(id_user_smtp)
+    password = db.query(
+            models.UsuarioSmtp.Senha
+        ).filter(
+            models.UsuarioSmtp.IdUsuarioSmtp == id_user_smtp
+        ).first().Senha
+    decripted_password = decrypt_password(password)
+    return decripted_password
