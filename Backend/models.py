@@ -5,6 +5,14 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
 
+class Usuario(Base):
+    __tablename__ = "usuario"
+
+    IdUsuario = Column(Integer, primary_key=True, nullable=False, index=True)
+    Nome = Column(String, nullable=False)
+    Email = Column(String, nullable=False, unique=True, index=True)
+    Senha = Column(String, nullable=False)    
+
 class Lista(Base):
     __tablename__ = "lista"
     
