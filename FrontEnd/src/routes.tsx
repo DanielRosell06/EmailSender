@@ -16,6 +16,7 @@ import LixeiraListasPage from "./pages/Lista/LixeiraListaPage.tsx";
 import CreateEnvioExpPage from "./pages/Envio/CreateEnvioExpPage.tsx";
 import ContaPage from "./pages/Conta/ContaPage.tsx";
 import CadastroPage from "./pages/Usuario/CadastroPage.tsx";
+import LoginPage from "./pages/Usuario/LoginPage.tsx";
 
 
 const router = createBrowserRouter([
@@ -85,6 +86,10 @@ const router = createBrowserRouter([
     {
         path: "cadastro",
         element: <CadastroPage />,
+    },
+    {
+        path: "login",
+        element: <LoginPage />,
     },
 ]);
 
