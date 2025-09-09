@@ -6,3 +6,7 @@ class Usuario(BaseModel):
     Nome: str
     Email: str
     Senha: str
+
+class LoginUsuario(BaseModel):
+    Email: str
+    Senha: str

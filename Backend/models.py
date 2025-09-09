@@ -1,6 +1,6 @@
 # models.py
 
-from sqlalchemy import Column, Integer, String, Boolean, Date, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Date, Text, ForeignKey, LargeBinary
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -11,7 +11,7 @@ class Usuario(Base):
     IdUsuario = Column(Integer, primary_key=True, nullable=False, index=True)
     Nome = Column(String, nullable=False)
     Email = Column(String, nullable=False, unique=True, index=True)
-    Senha = Column(String, nullable=False)    
+    Senha = Column(LargeBinary, nullable=False)    
 
 class Lista(Base):
     __tablename__ = "lista"
