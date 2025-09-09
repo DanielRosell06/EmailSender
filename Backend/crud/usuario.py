@@ -10,9 +10,7 @@ import bcrypt
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
-
 load_dotenv()
-
 USER_KEY = os.getenv("USER_KEY")
 
 def create_usuario(db: Session, usuario: schema_usuario.Usuario):
@@ -49,6 +47,7 @@ def create_usuario(db: Session, usuario: schema_usuario.Usuario):
         return 4  # 4: Erro no servidor
     
 def login_usuario(db: Session, usuario: schema_usuario.LoginUsuario):
+    print(f"Chave SECRETA de CRIAÇÃO: {USER_KEY}")
     try:
         db_usuario = db.query(
             models.Usuario).filter(
@@ -59,9 +58,9 @@ def login_usuario(db: Session, usuario: schema_usuario.LoginUsuario):
         
         if bcrypt.checkpw(usuario.Senha.encode('utf-8'), db_usuario.Senha):
             expire = datetime.now(timezone.utc) + timedelta(days=3)
-            to_encode = {"sub": db_usuario.IdUsuario, "exp": expire}
+            to_encode = {"sub": str(db_usuario.IdUsuario), "exp": expire}
 
-            encoded_jwt = jwt.encode(to_encode, USER_KEY, algorithm="HS256")
+            encoded_jwt = jwt.encode(to_encode, USER_KEY.encode(), algorithm="HS256")
             return encoded_jwt
         else:
             return "2" # 2: Senha incorreta
@@ -70,3 +69,6 @@ def login_usuario(db: Session, usuario: schema_usuario.LoginUsuario):
         # Trata outros erros gerais do servidor
         print(f"Ocorreu um erro inesperado no servidor: {e}")
         return "3"  # 3: Erro no servidor
+    
+def get_usuario_by_id(db: Session, user_id: int):
+    return db.query(models.Usuario).filter(models.Usuario.IdUsuario == user_id).first()

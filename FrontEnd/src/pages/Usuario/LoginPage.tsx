@@ -3,6 +3,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [submitError, setSubmitError] = useState<string>("")
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -45,12 +47,56 @@ export default function LoginPage() {
         if (validateForm()) {
             setIsLoading(true);
 
-            // Simular delay de login
-            setTimeout(() => {
-                console.log('Login data:', formData);
-                alert('Login realizado com sucesso!');
-                setIsLoading(false);
-            }, 1500);
+
+            const UsuarioObj = {
+                "Email": formData.email,
+                "Senha": formData.password
+            }
+
+            fetch(`${backendUrl}/login_usuario`, {
+                headers: { 'Content-Type': 'application/json' },
+                method: "POST",
+                body: JSON.stringify(UsuarioObj)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro de rede ou do servidor');
+                    }
+                    // Retorna a promessa com o JSON
+                    return response.json();
+                })
+                .then((result: string) => {
+                    // 'result' agora é explicitamente do tipo number
+                    switch (result) {
+                        case "1":
+                            // Caso de sucesso
+                            setSubmitError("Email não encontrado");
+                            // Espera 2 segundos antes de navegar para a página de login
+                            setTimeout(() => {
+                                navigate("/login");
+                            }, 2000);
+                            break;
+                        case "2":
+                            // E-mail já cadastrado
+                            setSubmitError('Senha ou E-mail incorreto');
+                            break;
+                        case "3":
+                            // Erro no banco de dados
+                            setSubmitError('Ocorreu um erro no servidor. Tente novamente!');
+                            break;
+                        default:
+                            localStorage.setItem('token', result);
+                            setSubmitError('');
+                            navigate("/");
+                            break;
+                    }
+                    setIsLoading(false);
+                })
+                .catch(() => {
+                    // Trata erros de requisição
+                    setSubmitError('Não foi possível se conectar ao servidor. Tente novamente mais tarde!');
+                    setIsLoading(false);
+                });
         }
     };
 
@@ -137,6 +183,10 @@ export default function LoginPage() {
                             <a href="#" className="text-white/80 hover:text-white transition-colors">
                                 Esqueceu a senha?
                             </a>
+                        </div>
+
+                        <div>
+                            <h1 className='text-red-500'>{submitError}</h1>
                         </div>
 
                         {/* Login Button */}
