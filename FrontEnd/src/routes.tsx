@@ -17,12 +17,15 @@ import CreateEnvioExpPage from "./pages/Envio/CreateEnvioExpPage.tsx";
 import ContaPage from "./pages/Conta/ContaPage.tsx";
 import CadastroPage from "./pages/Usuario/CadastroPage.tsx";
 import LoginPage from "./pages/Usuario/LoginPage.tsx";
+import RotaPrivada from "./components/Auth.tsx";
 
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Layout />,
+        element: <RotaPrivada>
+            <Layout />
+        </RotaPrivada>,
         children: [
             {
                 path: "",
