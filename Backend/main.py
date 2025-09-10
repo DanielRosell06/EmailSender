@@ -1,7 +1,7 @@
 # main.py
 import os
 import importlib
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import engine, Base, get_db
@@ -10,6 +10,7 @@ import uvicorn
 import asyncio
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+from starlette.responses import FileResponse # Importe este módulo
 
 # Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
@@ -56,5 +57,14 @@ for filename in os.listdir(ROUTERS_DIR):
 # Define o caminho para a pasta 'dist'
 frontend_dist_path = Path(__file__).parent.parent / "FrontEnd" / "dist"
 
-# Diz que servirá um conteúdo estático
-app.mount("/", StaticFiles(directory=frontend_dist_path, html=True), name="static")
+@app.get("/{path_name:path}")
+def serve_react_app(path_name: str, request: Request):
+    # Verifica se a URL é de um arquivo estático (ex: .css, .js, .png)
+    if path_name.endswith(('.css', '.js', '.map', '.ico', '.png', '.jpg', '.jpeg', '.gif', '.svg')):
+        # Isso não é necessário se você estiver usando um servidor estático como Nginx, mas garante que o FastAPI possa servir os arquivos se necessário.
+        full_path = frontend_dist_path / path_name
+        if full_path.exists():
+            return FileResponse(full_path)
+
+    # Para todas as outras URLs, serve o index.html
+    return FileResponse(frontend_dist_path / 'index.html')
