@@ -62,7 +62,7 @@ def generate_token(original_string, user_number):
 
     return hashed_token
 
-async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
+async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreate, sid: str):
     """
     Função de envio de e-mail atualizada com progresso assíncrono.
     Recebe o 'sid' (Session ID) do cliente para enviar mensagens específicas.
@@ -83,14 +83,10 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
     smtp_password = decrypt_password(usuario_smtp.Senha)
     smtp_port = usuario_smtp.Porta
 
-    print("usuario: " + smtp_user)
-    print("senha: " + smtp_password)
-    print("porta: " + smtp_port)
-    print("dominio: " + smtp_domain)
-
     db_envio = models.Envio(
         Lista = envio.Lista,
-        Campanha = envio.Campanha
+        Campanha = envio.Campanha,
+        IdUsuario = user_id
     )
     campanha.Ultimo_Uso = datetime.now()
     db.add(db_envio)
@@ -158,10 +154,11 @@ async def create_envio(db: Session, envio: schemas_envio.EnvioCreate, sid: str):
     return db_envio
 
 # ... (restante do seu código)
-def get_all_envio_com_lista_campanha_detalhe(db: Session):
+def get_all_envio_com_lista_campanha_detalhe(user_id:int, db: Session):
     # ... (seu código atual, sem alterações)
     envios_com_relacoes = (
         db.query(models.Envio)
+        .filter(models.Envio.IdUsuario == user_id)
         .options(
             joinedload(models.Envio.detalhes),
             joinedload(models.Envio.lista_pai),   # Alterado de .Lista para .lista_pai

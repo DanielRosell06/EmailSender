@@ -24,13 +24,14 @@ def decrypt_password(encrypted_password: str) -> str:
     return decrypted_password.decode()
 
 
-def create_user_smtp(db: Session, new_usuario_smtp: schema_usuario_smtp.UsuarioSmtp):
+def create_user_smtp(user_id: int, db: Session, new_usuario_smtp: schema_usuario_smtp.UsuarioSmtp):
     encrypted_password = encrypt_password(new_usuario_smtp.Senha)
     usuario = models.UsuarioSmtp(
         Usuario=new_usuario_smtp.Usuario,
         Senha=encrypted_password, # Salva a senha encriptada
         Dominio=new_usuario_smtp.Dominio,
         Porta=new_usuario_smtp.Porta,
+        IdUsuario=user_id
     )
     
     db.add(usuario)
@@ -38,22 +39,23 @@ def create_user_smtp(db: Session, new_usuario_smtp: schema_usuario_smtp.UsuarioS
     db.refresh(usuario)
     return usuario
 
-def get_user_smtp_sem_senha(db: Session):
+def get_user_smtp_sem_senha(user_id:int, db: Session):
     usuario = db.query(
         models.UsuarioSmtp.IdUsuarioSmtp,
         models.UsuarioSmtp.Dominio,
         models.UsuarioSmtp.Usuario,
         models.UsuarioSmtp.Porta
-    ).all()
+    ).filter(models.UsuarioSmtp.IdUsuario == user_id).all()
 
     return usuario
 
-def get_user_smtp_senha(id_user_smtp: int, db: Session):
+def get_user_smtp_senha(user_id: int, id_user_smtp: int, db: Session):
     print(id_user_smtp)
     password = db.query(
             models.UsuarioSmtp.Senha
         ).filter(
-            models.UsuarioSmtp.IdUsuarioSmtp == id_user_smtp
+            models.UsuarioSmtp.IdUsuarioSmtp == id_user_smtp,
+            models.UsuarioSmtp.IdUsuario == user_id
         ).first().Senha
     decripted_password = decrypt_password(password)
     return decripted_password

@@ -20,7 +20,7 @@ def create_user_smtp(user_smtp: schema_usuario_smtp.UsuarioSmtp, db: Session = D
     """
     Cria um create_user_smtp
     """
-    response = crud_usuario_smtp.create_user_smtp(db=db, new_usuario_smtp=user_smtp)
+    response = crud_usuario_smtp.create_user_smtp(user_id=user_id, db=db, new_usuario_smtp=user_smtp)
      
     return response
 
@@ -29,7 +29,7 @@ def get_all_user_smtp(db: Session = Depends(get_db), user_id: int = Depends(veri
     """
     Pega todos os UserSmtp sem a senha
     """
-    response = crud_usuario_smtp.get_user_smtp_sem_senha(db=db)
+    response = crud_usuario_smtp.get_user_smtp_sem_senha(user_id=user_id, db=db)
      
     return response
 
@@ -38,6 +38,6 @@ def get_all_user_smtp(id_user_smtp: int, db: Session = Depends(get_db), user_id:
     """
     Pega a senha descriptografada do usuario 
     """
-    response = crud_usuario_smtp.get_user_smtp_senha(id_user_smtp=id_user_smtp, db=db)
+    response = crud_usuario_smtp.get_user_smtp_senha(user_id=user_id, id_user_smtp=id_user_smtp, db=db)
      
     return response

@@ -23,7 +23,6 @@ def verificar_token(authorization: str = Header(..., alias="Authorization")):
 
     token = authorization.split(" ")[1] # Pega a string do token
 
-    print(f"Header de Autorização recebido: '{authorization}'")
 
     try:
         # Decodifica o token para extrair o payload
@@ -34,7 +33,6 @@ def verificar_token(authorization: str = Header(..., alias="Authorization")):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token inválido: ID do usuário não encontrado"
             )
-        print(user_id)
         return user_id # Retorna o ID do usuário para a rota
     
     except jwt.InvalidTokenError as e:

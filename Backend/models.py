@@ -20,6 +20,12 @@ class Lista(Base):
     Titulo = Column(String, nullable=False)
     Ultimo_Uso = Column(Date, default=func.now())
     Lixeira = Column(Boolean, default=False)
+
+    # Adicionando a chave estrangeira para o usuário
+    IdUsuario = Column(Integer, ForeignKey("usuario.IdUsuario"))
+    
+    # Relacionamento de volta para Usuario
+    usuario_pai = relationship("Usuario")
     
     # Relacionamento com Email (uma lista tem muitos emails)
     emails = relationship("Email", back_populates="lista_pai")
@@ -35,6 +41,12 @@ class Campanha(Base):
     Ultimo_Uso = Column(Date, default=func.now())
     Favorita = Column(Boolean, default=False)
     Lixeira = Column(Boolean, default=False)
+    
+    # Adicionando a chave estrangeira para o usuário
+    IdUsuario = Column(Integer, ForeignKey("usuario.IdUsuario"))
+
+    # Relacionamento de volta para Usuario
+    usuario_pai = relationship("Usuario")
 
 class Email(Base):
     __tablename__ = "email"
@@ -54,6 +66,9 @@ class Envio(Base):
     IdEnvio = Column(Integer, primary_key=True, nullable=False, index=True)
     Dt_Envio = Column(Date, nullable=False, default=func.now())
 
+    # Chave Estrangeira
+    IdUsuario = Column(Integer, ForeignKey("usuario.IdUsuario"))
+
     #Chaves estrangeiras
     Lista = Column(Integer, ForeignKey("lista.IdLista"))
     Campanha = Column(Integer, ForeignKey("campanha.IdCampanha"))
@@ -61,6 +76,7 @@ class Envio(Base):
     # Relacionamento com lista e campanha
     lista_pai = relationship("Lista")
     campanha_pai = relationship("Campanha")
+    usuario_pai = relationship("Usuario")
 
     # Relacionamento com Detalhe (um envio tem muitos detalhes)
     detalhes = relationship("Detalhe", back_populates="envio_pai")
@@ -100,6 +116,7 @@ class UsuarioSmtp(Base):
     __tablename__ = "usuario_smtp"
 
     IdUsuarioSmtp = Column(Integer, primary_key=True, nullable=False, index=True)
+    IdUsuario = Column(Integer, ForeignKey("usuario.IdUsuario"))
 
     #Colunas de conta do usuario
     Usuario = Column(String, nullable=False)
@@ -108,3 +125,6 @@ class UsuarioSmtp(Base):
     #Colunas de configuracao do envio
     Dominio = Column(String, nullable=False)
     Porta = Column(String, nullable=False, default="587")
+
+    # Relacionamento de volta para Usuario
+    usuario_pai = relationship("Usuario")

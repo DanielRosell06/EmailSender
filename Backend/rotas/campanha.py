@@ -15,7 +15,7 @@ def create_campanha(campanha_data: schemas_campanha.CampanhaCreate, db: Session 
     """
     Cria uma nova campanha com os dados fornecidos.
     """
-    response_campain = crud_campanha.create_campanha(db=db, campanha=campanha_data)
+    response_campain = crud_campanha.create_campanha(user_id=user_id, db=db, campanha=campanha_data)
      
     return response_campain
 
@@ -24,7 +24,7 @@ def get_all_campanhas(db: Session = Depends(get_db), user_id: int = Depends(veri
     """
     Retorna todas as campanhas cadastradas.
     """
-    campanhas = crud_campanha.get_all_campanha(db=db)
+    campanhas = crud_campanha.get_all_campanha(user_id=user_id, db=db)
     return campanhas
 
 
@@ -33,7 +33,7 @@ def get_campanha_by_id(id_campanha: int, db: Session = Depends(get_db), user_id:
     """
     Retorna todas as campanhas cadastradas.
     """
-    campanhas = crud_campanha.get_campanha_by_id(db=db, id_campanha=id_campanha)
+    campanhas = crud_campanha.get_campanha_by_id(user_id=user_id, db=db, id_campanha=id_campanha)
     return campanhas
 
 @router.put("/edit_campanha/", response_model=schemas_campanha.Campanha)
@@ -49,7 +49,7 @@ def delete_campanha( id_campanha: int, db: Session = Depends(get_db), user_id: i
     """
     Deleta a campanha de id = id_campanha
     """
-    deleted = crud_campanha.delete_campanha(db, id_campanha)
+    deleted = crud_campanha.delete_campanha(db=db, id_campanha=id_campanha, user_id=user_id)
     return deleted
 
 @router.delete("/undelete_campanha/", response_model=bool)
@@ -57,5 +57,5 @@ def delete_campanha( id_campanha: int, db: Session = Depends(get_db), user_id: i
     """
     Retira a campanha de id = id_campanha da lixeira
     """
-    undeleted = crud_campanha.undelete_campanha(db, id_campanha)
+    undeleted = crud_campanha.undelete_campanha(db=db, id_campanha=id_campanha, user_id=user_id)
     return undeleted

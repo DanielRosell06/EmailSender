@@ -13,6 +13,7 @@ interface ProgressData {
 }
 
 const LoadingPage: React.FC = () => {
+  const token = localStorage.getItem('token');
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const LoadingPage: React.FC = () => {
       console.log('Conectado ao WebSocket:', socketRef.current?.id);
       // Envia os dados de envio para o backend, incluindo o sid
       if (envioData) {
-        socketRef.current?.emit('start_envio', { ...envioData, sid: socketRef.current?.id });
+        socketRef.current?.emit('start_envio', { ...envioData, sid: socketRef.current?.id, token: `Bearer ${token}`});
       }
     });
 
@@ -117,7 +118,7 @@ const LoadingPage: React.FC = () => {
               <span className="font-bold text-green-700">{progress.sent}</span> de <span className="font-bold">{progress.total}</span> e-mails enviados (<span className="font-bold">{percentage.toFixed(2)}%</span>)
             </p>
           )}
-          
+
         </div>
       </div>
     </>

@@ -17,7 +17,7 @@ crud_envio.set_socketio_server(sio)
 
 @router.get("/get_all_envio_com_lista_campanha_detalhe", response_model=list[schemas_envio.Envio])
 def read_envios(db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
-    response_envios = crud_envio.get_all_envio_com_lista_campanha_detalhe(db)
+    response_envios = crud_envio.get_all_envio_com_lista_campanha_detalhe(user_id=user_id, db=db)
     return response_envios
 
 @router.post("/envio/", response_model=schemas_envio.EnvioCreate)
@@ -25,28 +25,31 @@ def create_envio(envio_data: schemas_envio.EnvioCreate, db: Session = Depends(ge
     """
     Cria um envio e realiza o envio dos emails atraves de uma Lista e uma Campanha.
     """
-    response_envio = crud_envio.create_envio(db=db, envio=envio_data)
+    response_envio = crud_envio.create_envio(user_id=user_id, db=db, envio=envio_data)
      
     return response_envio
 
 
 @sio.on('start_envio')
 async def start_envio(sid: str, data: dict):
-    """
-    Manipula o evento 'start_envio' do WebSocket.
-    O cliente envia os dados do envio, e o backend inicia o processo.
-    """
     try:
-        # Pega a sessão do banco de dados para a tarefa assíncrona
         db = next(get_db())
         
-        # Converte os dados recebidos para o Pydantic Schema
+        token = data.get("token")
+        if not token:
+            await sio.emit('envio_error', {'message': 'Token de autenticação não fornecido.'}, room=sid)
+            return
+
+        try:
+            user_id = verificar_token(token)
+        except Exception:
+            await sio.emit('envio_error', {'message': 'Token de autenticação inválido ou expirado.'}, room=sid)
+            return
+
         envio_data = schemas_envio.EnvioCreate(**data)
         
-        # Inicia a tarefa de envio em segundo plano
-        await crud_envio.create_envio(db=db, envio=envio_data, sid=sid)
+        await crud_envio.create_envio(user_id=user_id, db=db, envio=envio_data, sid=sid)
         
     except Exception as e:
         print(f"Erro ao iniciar o envio: {e}")
-        # Opcional: envia um evento de erro de volta para o cliente
         await sio.emit('envio_error', {'message': str(e)}, room=sid)
