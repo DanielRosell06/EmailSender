@@ -23,7 +23,7 @@ const RotaPrivada: React.FC<RotaPrivadaProps> = ({ children }) => {
             }
 
             try {
-                const response = await fetch(`${backendUrl}/api/verifica_token/`, {
+                const response = await fetch(`${backendUrl}/api/verifica_token`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     },

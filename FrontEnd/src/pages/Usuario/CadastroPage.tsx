@@ -64,7 +64,7 @@ export default function CadastroPage() {
             "Senha": formData.password
         }
         if (validateForm()) {
-            fetch(`${backendUrl}/api/create_usuario/`, {
+            fetch(`${backendUrl}/api/create_usuario`, {
                 headers: { 'Content-Type': 'application/json' },
                 method: "POST",
                 body: JSON.stringify(UsuarioObj)

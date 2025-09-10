@@ -12,7 +12,7 @@ from crud import email as crud_email
 
 router = APIRouter()
 
-@router.post("/listas/", response_model=schemas_lista.Lista)
+@router.post("/listas", response_model=schemas_lista.Lista)
 def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Cria uma nova lista com os dados fornecidos.
@@ -22,7 +22,7 @@ def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(ge
      
     return response_list
 
-@router.get("/all_lista/", response_model=list[schemas_lista.Lista])
+@router.get("/all_lista", response_model=list[schemas_lista.Lista])
 def get_all_listas(db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Retorna todas as listas cadastradas.
@@ -30,7 +30,7 @@ def get_all_listas(db: Session = Depends(get_db), user_id: int = Depends(verific
     listas = crud_lista.get_all_lista(user_id=user_id, db=db)
     return listas
 
-@router.get("/get_lista_by_id_com_email/", response_model=schemas_lista.ListaComEmail)
+@router.get("/get_lista_by_id_com_email", response_model=schemas_lista.ListaComEmail)
 def get_all_listas(id_lista = int, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Retorna a lista com IdLista = id_lista, e todos os seus emails
@@ -39,7 +39,7 @@ def get_all_listas(id_lista = int, db: Session = Depends(get_db), user_id: int =
     return lista
 
 
-@router.get("/lista/", response_model=list[schemas_lista.Lista])
+@router.get("/lista", response_model=list[schemas_lista.Lista])
 def get_all_listas(db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Retorna todas as listas cadastradas.
@@ -47,7 +47,7 @@ def get_all_listas(db: Session = Depends(get_db), user_id: int = Depends(verific
     listas = crud_lista.get_all_lista(user_id=user_id, db=db)
     return listas
 
-@router.delete("/delete_lista/", response_model=bool)
+@router.delete("/delete_lista", response_model=bool)
 def delete_lista( id_lista: int, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Deleta a lista de id = id_lista
@@ -55,7 +55,7 @@ def delete_lista( id_lista: int, db: Session = Depends(get_db), user_id: int = D
     deleted = crud_lista.delete_lista(db=db, id_lista=id_lista, user_id=user_id)
     return deleted
 
-@router.delete("/undelete_lista/", response_model=bool)
+@router.delete("/undelete_lista", response_model=bool)
 def undelete_lista( id_lista: int, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Retira a lista de id = id_lista da lixeira
@@ -63,7 +63,7 @@ def undelete_lista( id_lista: int, db: Session = Depends(get_db), user_id: int =
     undeleted = crud_lista.undelete_lista(db=db, id_lista=id_lista, user_id=user_id)
     return undeleted
 
-@router.put("/edit_lista/", response_model=str)
+@router.put("/edit_lista", response_model=str)
 def edit_lista( id_lista: int, new_titulo: str, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Edita o título da lista

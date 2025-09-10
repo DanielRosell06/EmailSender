@@ -20,7 +20,7 @@ def read_envios(db: Session = Depends(get_db), user_id: int = Depends(verificar_
     response_envios = crud_envio.get_all_envio_com_lista_campanha_detalhe(user_id=user_id, db=db)
     return response_envios
 
-@router.post("/envio/", response_model=schemas_envio.EnvioCreate)
+@router.post("/envio", response_model=schemas_envio.EnvioCreate)
 def create_envio(envio_data: schemas_envio.EnvioCreate, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Cria um envio e realiza o envio dos emails atraves de uma Lista e uma Campanha.

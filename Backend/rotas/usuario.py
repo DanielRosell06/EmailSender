@@ -22,7 +22,7 @@ def create_usuario(usuario: schemas_usuario.Usuario, db: Session = Depends(get_d
     return response_envio
 
 
-@router.post("/login_usuario/", response_model=str)
+@router.post("/login_usuario", response_model=str)
 def login_usuario(usuario: schemas_usuario.LoginUsuario, db: Session = Depends(get_db)):
     """
     Realiza o login e retorna o token e payload do jwt
@@ -32,7 +32,7 @@ def login_usuario(usuario: schemas_usuario.LoginUsuario, db: Session = Depends(g
     return response_envio
 
 
-@router.get("/verifica_token/")
+@router.get("/verifica_token")
 def verificar_autenticacao(user_id: int = Depends(verificar_token), db: Session = Depends(get_db)):
     """
     Verifica se o usuário está autenticado e com um token válido.

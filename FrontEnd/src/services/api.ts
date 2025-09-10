@@ -13,7 +13,7 @@ export const api = async (url: string, options: RequestInit = {}): Promise<Respo
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     };
 
-    const response = await fetch(`${backendUrl}/api${url}/`, {
+    const response = await fetch(`${backendUrl}/api${url}`, {
         ...options,
         headers,
     });

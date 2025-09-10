@@ -53,7 +53,7 @@ export default function LoginPage() {
                 "Senha": formData.password
             }
 
-            fetch(`${backendUrl}/api/login_usuario/`, {
+            fetch(`${backendUrl}/api/login_usuario`, {
                 headers: { 'Content-Type': 'application/json' },
                 method: "POST",
                 body: JSON.stringify(UsuarioObj)

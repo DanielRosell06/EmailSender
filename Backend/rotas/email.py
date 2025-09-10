@@ -12,7 +12,7 @@ from crud import email as crud_email
 
 router = APIRouter()
 
-@router.post("/create_email/", response_model=bool)
+@router.post("/create_email", response_model=bool)
 def create_email(lista_id:int, emails: list[str], db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Cria emails com o IdLista = lista_id
@@ -21,7 +21,7 @@ def create_email(lista_id:int, emails: list[str], db: Session = Depends(get_db),
      
     return response
 
-@router.put("/edit_email/", response_model=bool)
+@router.put("/edit_email", response_model=bool)
 def edit_email(emails: list[schemas_email.EmailEdit], db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Edita o conteudo dos emails fornecidos
@@ -30,7 +30,7 @@ def edit_email(emails: list[schemas_email.EmailEdit], db: Session = Depends(get_
      
     return response
 
-@router.delete("/delete_email/", response_model=bool)
+@router.delete("/delete_email", response_model=bool)
 def delete_email(email_ids: list[int], db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Remove os emails fornecidos
