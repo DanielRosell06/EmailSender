@@ -44,7 +44,7 @@ const CreateListModal = () => {
         Emails: emails
       };
 
-      const response = await api('/listas/', {
+      const response = await api('/listas', {
         method: 'POST',
         body: JSON.stringify(newLista),
       });
