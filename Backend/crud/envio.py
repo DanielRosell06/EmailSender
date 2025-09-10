@@ -109,7 +109,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
             for email_obj in lista:
                 email = email_obj.Conteudo
                 token = generate_token(email, db_envio.IdEnvio)
-                documento_com_tag = campanha.Documento + f' <img src="{SERVER_URL}/update_status_envio?token={token}">'
+                documento_com_tag = campanha.Documento + f' <img src="{SERVER_URL}/api/update_status_envio?token={token}">'
 
                 msg = MIMEMultipart()
                 msg['From'] = smtp_user
