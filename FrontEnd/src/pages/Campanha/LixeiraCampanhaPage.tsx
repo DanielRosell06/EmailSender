@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV, FaChevronLeft } from "react-icons/fa";
+import { FaPaperPlane, FaCalendarAlt, FaEllipsisV, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api.ts';
@@ -40,8 +40,6 @@ const LixeiraCampanhasPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [selectedCampanha, setSelectedCampanha] = useState<Campanha | null>(null);
     const navigate = useNavigate();
-
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
         const fetchCampanhas = async () => {

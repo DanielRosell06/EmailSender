@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaChevronLeft, FaExpand } from "react-icons/fa";
+import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaExpand } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { api } from '@/services/api.ts';

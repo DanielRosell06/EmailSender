@@ -42,8 +42,6 @@ const CampanhasPage: React.FC = () => {
     const [selectedCampanha, setSelectedCampanha] = useState<Campanha | null>(null);
     const navigate = useNavigate();
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-
     useEffect(() => {
         const fetchCampanhas = async () => {
             setLoading(true);

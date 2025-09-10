@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaPaperPlane, FaArrowRight, FaEllipsisV, FaChevronLeft } from "react-icons/fa";
+import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaEllipsisV, FaChevronLeft } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { api } from '@/services/api.ts';
@@ -7,7 +7,6 @@ import { api } from '@/services/api.ts';
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
@@ -32,37 +31,11 @@ interface Lista {
     Lixeira: boolean;
 }
 
-interface DetalheEnvio {
-    IdDetalhe: number;
-    Conteudo: string;
-}
-
-interface CampanhaEnvio {
-    IdCampanha: number;
-    Titulo: string;
-    Cor: string;
-}
-
-interface ListaEnvio {
-    IdLista: number;
-    Titulo: string;
-}
-
-interface Envio {
-    IdEnvio: number;
-    Dt_Envio: string;
-    Detalhes: DetalheEnvio[];
-    Campanha: CampanhaEnvio;
-    Lista: ListaEnvio;
-}
-
 const LixeiraListasPage: React.FC = () => {
     const [listas, setListas] = useState<Lista[]>([]);
-    const [enviosRecentes, setEnviosRecentes] = useState<Envio[]>([]);
 
     // Estados de carregamento individuais
     const [loadingListas, setLoadingListas] = useState(true);
-    const [loadingEnvios, setLoadingEnvios] = useState(true);
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const navigate = useNavigate();
@@ -90,37 +63,19 @@ const LixeiraListasPage: React.FC = () => {
     }, [backendUrl]);
 
     // Efeito para buscar Envios
-    useEffect(() => {
-        const fetchEnviosData = async () => {
-            setLoadingEnvios(true);
-            try {
-                const res = await api('/get_all_envio_com_lista_campanha_detalhe');
-                const data = await res.json();
-                const sortedEnvios = data.slice(0, 5);
-                setEnviosRecentes(sortedEnvios);
-            } catch (error) {
-                console.error("Erro ao carregar envios recentes:", error);
-                setEnviosRecentes([]);
-            } finally {
-                setLoadingEnvios(false);
-            }
-        };
-
-        fetchEnviosData();
-    }, [backendUrl]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('pt-BR');
     };
 
-    const handleEnvioClick = (idEnvio: number) => {
-        navigate(`/envio_detail/${idEnvio}`);
-    };
-
     const handleUndeleteLista = async (idLista: number) => {
         try {
             const res = await api(`/undelete_lista?id_lista=${idLista}`, { method: "DELETE" });
+
+            if (!res.ok) {
+                throw new Error('Erro na requisição para remover a lista da lixeira.');
+            }
 
             setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
 

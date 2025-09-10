@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FaEnvelope, FaUsers, FaPaperPlane, FaChevronLeft, FaSearch, FaCheckCircle, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaEnvelope, FaUsers, FaPaperPlane, FaChevronLeft, FaSearch, FaCheckCircle, FaChevronUp } from "react-icons/fa";
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -129,7 +129,9 @@ const ContaPage: React.FC = () => {
                 body: JSON.stringify(newAccount)
             });
 
-            const data = await res.json();
+            if (!res.ok) {
+                throw new Error('Erro na requisição para criar usuario smtp.');
+            }
 
             reloadAccounts();
             setNewAccount({ Dominio: '', Porta: '587', Usuario: '', Senha: '' });
@@ -224,7 +226,7 @@ const ContaPage: React.FC = () => {
                 <CardDescription className="text-gray-600">Gerencie suas contas de e-mail aqui.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 p-6 pt-0">
-                {accounts.length > 0 ? (
+                {!loadingAccounts ? (accounts.length > 0 ? (
                     accounts.map((account) => (
                         <div
                             key={account.IdUsuarioSmtp}
@@ -272,7 +274,13 @@ const ContaPage: React.FC = () => {
                     ))
                 ) : (
                     <p className="text-center text-gray-500">Nenhuma conta encontrada.</p>
-                )}
+                )) :
+                    <>
+                        <Skeleton className='flex items-center justify-between h-20 pr-4 pl-4 rounded-xl bg-slate-200 transition-all duration-300 transform '></Skeleton>
+                        <Skeleton className='flex items-center justify-between h-20 pr-4 pl-4 rounded-xl bg-slate-200 transition-all duration-300 transform '></Skeleton>
+                        <Skeleton className='flex items-center justify-between h-20 pr-4 pl-4 rounded-xl bg-slate-200 transition-all duration-300 transform '></Skeleton>
+                    </>
+                }
             </CardContent>
         </Card>
     );

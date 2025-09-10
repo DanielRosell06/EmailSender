@@ -4,12 +4,10 @@ import { FiUpload } from 'react-icons/fi';
 import { FaTimes } from 'react-icons/fa';
 
 interface CSVLoaderProps {
-    onLoadEmails: Function,
-    value?: Array<String>,
+    onLoadEmails: (data: { value: string[] }) => void;
 }
 
-// function Modal({ buttonClassName, buttonTitle, modalTitle, children }: ModalProps) {
-function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
+function CSVLoader({ onLoadEmails }: CSVLoaderProps) {
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [emails, setEmails] = useState<string[]>([]);
@@ -31,7 +29,7 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
             const reader = new FileReader();
             reader.onprogress = (e) => {
                 if (e.lengthComputable) {
-                    const percent = (e.loaded / e.total) * 50; // 50% para a leitura do arquivo
+                    const percent = (e.loaded / e.total) * 50;
                     setProgress(percent);
                 }
             };
@@ -39,11 +37,9 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
             reader.onload = (e) => {
                 if (e.target?.result) {
                     const csvText = e.target.result as string;
-
-                    // Use uma pequena pausa para simular o tempo de processamento
                     setTimeout(() => {
                         Papa.parse(csvText, {
-                            header: false, // Alterado para false para ler todas as células
+                            header: false,
                             skipEmptyLines: true,
                             complete: (results) => {
                                 const extractedEmails: string[] = [];
@@ -57,13 +53,12 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
                                             extractedEmails.push(cell);
                                         }
                                         processedCells++;
-                                        const percent = 50 + (processedCells / totalCells) * 50; // 50% para o processamento
+                                        const percent = 50 + (processedCells / totalCells) * 50;
                                         setProgress(percent);
                                     });
                                 });
 
                                 setEmails(extractedEmails);
-                                value = emails
                                 setLoading(false);
                                 setProgress(100);
                             },
@@ -72,7 +67,7 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
                                 setLoading(false);
                             }
                         });
-                    }, 100); // Pequena pausa para garantir que a barra de progresso de 50% seja mostrada
+                    }, 100);
                 }
             };
             reader.readAsText(file);
@@ -80,10 +75,11 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
     };
 
     const handleAddToList = () => {
+        // Agora, o componente chama onLoadEmails passando um objeto com a chave "value"
         onLoadEmails({ value: emails });
-        setEmails([])
-        setLoading(false)
-        setFileName("Nenhum arquivo selecionado")
+        setEmails([]);
+        setLoading(false);
+        setFileName("Nenhum arquivo selecionado");
     };
 
     return (
@@ -112,7 +108,7 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
                             <FaTimes className='font-bold text-xl mt-auto mb-auto'></FaTimes>
                         </button>
                     </div>
-                ) :
+                ) : (
                     <>
                         <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 hover:border-slate-400 transition-colors duration-200">
                             <div className="flex items-center gap-4">
@@ -146,10 +142,10 @@ function CSVLoader({ onLoadEmails, value }: CSVLoaderProps) {
                             accept=".csv"
                         />
                     </>
-                }
+                )}
             </div>
         </div>
     );
-};
+}
 
 export default CSVLoader;

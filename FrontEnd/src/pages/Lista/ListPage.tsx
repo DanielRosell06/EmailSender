@@ -127,6 +127,10 @@ const ListasPage: React.FC = () => {
         try {
             const res = await api(`/delete_lista?id_lista=${idLista}`, { method: "DELETE" });
 
+            if (!res.ok) {
+                throw new Error('Erro na requisição para deletar a lista.');
+            }
+
             setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
 
         } catch (error) {

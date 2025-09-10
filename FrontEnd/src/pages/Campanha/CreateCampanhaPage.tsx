@@ -63,8 +63,6 @@ export default function CreateCampanhaPage() {
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false)
     const navigate = useNavigate();
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-
     const copyToClipboard = () => {
         navigator.clipboard.writeText(htmlCode)
     }

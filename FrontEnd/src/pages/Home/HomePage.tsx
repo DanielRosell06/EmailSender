@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaStar, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaExclamationTriangle, FaEllipsisV } from "react-icons/fa";
+import { FaPlus, FaPaperPlane, FaCalendarAlt, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaEllipsisV } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api.ts';
 
@@ -83,7 +83,6 @@ const HomePage: React.FC = () => {
     const [loadingCampanhas, setLoadingCampanhas] = useState(true);
     const [loadingListas, setLoadingListas] = useState(true);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
         const fetchCampanhas = async () => {

@@ -123,7 +123,6 @@ const CreateListModal = () => {
               </div>
             </div>
 
-            {/* Seção de Arquivo .csv (mantida sem funcionalidade de API) */}
             <CSVReader onLoadEmails={(e: any) => {
               if (Array.isArray(e.value)) {
                 // value é um array de e-mails do CSV
@@ -138,7 +137,6 @@ const CreateListModal = () => {
             }}></CSVReader>
           </div>
 
-          {/* Seção de E-Mails */}
           <div className='text-left'>
             <h1 className='text-xl font-bold'>E-Mails</h1>
             <h3 className='text-slate-500'>E-Mails que estão na lista até agora</h3>

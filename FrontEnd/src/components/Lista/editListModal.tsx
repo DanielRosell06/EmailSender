@@ -18,7 +18,6 @@ import {
 import { api } from '@/services/api.ts';
 
 // URL da sua API
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 interface Email {
   IdEmail: number;
@@ -41,9 +40,6 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
   const [loading, setLoading] = useState(true);
   const [newEmails, setNewEmails] = useState<string[]>([]);
   const [deletedEmails, setDeletedEmails] = useState<number[]>([]);
-  const [editedEmails, setEditedEmails] = useState<Email[]>([]);
-
-  // ... outros imports
 
   useEffect(() => {
     const fetchListaData = async () => {
