@@ -32,7 +32,7 @@ def login_usuario(usuario: schemas_usuario.LoginUsuario, db: Session = Depends(g
     return response_envio
 
 
-@router.get("/verifica_token")
+@router.get("/verifica_token/")
 def verificar_autenticacao(user_id: int = Depends(verificar_token), db: Session = Depends(get_db)):
     """
     Verifica se o usuário está autenticado e com um token válido.
