@@ -35,6 +35,10 @@ def edit_email(db: Session, emails: list[schemas_email.EmailEdit]):
 
 def delete_email(db: Session, email_ids: list[int]):
     try:
+        db.query(models.StatusEnvio).filter(
+            models.StatusEnvio.IdEmail.in_(email_ids)
+        ).delete(synchronize_session=False)
+
         num_deleted = db.query(models.Email).filter(models.Email.IdEmail.in_(email_ids)).delete(synchronize_session=False)
         db.commit()
         return True
