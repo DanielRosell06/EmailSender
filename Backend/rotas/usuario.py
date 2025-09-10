@@ -12,7 +12,7 @@ from main import sio
 
 router = APIRouter()
 
-@router.post("/create_usuario/", response_model=int)
+@router.post("/create_usuario", response_model=int)
 def create_usuario(usuario: schemas_usuario.Usuario, db: Session = Depends(get_db)):
     """
     Cria uma usuario.
