@@ -3,6 +3,7 @@ import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaPaperPlane, FaArrowRight,
 import { Button } from "@/components/ui/button";
 import CreateListModal from "@/components/Lista/createListModal";
 import { useNavigate } from "react-router-dom";
+import { api } from '@/services/api.ts';
 
 import {
     DropdownMenu,
@@ -70,35 +71,47 @@ const ListasPage: React.FC = () => {
     const navigate = useNavigate();
 
     function reloadListas() {
-        setReload(reload*-1)
+        setReload(reload * -1)
     }
 
-    // Efeito para buscar Listas
     useEffect(() => {
-        setLoadingListas(true);
-        fetch(`${backendUrl}/all_lista`)
-            .then(res => res.json())
-            .then(data => {
+        const fetchListas = async () => {
+            setLoadingListas(true);
+            try {
+                const res = await api('/all_lista');
+                const data = await res.json();
                 const sortedListas = data.sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime());
                 setListas(sortedListas);
-            })
-            .catch(() => {
+            } catch (error) {
+                console.error("Erro ao buscar listas:", error);
                 setListas([]);
-            })
-            .finally(() => setLoadingListas(false));
-    }, [backendUrl,reload]);
+            } finally {
+                setLoadingListas(false);
+            }
+        };
+
+        fetchListas();
+    }, [backendUrl, reload]);
 
     // Efeito para buscar Envios
     useEffect(() => {
-        setLoadingEnvios(true);
-        fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`)
-            .then(res => res.json())
-            .then(data => {
+        const fetchEnviosData = async () => {
+            setLoadingEnvios(true);
+            try {
+                const res = await api('/get_all_envio_com_lista_campanha_detalhe');
+                const data = await res.json();
+
                 const sortedEnvios = data.slice(0, 5);
                 setEnviosRecentes(sortedEnvios);
-            })
-            .catch(() => setEnviosRecentes([]))
-            .finally(() => setLoadingEnvios(false));
+            } catch (error) {
+                console.error("Erro ao carregar envios recentes:", error);
+                setEnviosRecentes([]);
+            } finally {
+                setLoadingEnvios(false);
+            }
+        };
+
+        fetchEnviosData();
     }, [backendUrl]);
 
     const formatDate = (dateString: string) => {
@@ -110,15 +123,17 @@ const ListasPage: React.FC = () => {
         navigate(`/envio_detail/${idEnvio}`);
     };
 
-    const handleDeleteLista = (idLista: number) => {
-        fetch(`${backendUrl}/delete_lista?id_lista=${idLista}`, { method: "DELETE" })
-            .then(() => {
-                setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
-            })
-            .catch(() => {
-                alert('Não foi possivel mover a lista para a lixeira, tente novamente mais tarde!')
-            });
-    }
+    const handleDeleteLista = async (idLista: number) => {
+        try {
+            const res = await api(`/delete_lista?id_lista=${idLista}`, { method: "DELETE" });
+
+            setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
+
+        } catch (error) {
+            console.error("Erro ao deletar lista:", error);
+            alert('Não foi possivel mover a lista para a lixeira, tente novamente mais tarde!');
+        }
+    };
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [listToEditId, setListToEditId] = useState<number | null>(null);

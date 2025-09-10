@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { api } from '@/services/api.ts';
 
 import {
     DropdownMenu,
@@ -36,7 +37,6 @@ interface Campanha {
 }
 
 const CampanhasPage: React.FC = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false)
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCampanha, setSelectedCampanha] = useState<Campanha | null>(null);
@@ -45,17 +45,24 @@ const CampanhasPage: React.FC = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
-        setLoading(true);
+        const fetchCampanhas = async () => {
+            setLoading(true);
 
-        fetch(`${backendUrl}/all_campanha`)
-            .then(res => res.json())
-            .then(data => {
+            try {
+                const res = await api('/all_campanha');
+                const data = await res.json();
+
                 setCampanhas(data);
-            })
-            .catch(() => {
+
+            } catch (error) {
+                console.error("Erro ao buscar campanhas:", error);
                 setCampanhas([]);
-            })
-            .finally(() => setLoading(false));
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCampanhas();
     }, []);
 
     const getGradientFromColor = (cor: string) => {
@@ -83,18 +90,22 @@ const CampanhasPage: React.FC = () => {
         setSelectedCampanha(campanha);
     };
 
-    const handleDeleteCampanha = (id_campanha: number) => {
-        fetch(`${backendUrl}/delete_campanha/?id_campanha=${id_campanha}`, { method: "DELETE" })
-            .then(res => res.json())
-            .then((deleted) => {
-                if (deleted) {
-                    setCampanhas(campanhas.filter(c => c.IdCampanha !== id_campanha));
-                    if (selectedCampanha?.IdCampanha === id_campanha) {
-                        setSelectedCampanha(null);
-                    }
+    const handleDeleteCampanha = async (id_campanha: number) => {
+        try {
+            // Usa a sua função 'api' e passa o método DELETE
+            const res = await api(`/delete_campanha/?id_campanha=${id_campanha}`, { method: "DELETE" });
+            const deleted = await res.json();
+
+            if (deleted) {
+                setCampanhas(campanhas.filter(c => c.IdCampanha !== id_campanha));
+                if (selectedCampanha?.IdCampanha === id_campanha) {
+                    setSelectedCampanha(null);
                 }
-            });
-    }
+            }
+        } catch (error) {
+            console.error("Erro ao deletar campanha:", error);
+        }
+    };
 
     const renderSkeletons = () => (
         <div className="min-h-screen p-8 bg-white/70 backdrop-blur-sm">

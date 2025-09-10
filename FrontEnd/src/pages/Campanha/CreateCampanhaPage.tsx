@@ -9,6 +9,7 @@ import { Copy, RefreshCw, Save } from "lucide-react"
 import Modal from "../../components/Modal"
 import { FaPaperPlane, FaChevronLeft } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
+import { api } from '@/services/api.ts';
 
 const defaultHtml = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -75,34 +76,28 @@ export default function CreateCampanhaPage() {
                 Cor: selectedColor.name,
                 Assunto: campaignSubject,
                 Documento: htmlCode
-            }
+            };
 
-            const response = await fetch(`${backendUrl}/create_campanha`, {
+            // Usa a sua função 'api' e passa o método e o corpo
+            const response = await api('/create_campanha', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify(campanha_data)
-            })
+            });
 
-            if (!response.ok) {
-                throw new Error(`Erro ao salvar campanha: ${response.status}`)
-            }
-
-            const savedCampaign = await response.json()
-            console.log('Campanha salva com sucesso:', savedCampaign)
+            const savedCampaign = await response.json();
+            console.log('Campanha salva com sucesso:', savedCampaign);
 
             // Limpar o formulário após salvar
-            setCampaignTitle("")
-            setHtmlCode(defaultHtml)
-            setSelectedColor(tailwindColors[0])
-            navigate(-1)
+            setCampaignTitle("");
+            setHtmlCode(defaultHtml);
+            setSelectedColor(tailwindColors[0]);
+            navigate(-1);
 
         } catch (error) {
-            console.error('Erro ao salvar campanha:', error)
-            alert('Erro ao salvar campanha. Tente novamente.')
+            console.error('Erro ao salvar campanha:', error);
+            alert('Erro ao salvar campanha. Tente novamente.');
         }
-    }
+    };
 
     const resetCode = () => {
         setHtmlCode(defaultHtml)
@@ -155,8 +150,8 @@ export default function CreateCampanhaPage() {
                                     key={color.name}
                                     onClick={() => setSelectedColor(color)}
                                     className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${color.class} ${selectedColor.name === color.name
-                                            ? "border-blue-700 scale-110 ring-2 ring-blue-300"
-                                            : "border-slate-300 hover:scale-105 hover:ring-1 hover:ring-blue-200"
+                                        ? "border-blue-700 scale-110 ring-2 ring-blue-300"
+                                        : "border-slate-300 hover:scale-105 hover:ring-1 hover:ring-blue-200"
                                         }`}
                                     title={color.name}
                                 />

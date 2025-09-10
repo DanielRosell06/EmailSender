@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Copy,  RefreshCw, Save } from "lucide-react"
+import { Copy, RefreshCw, Save } from "lucide-react"
 import Modal from "../Modal"
+import { api } from '@/services/api.ts';
 
 const defaultHtml = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -58,8 +59,6 @@ export default function HtmlEditor() {
   const [selectedColor, setSelectedColor] = useState(tailwindColors[0])
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false)
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-
   const copyToClipboard = () => {
     navigator.clipboard.writeText(htmlCode)
   }
@@ -70,33 +69,27 @@ export default function HtmlEditor() {
         Titulo: campaignTitle || "Campanha sem título",
         Cor: selectedColor.name,
         Documento: htmlCode
-      }
+      };
 
-      const response = await fetch(`${backendUrl}/campanhas`, {
+      // Usa a sua função 'api' e passa o método e o corpo
+      const response = await api('/campanhas', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(campanha_data)
-      })
+      });
 
-      if (!response.ok) {
-        throw new Error(`Erro ao salvar campanha: ${response.status}`)
-      }
+      const savedCampaign = await response.json();
+      console.log('Campanha salva com sucesso:', savedCampaign);
 
-      const savedCampaign = await response.json()
-      console.log('Campanha salva com sucesso:', savedCampaign)
-      
       // Limpar o formulário após salvar
-      setCampaignTitle("")
-      setHtmlCode(defaultHtml)
-      setSelectedColor(tailwindColors[0])
-      
+      setCampaignTitle("");
+      setHtmlCode(defaultHtml);
+      setSelectedColor(tailwindColors[0]);
+
     } catch (error) {
-      console.error('Erro ao salvar campanha:', error)
-      alert('Erro ao salvar campanha. Tente novamente.')
+      console.error('Erro ao salvar campanha:', error);
+      alert('Erro ao salvar campanha. Tente novamente.');
     }
-  }
+  };
 
   const resetCode = () => {
     setHtmlCode(defaultHtml)
@@ -134,11 +127,10 @@ export default function HtmlEditor() {
                   <button
                     key={color.name}
                     onClick={() => setSelectedColor(color)}
-                    className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${color.class} ${
-                      selectedColor.name === color.name
-                        ? "border-stone-700 scale-110 ring-2 ring-purple-300"
-                        : "border-slate-300 hover:scale-105 hover:ring-1 hover:ring-purple-200"
-                    }`}
+                    className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${color.class} ${selectedColor.name === color.name
+                      ? "border-stone-700 scale-110 ring-2 ring-purple-300"
+                      : "border-slate-300 hover:scale-105 hover:ring-1 hover:ring-purple-200"
+                      }`}
                     title={color.name}
                   />
                 ))}
@@ -151,23 +143,23 @@ export default function HtmlEditor() {
         </div>
 
         <div className="flex gap-4 mb-4">
-          <Button 
-            onClick={copyToClipboard} 
+          <Button
+            onClick={copyToClipboard}
             className="bg-slate-300 text-stone-700 hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-emerald-500 hover:text-white transition-all duration-300 rounded-full hover:cursor-pointer"
             size="sm"
           >
             <Copy className="w-4 h-4 mr-2" />
             Copiar Código
           </Button>
-          <Button 
-            onClick={resetCode} 
+          <Button
+            onClick={resetCode}
             className="bg-slate-300 text-stone-700 hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-emerald-500 hover:text-white transition-all duration-300 rounded-full hover:cursor-pointer"
             size="sm"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Resetar
           </Button>
-          
+
           <Modal
             buttonClassName="bg-slate-300 text-stone-700 hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-emerald-500 hover:text-white transition-all duration-300 rounded-full hover:cursor-pointer !p-2 !px-4 !text-sm !font-medium flex items-center gap-2"
             buttonTitle="Ajuda"
@@ -181,7 +173,7 @@ export default function HtmlEditor() {
             <div className='space-y-4'>
               <div className="space-y-3">
                 <h2 className="text-xl font-bold text-stone-700">📝 Instruções de Uso:</h2>
-                
+
                 <div className="space-y-2">
                   <p className="flex items-start gap-2">
                     <span className="font-bold text-blue-600 min-w-[24px]">1.</span>
@@ -189,21 +181,21 @@ export default function HtmlEditor() {
                       <strong>Escreva seu código HTML</strong> diretamente no editor à esquerda
                     </span>
                   </p>
-                  
+
                   <p className="flex items-start gap-2">
                     <span className="font-bold text-blue-600 min-w-[24px]">2.</span>
                     <span className="text-stone-700">
                       Ou <strong>cole seu código HTML existente</strong> substituindo o código padrão
                     </span>
                   </p>
-                  
+
                   <p className="flex items-start gap-2">
                     <span className="font-bold text-blue-600 min-w-[24px]">3.</span>
                     <span className="text-stone-700">
                       <strong>Visualize em tempo real</strong> no preview à direita
                     </span>
                   </p>
-                  
+
                   <p className="flex items-start gap-2">
                     <span className="font-bold text-blue-600 min-w-[24px]">4.</span>
                     <span className="text-stone-700">
@@ -212,20 +204,20 @@ export default function HtmlEditor() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-400">
                 <h3 className="font-bold text-amber-800 mb-2">🖼️ Sobre Imagens:</h3>
                 <p className="text-amber-700 text-sm leading-relaxed">
-                  Se você for utilizar imagens na sua campanha, certifique-se de usar <strong>URLs da internet</strong> 
-                  (links que começam com https://). Não use imagens locais do seu computador, 
+                  Se você for utilizar imagens na sua campanha, certifique-se de usar <strong>URLs da internet</strong>
+                  (links que começam com https://). Não use imagens locais do seu computador,
                   pois elas não funcionarão nos e-mails.
                 </p>
               </div>
-              
+
               <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
                 <h3 className="font-bold text-blue-800 mb-2">✅ Dicas para E-mail:</h3>
                 <p className="text-blue-700 text-sm leading-relaxed">
-                  Este código será usado em campanhas de e-mail. Para melhor compatibilidade, 
+                  Este código será usado em campanhas de e-mail. Para melhor compatibilidade,
                   evite JavaScript e prefira CSS inline quando possível.
                 </p>
               </div>
@@ -233,7 +225,7 @@ export default function HtmlEditor() {
           </Modal>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{minHeight: "500px"}}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ minHeight: "500px" }}>
           {/* Editor */}
           <Card className="p-4 flex flex-col border-slate-200 shadow-lg">
             <div className="flex items-center justify-between mb-3">
@@ -269,9 +261,9 @@ export default function HtmlEditor() {
         </div>
 
         <div className="mt-6 flex justify-center">
-          <Button 
-            onClick={saveCampaign} 
-            size="lg" 
+          <Button
+            onClick={saveCampaign}
+            size="lg"
             className="px-8 bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500 text-white font-bold 
               hover:from-blue-600 hover:via-cyan-600 hover:to-emerald-600 
               transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 hover:cursor-pointer"

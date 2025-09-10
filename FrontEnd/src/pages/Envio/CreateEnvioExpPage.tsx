@@ -12,6 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { api } from '@/services/api.ts';
 
 
 interface Lista {
@@ -58,22 +59,28 @@ const CreateEnvioExpPage: React.FC = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
-        if (backendUrl != "" && IdLista != "") {
-            console.log(IdLista)
-            fetch(`${backendUrl}/get_lista_by_id_com_email?id_lista=${IdLista}`)
-                .then(res => res.json())
-                .then(listaData => {
-                    setLista(listaData);
-                    // Inicializa a lista filtrada com todos os e-mails
-                    if (listaData && listaData.Emails) {
-                        setFilteredEmails(listaData.Emails);
-                    }
-                })
-                .catch(() => setLista(null))
-                .finally(() => {
-                    setLoadingLista(false)
-                });
-        }
+        const fetchListaData = async () => {
+            if (backendUrl === "" || IdLista === "") {
+                return;
+            }
+            setLoadingLista(true);
+            try {
+                const res = await api(`/get_lista_by_id_com_email?id_lista=${IdLista}`);
+                const listaData = await res.json();
+                setLista(listaData);
+
+                if (listaData && listaData.Emails) {
+                    setFilteredEmails(listaData.Emails);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar dados da lista:", error);
+                setLista(null);
+            } finally {
+                setLoadingLista(false);
+            }
+        };
+
+        fetchListaData();
     }, [backendUrl, IdLista]);
 
     useEffect(() => {
@@ -81,27 +88,43 @@ const CreateEnvioExpPage: React.FC = () => {
     }, [lista])
 
     useEffect(() => {
-        setLoadingCampanha(true);
-        if (backendUrl != "" && IdLista != "") {
-            fetch(`${backendUrl}/campanha_by_id?id_campanha=${IdCampanha}`)
-                .then(res => res.json())
-                .then(campanhaData => {
-                    setCampanha(campanhaData);
-                })
-                .catch(() => setCampanha(null))
-                .finally(() => setLoadingCampanha(false));
-        }
-    }, [backendUrl, IdLista]);
+        const fetchCampanhaData = async () => {
+            setLoadingCampanha(true);
+            if (backendUrl === "" || IdCampanha === "") {
+                return;
+            }
+            try {
+                const res = await api(`/campanha_by_id?id_campanha=${IdCampanha}`);
+                const campanhaData = await res.json();
+                setCampanha(campanhaData);
+            } catch (error) {
+                console.error("Erro ao buscar dados da campanha:", error);
+                setCampanha(null);
+            } finally {
+                setLoadingCampanha(false);
+            }
+        };
+
+        fetchCampanhaData();
+    }, [backendUrl, IdCampanha]);
 
     useEffect(() => {
-        if (backendUrl != "") {
-            fetch(`${backendUrl}/get_all_user_smtp`)
-                .then(res => res.json())
-                .then(data_users => {
-                    setContas(data_users);
-                })
-                .catch(() => setContas([]))
-        }
+        const fetchContas = async () => {
+            if (backendUrl === "") {
+                return;
+            }
+
+            try {
+                const res = await api('/get_all_user_smtp');
+                const data_users = await res.json();
+                setContas(data_users);
+            } catch (error) {
+                console.error("Erro ao buscar contas:", error);
+                setContas([]);
+            }
+        };
+
+        fetchContas();
     }, [backendUrl]);
 
     // Novo useEffect para filtrar a lista de e-mails sempre que o termo de pesquisa ou a lista original mudar
@@ -115,7 +138,7 @@ const CreateEnvioExpPage: React.FC = () => {
     }, [searchTermLista, lista]);
 
     const handleEnvio = () => {
-        if (selectedAccount == null){
+        if (selectedAccount == null) {
             alert('Selecione qual conta irá enviar o email')
             return
         }

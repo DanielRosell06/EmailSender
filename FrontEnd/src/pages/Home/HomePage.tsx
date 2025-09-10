@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaPaperPlane, FaCalendarAlt, FaStar, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaExclamationTriangle, FaEllipsisV } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { api } from '@/services/api.ts';
 
 import {
     DropdownMenu,
@@ -85,58 +86,79 @@ const HomePage: React.FC = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
-        setLoadingCampanhas(true);
-        console.log("Backend =" + backendUrl)
+        const fetchCampanhas = async () => {
+            setLoadingCampanhas(true);
+            console.log("Backend =" + import.meta.env.VITE_BACKEND_URL);
 
-        fetch(`${backendUrl}/all_campanha`)
-            .then(res => res.json())
-            .then(data => {
+            try {
+                // Usa a sua função 'api' para fazer a requisição
+                const res = await api('/all_campanha');
+
+                // O tratamento de erro 401 já é feito na função 'api'
+                const data = await res.json();
+
                 const sortedCampanhas = data
                     .sort((a: Campanha, b: Campanha) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime())
                     .filter((campanha: Campanha) => campanha.Lixeira === false)
                     .slice(0, 4);
                 setCampanhas(sortedCampanhas);
-            })
-            .catch(() => setCampanhas([]))
-            .finally(() => setLoadingCampanhas(false));
+
+            } catch (error) {
+                console.error("Erro ao buscar campanhas:", error);
+                setCampanhas([]);
+            } finally {
+                setLoadingCampanhas(false);
+            }
+        };
+
+        fetchCampanhas();
     }, []);
 
     useEffect(() => {
-        setLoadingListas(true);
-        fetch(`${backendUrl}/all_lista`)
-            .then(res => res.json())
-            .then(data => {
+        const fetchListas = async () => {
+            setLoadingListas(true);
+
+            try {
+                // Usa a sua função 'api' para fazer a requisição GET
+                const res = await api('/all_lista');
+
+                // O tratamento para 401 já está na sua função 'api'
+                const data = await res.json();
+
                 const sortedListas = data
                     .sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime())
                     .slice(0, 6);
                 setListas(sortedListas);
-            })
-            .catch(() => setListas([]))
-            .finally(() => setLoadingListas(false));
+
+            } catch (error) {
+                console.error("Erro ao buscar listas:", error);
+                setListas([]);
+            } finally {
+                setLoadingListas(false);
+            }
+        };
+
+        fetchListas();
     }, []);
 
     useEffect(() => {
         const fetchEnviosData = async () => {
             setLoadingEnvios(true);
+
             try {
-                const res = await fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`);
+                const res = await api('/get_all_envio_com_lista_campanha_detalhe');
                 const envios: Envio[] = await res.json();
                 const sortedEnvios = envios.slice(0, 5);
 
                 const enviosComContagem = await Promise.all(
                     sortedEnvios.map(async (envio) => {
-                        try {
-                            const statusRes = await fetch(`${backendUrl}/get_status_envio_by_envio?id_envio=${envio.IdEnvio}`);
-                            const statusData: { Status: StatusEnvio[] } = await statusRes.json();
+                        const statusRes = await api(`/get_status_envio_by_envio?id_envio=${envio.IdEnvio}`);
+                        const statusData: { Status: StatusEnvio[] } = await statusRes.json();
 
-                            const entregues = statusData.Status.length;
-                            const aberturas = statusData.Status.filter(s => s.Visto).length;
+                        const entregues = statusData.Status.length;
+                        const aberturas = statusData.Status.filter(s => s.Visto).length;
 
-                            return { ...envio, entregas: entregues, aberturas: aberturas };
-                        } catch (error) {
-                            console.error(`Erro ao buscar status para o envio ${envio.IdEnvio}:`, error);
-                            return { ...envio, entregas: 0, aberturas: 0 };
-                        }
+                        return { ...envio, entregas: entregues, aberturas: aberturas };
                     })
                 );
 
@@ -150,7 +172,7 @@ const HomePage: React.FC = () => {
         };
 
         fetchEnviosData();
-    }, [backendUrl]);
+    }, []);
 
     const getGradientFromColor = (cor: string) => {
         const colorMap: { [key: string]: string } = {
@@ -453,7 +475,7 @@ const HomePage: React.FC = () => {
                             <Button
                                 variant="link"
                                 className="text-gray-600 hover:text-green-500"
-                                onClick={() => navigate('/envios')}
+                                onClick={() => navigate('/create_envio')}
                             >
                                 Ver Todos <FaArrowRight className="ml-2" />
                             </Button>

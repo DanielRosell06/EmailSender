@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from schema import envio as schemas_envio
 from crud import envio as crud_envio
+from jwt_auth import verificar_token
 
 # Importa a instância global do SocketIO do main.py
 # É crucial que essa linha seja adicionada
@@ -15,12 +16,12 @@ router = APIRouter()
 crud_envio.set_socketio_server(sio)
 
 @router.get("/get_all_envio_com_lista_campanha_detalhe", response_model=list[schemas_envio.Envio])
-def read_envios(db: Session = Depends(get_db)):
+def read_envios(db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     response_envios = crud_envio.get_all_envio_com_lista_campanha_detalhe(db)
     return response_envios
 
 @router.post("/envio/", response_model=schemas_envio.EnvioCreate)
-def create_envio(envio_data: schemas_envio.EnvioCreate, db: Session = Depends(get_db)):
+def create_envio(envio_data: schemas_envio.EnvioCreate, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Cria um envio e realiza o envio dos emails atraves de uma Lista e uma Campanha.
     """

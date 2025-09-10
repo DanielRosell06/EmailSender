@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
+from jwt_auth import verificar_token
 
 
 from schema import usuario_smtp as schema_usuario_smtp
@@ -15,7 +16,7 @@ from main import sio
 router = APIRouter()
 
 @router.post("/create_user_smtp/", response_model=schema_usuario_smtp.UsuarioSmtp)
-def create_user_smtp(user_smtp: schema_usuario_smtp.UsuarioSmtp, db: Session = Depends(get_db)):
+def create_user_smtp(user_smtp: schema_usuario_smtp.UsuarioSmtp, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Cria um create_user_smtp
     """
@@ -24,7 +25,7 @@ def create_user_smtp(user_smtp: schema_usuario_smtp.UsuarioSmtp, db: Session = D
     return response
 
 @router.get("/get_all_user_smtp/", response_model=list[schema_usuario_smtp.UsuarioSmtpComIdUsuarioSmtpSemSenha])
-def get_all_user_smtp(db: Session = Depends(get_db)):
+def get_all_user_smtp(db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Pega todos os UserSmtp sem a senha
     """
@@ -33,7 +34,7 @@ def get_all_user_smtp(db: Session = Depends(get_db)):
     return response
 
 @router.get("/get_user_password/", response_model=str)
-def get_all_user_smtp(id_user_smtp: int, db: Session = Depends(get_db)):
+def get_all_user_smtp(id_user_smtp: int, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Pega a senha descriptografada do usuario 
     """

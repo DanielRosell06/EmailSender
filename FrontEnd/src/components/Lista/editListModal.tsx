@@ -15,6 +15,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { api } from '@/services/api.ts';
+
 // URL da sua API
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
@@ -41,20 +43,32 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
   const [deletedEmails, setDeletedEmails] = useState<number[]>([]);
   const [editedEmails, setEditedEmails] = useState<Email[]>([]);
 
+  // ... outros imports
+
   useEffect(() => {
-    if (isModalOpen && listaId) {
+    const fetchListaData = async () => {
+      if (!isModalOpen || !listaId) {
+        return;
+      }
+
       setLoading(true);
-      fetch(`${backendUrl}/get_lista_by_id_com_email?id_lista=${listaId}`)
-        .then(response => response.json())
-        .then(data => {
-          setListaTitle(data.Titulo);
-          setOldListaTitle(data.Titulo);
-          setEmails(data.Emails);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+
+      try {
+        const response = await api(`/get_lista_by_id_com_email?id_lista=${listaId}`);
+        const data = await response.json();
+
+        setListaTitle(data.Titulo);
+        setOldListaTitle(data.Titulo);
+        setEmails(data.Emails);
+
+      } catch (error) {
+        console.error("Erro ao carregar dados da lista:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListaData();
   }, [isModalOpen, listaId]);
 
   const handleAddEmail = () => {
@@ -79,20 +93,22 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
     const promises = [];
 
     if (listaTitle !== oldListaTitle) {
-      const editTitlePromise = fetch(`${backendUrl}/edit_lista?id_lista=${listaId}&new_titulo=${listaTitle}`, { method: "PUT" })
+      const editTitlePromise = api(`/edit_lista?id_lista=${listaId}&new_titulo=${listaTitle}`, { method: "PUT" })
         .then(response => {
+          // A sua função 'api' já lida com o status 401. 
+          // Você só precisa se preocupar com outros tipos de erros aqui.
           if (!response.ok) {
             throw new Error('Erro ao alterar o título da lista. Tente novamente mais tarde.');
           }
           return response.json();
         });
+
       promises.push(editTitlePromise);
     }
 
     if (newEmails.length > 0) {
-      const createEmailsPromise = fetch(`${backendUrl}/create_email?lista_id=${listaId}`, {
+      const createEmailsPromise = api(`/create_email?lista_id=${listaId}`, {
         method: "POST",
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newEmails)
       })
         .then(response => {
@@ -101,13 +117,14 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
           }
           return response.json();
         });
+
       promises.push(createEmailsPromise);
     }
 
     if (deletedEmails.length > 0) {
-      const deleteEmailsPromise = fetch(`${backendUrl}/delete_email`, {
+      console.log(deletedEmails)
+      const deleteEmailsPromise = api(`/delete_email`, {
         method: "DELETE",
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(deletedEmails)
       })
         .then(response => {
@@ -116,6 +133,7 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
           }
           return response.json();
         });
+
       promises.push(deleteEmailsPromise);
     }
 

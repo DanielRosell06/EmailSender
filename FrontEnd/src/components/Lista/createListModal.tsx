@@ -15,16 +15,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// URL da sua API
-
+import { api } from '@/services/api.ts';
 
 const CreateListModal = () => {
   const [listaTitle, setListaTitle] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
   // Função para adicionar um e-mail ao estado
   const handleAddEmail = () => {
@@ -47,17 +44,10 @@ const CreateListModal = () => {
         Emails: emails
       };
 
-      const response = await fetch(`${backendUrl}/listas/`, {
+      const response = await api('/listas/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(newLista),
       });
-
-      if (!response.ok) {
-        throw new Error('Erro ao salvar a lista.');
-      }
 
       const savedList = await response.json();
       console.log('Lista salva com sucesso:', savedList);
@@ -68,7 +58,7 @@ const CreateListModal = () => {
       setIsModalOpen(false)
 
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao salvar a lista:", error);
     }
   };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaUsers, FaCalendarAlt, FaEnvelopeOpenText, FaPaperPlane, FaArrowRight, FaEllipsisV, FaChevronLeft } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { api } from '@/services/api.ts';
 
 import {
     DropdownMenu,
@@ -68,30 +69,44 @@ const LixeiraListasPage: React.FC = () => {
 
     // Efeito para buscar Listas
     useEffect(() => {
-        setLoadingListas(true);
-        fetch(`${backendUrl}/all_lista`)
-            .then(res => res.json())
-            .then(data => {
+        const fetchListas = async () => {
+            setLoadingListas(true);
+
+            try {
+                const res = await api('/all_lista');
+                const data = await res.json();
+
                 const sortedListas = data.sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime());
                 setListas(sortedListas);
-            })
-            .catch(() => {
+            } catch (error) {
+                console.error("Erro ao buscar listas:", error);
                 setListas([]);
-            })
-            .finally(() => setLoadingListas(false));
+            } finally {
+                setLoadingListas(false);
+            }
+        };
+
+        fetchListas();
     }, [backendUrl]);
 
     // Efeito para buscar Envios
     useEffect(() => {
-        setLoadingEnvios(true);
-        fetch(`${backendUrl}/get_all_envio_com_lista_campanha_detalhe`)
-            .then(res => res.json())
-            .then(data => {
+        const fetchEnviosData = async () => {
+            setLoadingEnvios(true);
+            try {
+                const res = await api('/get_all_envio_com_lista_campanha_detalhe');
+                const data = await res.json();
                 const sortedEnvios = data.slice(0, 5);
                 setEnviosRecentes(sortedEnvios);
-            })
-            .catch(() => setEnviosRecentes([]))
-            .finally(() => setLoadingEnvios(false));
+            } catch (error) {
+                console.error("Erro ao carregar envios recentes:", error);
+                setEnviosRecentes([]);
+            } finally {
+                setLoadingEnvios(false);
+            }
+        };
+
+        fetchEnviosData();
     }, [backendUrl]);
 
     const formatDate = (dateString: string) => {
@@ -103,15 +118,17 @@ const LixeiraListasPage: React.FC = () => {
         navigate(`/envio_detail/${idEnvio}`);
     };
 
-    const handleUndeleteLista = (idLista: number) => {
-        fetch(`http://127.0.0.1:8000/undelete_lista?id_lista=${idLista}`, { method: "DELETE" })
-            .then(() => {
-                setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
-            })
-            .catch(() => {
-                alert('Não foi possivel mover a lista para a lixeira, tente novamente mais tarde!')
-            });
-    }
+    const handleUndeleteLista = async (idLista: number) => {
+        try {
+            const res = await api(`/undelete_lista?id_lista=${idLista}`, { method: "DELETE" });
+
+            setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
+
+        } catch (error) {
+            console.error("Erro ao restaurar lista:", error);
+            alert('Não foi possivel restaurar a lista, tente novamente mais tarde!');
+        }
+    };
 
     // Função de renderização para a seção de Listas
     const renderListasSection = () => {

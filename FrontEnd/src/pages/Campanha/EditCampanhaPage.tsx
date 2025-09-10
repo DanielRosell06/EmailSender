@@ -10,6 +10,7 @@ import Modal from "../../components/Modal"
 import { FaPaperPlane, FaChevronLeft } from "react-icons/fa"
 import { useLoaderData, useNavigate } from "react-router-dom"
 import { Skeleton } from "@/components/ui/skeleton"
+import { api } from '@/services/api.ts';
 
 const defaultHtml = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -72,21 +73,19 @@ export default function EditCampanhaPage() {
         const fetchCampaignData = async () => {
             if (!IdCampanha) {
                 console.error("ID da campanha não fornecido.");
-                setIsLoading(false); // Garante que o carregamento termine mesmo em caso de erro
+                setIsLoading(false);
                 return;
             }
 
             try {
-                const response = await fetch(`${backendUrl}/campanha_by_id?id_campanha=${IdCampanha}`);
-                if (!response.ok) {
-                    throw new Error(`Erro ao buscar campanha: ${response.status}`);
-                }
+                // Usa a sua função 'api' e passa o IdCampanha na URL
+                const response = await api(`/campanha_by_id?id_campanha=${IdCampanha}`);
                 const campanha = await response.json();
 
                 // Define os estados com os dados recebidos da API
                 setCampaignTitle(campanha.Titulo);
                 setHtmlCode(campanha.Documento);
-                setCampaignSubject(campanha.Assunto)
+                setCampaignSubject(campanha.Assunto);
 
                 // Encontra a cor correspondente no array local
                 const foundColor = tailwindColors.find(c => c.name === campanha.Cor);
@@ -97,7 +96,7 @@ export default function EditCampanhaPage() {
             } catch (error) {
                 console.error('Erro ao buscar dados da campanha:', error);
             } finally {
-                setIsLoading(false); // Finaliza o estado de carregamento
+                setIsLoading(false);
             }
         };
 
@@ -118,28 +117,26 @@ export default function EditCampanhaPage() {
                 Documento: htmlCode
             }
 
-            const response = await fetch(`${backendUrl}/edit_campanha/?id_campanha=${IdCampanha}`, {
+            // Passa o ID da campanha na URL e o método e o corpo como opções
+            const response = await api(`/edit_campanha/?id_campanha=${IdCampanha}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify(campanha_data)
-            })
+            });
 
             if (!response.ok) {
-                throw new Error(`Erro ao salvar campanha: ${response.status}`)
+                throw new Error(`Erro ao salvar campanha: ${response.status}`);
             }
 
-            const updatedCampaign = await response.json()
-            console.log('Campanha atualizada com sucesso:', updatedCampaign)
+            const updatedCampaign = await response.json();
+            console.log('Campanha atualizada com sucesso:', updatedCampaign);
 
-            navigate(-1)
+            navigate(-1);
 
         } catch (error) {
-            console.error('Erro ao atualizar campanha:', error)
-            alert('Erro ao atualizar campanha. Tente novamente.')
+            console.error('Erro ao atualizar campanha:', error);
+            alert('Erro ao atualizar campanha. Tente novamente.');
         }
-    }
+    };
 
     const resetCode = () => {
         setHtmlCode(defaultHtml)
@@ -224,8 +221,8 @@ export default function EditCampanhaPage() {
                                             key={color.name}
                                             onClick={() => setSelectedColor(color)}
                                             className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${color.class} ${selectedColor.name === color.name
-                                                    ? "border-blue-700 scale-110 ring-2 ring-blue-300"
-                                                    : "border-slate-300 hover:scale-105 hover:ring-1 hover:ring-blue-200"
+                                                ? "border-blue-700 scale-110 ring-2 ring-blue-300"
+                                                : "border-slate-300 hover:scale-105 hover:ring-1 hover:ring-blue-200"
                                                 }`}
                                             title={color.name}
                                         />

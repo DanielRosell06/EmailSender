@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaEye, FaRegEnvelope, FaWrench, FaEyeSlash } from 'react-icons/fa';
+import { api } from '@/services/api.ts';
 
 import {
     Card,
@@ -56,43 +57,58 @@ const ContaPage: React.FC = () => {
         Porta: '587',
     });
 
-    function reloadAccounts () {
-        setReloadAccountsVar(reloadAccountsVar*-1)
+    function reloadAccounts() {
+        setReloadAccountsVar(reloadAccountsVar * -1)
     }
 
-    // Função que você deve implementar para buscar a senha real
+
     const handleGetSenha = async (accountId: number) => {
         setLoadingSenha({
             IdUserSmtp: accountId,
             Senha: "",
             Loading: true
-        })
-        fetch(`${backendUrl}/get_user_password?id_user_smtp=${accountId}`)
-            .then(res => res.json())
-            .then(data => {
-                setLoadingSenha({
-                    IdUserSmtp: accountId,
-                    Senha: data,
-                    Loading: false
-                })
-            })
-            .catch(() => setLoadingSenha({
+        });
+
+        try {
+            const res = await api(`/get_user_password?id_user_smtp=${accountId}`);
+            const data = await res.json();
+
+            setLoadingSenha({
+                IdUserSmtp: accountId,
+                Senha: data,
+                Loading: false
+            });
+
+        } catch (error) {
+            setLoadingSenha({
                 IdUserSmtp: -1,
                 Senha: "",
                 Loading: true
-            }))
-            .finally(() => setLoadingAccounts(false));
+            });
+            console.error("Erro ao buscar senha:", error);
+        } finally {
+            setLoadingAccounts(false);
+        }
     };
 
     useEffect(() => {
-        fetch(`${backendUrl}/get_all_user_smtp`)
-            .then(res => res.json())
-            .then(data => {
-                console.log(data)
+        const fetchAccounts = async () => {
+            setLoadingAccounts(true);
+            try {
+                const res = await api('/get_all_user_smtp');
+                const data = await res.json();
+
+                console.log(data);
                 setAccounts(data);
-            })
-            .catch(() => setAccounts([]))
-            .finally(() => setLoadingAccounts(false));
+            } catch (error) {
+                console.error('Erro ao buscar contas:', error);
+                setAccounts([]);
+            } finally {
+                setLoadingAccounts(false);
+            }
+        };
+
+        fetchAccounts();
     }, [backendUrl, reloadAccountsVar]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,28 +116,28 @@ const ContaPage: React.FC = () => {
         setNewAccount({ ...newAccount, [name]: value });
     };
 
-    const handleAddAccount = () => {
+    const handleAddAccount = async () => {
         if (!newAccount.Dominio || !newAccount.Usuario || !newAccount.Senha || !newAccount.Porta) {
             alert('Por favor, preencha todos os campos.');
             return;
         }
-        console.log(newAccount)
-        fetch(`${backendUrl}/create_user_smtp`, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(
-                newAccount
-            )
-        })
-            .then(res => res.json())
-            .then(data => {
-                const accountWithId = data;
-                reloadAccounts()
-                setNewAccount({ Dominio: '', Porta: '587', Usuario: '', Senha: '' });
-            })
-            .catch(() => {
-                alert('Não foi possivel adicionar conta, tente novamente mais tarde!')
+        console.log(newAccount);
+
+        try {
+            const res = await api('/create_user_smtp', {
+                method: "POST",
+                body: JSON.stringify(newAccount)
             });
+
+            const data = await res.json();
+
+            reloadAccounts();
+            setNewAccount({ Dominio: '', Porta: '587', Usuario: '', Senha: '' });
+
+        } catch (error) {
+            console.error("Erro ao adicionar conta:", error);
+            alert('Não foi possivel adicionar conta, tente novamente mais tarde!');
+        }
     };
 
     const renderAddAccountSection = () => (
@@ -282,7 +298,7 @@ const ContaPage: React.FC = () => {
             <div className="p-6 pt-0">
                 <Button
                     onClick={() => window.open('https://www.hostinger.com.br/tutoriais/o-que-e-smtp', '_blank')}
-                    className="w-full bg-gradient-to-r from-orange-600 via-yellow-500 to-red-500 text-white font-semibold rounded-xl shadow transition-all hover:from-purple-700 hover:via-pink-600 hover:to-orange-600"
+                    className="w-full bg-gradient-to-r from-orange-600 via-yellow-500 to-red-500 text-white font-semibold rounded-xl shadow transition-all hover:from-orange-700 hover:via-yellow-600 hover:to-red-600"
                 >
                     Veja um Tutorial para criar sua conta
                 </Button>

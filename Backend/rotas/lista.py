@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends
 from database import engine, Base, get_db
 from sqlalchemy.orm import Session
+from jwt_auth import verificar_token
 
 from schema import lista as schemas_lista
 from schema import email as schemas_email
@@ -12,7 +13,7 @@ from crud import email as crud_email
 router = APIRouter()
 
 @router.post("/listas/", response_model=schemas_lista.Lista)
-def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(get_db)):
+def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Cria uma nova lista com os dados fornecidos.
     """
@@ -22,7 +23,7 @@ def create_lista(lista_data: schemas_lista.ListaCreate, db: Session = Depends(ge
     return response_list
 
 @router.get("/all_lista/", response_model=list[schemas_lista.Lista])
-def get_all_listas(db: Session = Depends(get_db)):
+def get_all_listas(db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Retorna todas as listas cadastradas.
     """
@@ -30,7 +31,7 @@ def get_all_listas(db: Session = Depends(get_db)):
     return listas
 
 @router.get("/get_lista_by_id_com_email/", response_model=schemas_lista.ListaComEmail)
-def get_all_listas(id_lista = int, db: Session = Depends(get_db)):
+def get_all_listas(id_lista = int, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
     Retorna a lista com IdLista = id_lista, e todos os seus emails
     """

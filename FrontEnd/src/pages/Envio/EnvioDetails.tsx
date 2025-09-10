@@ -3,11 +3,12 @@ import { FaPaperPlane, FaEnvelope, FaEye, FaEyeSlash, FaSearch, FaChevronLeft, F
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLoaderData, useNavigate } from "react-router-dom";
+import { api } from '@/services/api.ts';
 
 // Interfaces para os dados
 interface EmailStatus {
-  IdEmail: string;
-  Visto: boolean;
+    IdEmail: string;
+    Visto: boolean;
 }
 
 interface Campanha {
@@ -33,16 +34,14 @@ const EnvioDetailsPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
+
             try {
-                // AQUI A MUDANÇA: Usando a variável de ambiente
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/get_status_envio_by_envio?id_envio=${idEnvio}`);
-                
-                if (!response.ok) {
-                    throw new Error("Falha ao buscar dados do servidor.");
-                }
+                // Usa a sua função 'api' para fazer a requisição
+                const response = await api(`/get_status_envio_by_envio?id_envio=${idEnvio}`);
 
                 const data: EnvioData = await response.json();
                 setEnvioData(data);
+
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
             } finally {
@@ -160,7 +159,7 @@ const EnvioDetailsPage = () => {
                                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             </div>
                         </div>
-                        
+
                         {/* Estatísticas de Envio */}
                         <div className="flex gap-4 p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg">
                             <div className="flex items-center gap-2 text-gray-600">

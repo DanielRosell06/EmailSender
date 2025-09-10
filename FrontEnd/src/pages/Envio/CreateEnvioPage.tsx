@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaChevronLeft, FaExpand } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
+import { api } from '@/services/api.ts';
 
 import {
     Dialog,
@@ -51,29 +52,48 @@ const CreateEnvioPage: React.FC = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
-        setLoadingListas(true);
-        fetch(`${backendUrl}/all_lista`)
-            .then(res => res.json())
-            .then(listasData => {
+        const fetchListas = async () => {
+            setLoadingListas(true);
+
+            try {
+                const res = await api('/all_lista');
+                const listasData = await res.json();
+
                 const sortedListas = listasData.sort((a: Lista, b: Lista) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime());
                 setListas(sortedListas);
                 setFilteredListas(sortedListas);
-            })
-            .catch(() => setListas([]))
-            .finally(() => setLoadingListas(false));
+
+            } catch (error) {
+                console.error("Erro ao buscar listas:", error);
+                setListas([]);
+            } finally {
+                setLoadingListas(false);
+            }
+        };
+
+        fetchListas();
     }, [backendUrl]);
 
     useEffect(() => {
-        setLoadingCampanhas(true);
-        fetch(`${backendUrl}/all_campanha`)
-            .then(res => res.json())
-            .then(campanhasData => {
+        const fetchCampanhas = async () => {
+            setLoadingCampanhas(true);
+
+            try {
+                const res = await api('/all_campanha');
+                const campanhasData = await res.json();
                 const sortedCampanhas = campanhasData.sort((a: Campanha, b: Campanha) => new Date(b.Ultimo_Uso).getTime() - new Date(a.Ultimo_Uso).getTime());
                 setCampanhas(sortedCampanhas);
                 setFilteredCampanhas(sortedCampanhas);
-            })
-            .catch(() => setCampanhas([]))
-            .finally(() => setLoadingCampanhas(false));
+
+            } catch (error) {
+                console.error("Erro ao buscar campanhas:", error);
+                setCampanhas([]);
+            } finally {
+                setLoadingCampanhas(false);
+            }
+        };
+
+        fetchCampanhas();
     }, [backendUrl]);
 
     useEffect(() => {
