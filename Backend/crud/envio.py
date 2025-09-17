@@ -180,7 +180,6 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
             for email_obj in lista:
                 email = email_obj.Conteudo
                 token = generate_token(email, db_envio.IdEnvio)
-                documento_com_tag = campanha.Documento + f' <img src="{SERVER_URL}/api/update_status_envio?token={token}">'
 
                 # cria mensagem multiparte relacionada (html + imagens inline)
                 msg = MIMEMultipart("related")
@@ -192,7 +191,8 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                 msg.attach(alternative)
 
                 # tenta embutir imagens externas e obter o html modificado com cid
-                html_with_cid = _embed_external_images_and_get_html(documento_com_tag, msg)
+                documento_com_imagens = _embed_external_images_and_get_html(campanha.Documento, msg)
+                html_with_cid = documento_com_imagens + f' <img src="{SERVER_URL}/api/update_status_envio?token={token}">'
 
                 # plain fallback: remove tags simples (pega texto bruto). Importa bs4 localmente para isso.
                 try:
