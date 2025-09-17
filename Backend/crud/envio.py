@@ -15,6 +15,11 @@ import hashlib
 from datetime import datetime
 from cryptography.fernet import Fernet
 
+import requests
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 # Importa a instância do servidor SocketIO.
 # Isso geralmente é feito em um arquivo principal, como main.py, e a instância é passada aqui.
 # Por exemplo, `from main import sio`.
@@ -65,6 +70,7 @@ def generate_token(original_string, user_number):
 async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreate, sid: str):
     """
     Função de envio de e-mail atualizada com progresso assíncrono.
+    Agora: baixa imagens externas encontradas em <img src="..."> e as embute como CID.
     Recebe o 'sid' (Session ID) do cliente para enviar mensagens específicas.
     """
     global sio
@@ -96,6 +102,71 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
     # --- ETAPA 1: INÍCIO DO PROCESSO (10% DA BARRA) ---
     await sio.emit('progress', {'sent': 0, 'total': total_emails, 'percentage': 10, 'id_envio': db_envio.IdEnvio}, room=sid)
 
+    # helper local: faz fetch das imagens externas e as anexa como MIMEImage no msg (related),
+    # substituindo os src por cid:...
+    def _embed_external_images_and_get_html(html: str, msg):
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+            from email.mime.image import MIMEImage
+            import uuid
+            from urllib.parse import urljoin
+
+            soup = BeautifulSoup(html, "html.parser")
+            attached = {}  # url -> cid (evita baixar/duplicar)
+            for img_tag in soup.find_all("img"):
+                src = img_tag.get("src")
+                if not src:
+                    continue
+
+                # ignora se já é cid ou data:
+                if src.startswith("cid:") or src.startswith("data:"):
+                    continue
+
+                # normaliza fontes relativas com SERVER_URL se começar com '/'
+                resolved_src = src
+                if src.startswith("//"):
+                    resolved_src = "https:" + src
+                elif src.startswith("/"):
+                    if SERVER_URL:
+                        resolved_src = urljoin(SERVER_URL, src)
+                    else:
+                        # não conseguimos resolver sem SERVER_URL -> pular
+                        continue
+                elif not (src.lower().startswith("http://") or src.lower().startswith("https://")):
+                    # não é uma URL externa (ex: caminho local) -> pular
+                    continue
+
+                # se já anexamos essa url para este email, reaproveita cid
+                if resolved_src in attached:
+                    img_tag["src"] = f"cid:{attached[resolved_src]}"
+                    continue
+
+                try:
+                    r = requests.get(resolved_src, timeout=10)
+                    if r.status_code == 200 and r.content:
+                        cid = uuid.uuid4().hex
+                        try:
+                            mime_img = MIMEImage(r.content)
+                        except Exception:
+                            # fallback: criar MIMEImage sem detectar subtype explicitamente
+                            mime_img = MIMEImage(r.content)
+                        mime_img.add_header("Content-ID", f"<{cid}>")
+                        mime_img.add_header("Content-Disposition", "inline", filename=cid)
+                        msg.attach(mime_img)
+                        attached[resolved_src] = cid
+                        img_tag["src"] = f"cid:{cid}"
+                    else:
+                        # falha ao baixar: mantém o src original (cliente pode bloquear externamente)
+                        print(f"[embed_images] status != 200 para {resolved_src}: {r.status_code}")
+                except Exception as e:
+                    print(f"[embed_images] falha ao baixar imagem {resolved_src}: {e}")
+                    # mantém src original se falhar
+            return str(soup)
+        except Exception as e:
+            print(f"[embed_images] erro inesperado ao processar imagens: {e}")
+            return html
+
     try:
         contexto_ssl = ssl.create_default_context()
         with smtplib.SMTP(smtp_domain, smtp_port) as server:
@@ -111,11 +182,29 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                 token = generate_token(email, db_envio.IdEnvio)
                 documento_com_tag = campanha.Documento + f' <img src="{SERVER_URL}/api/update_status_envio?token={token}">'
 
-                msg = MIMEMultipart()
+                # cria mensagem multiparte relacionada (html + imagens inline)
+                msg = MIMEMultipart("related")
                 msg['From'] = smtp_user
                 msg['Subject'] = campanha.Assunto
-                msg.attach(MIMEText(documento_com_tag, 'html', 'utf-8'))
 
+                # alternativa (plain + html)
+                alternative = MIMEMultipart("alternative")
+                msg.attach(alternative)
+
+                # tenta embutir imagens externas e obter o html modificado com cid
+                html_with_cid = _embed_external_images_and_get_html(documento_com_tag, msg)
+
+                # plain fallback: remove tags simples (pega texto bruto). Importa bs4 localmente para isso.
+                try:
+                    from bs4 import BeautifulSoup as _BS
+                    plain_text = _BS(html_with_cid, "html.parser").get_text(separator="\n").strip()
+                except Exception:
+                    plain_text = ""
+
+                alternative.attach(MIMEText(plain_text, 'plain', 'utf-8'))
+                alternative.attach(MIMEText(html_with_cid, 'html', 'utf-8'))
+
+                # registra status no banco
                 db_status = models.StatusEnvio(
                     IdEnvio = db_envio.IdEnvio,
                     IdEmail = email_obj.IdEmail,
@@ -123,8 +212,14 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                 )
                 db.add(db_status)
                 
-                del msg['To']
+                # define destinatário (mantendo seu padrão anterior)
+                try:
+                    del msg['To']
+                except Exception:
+                    pass
                 msg['To'] = email
+
+                # envia
                 server.sendmail(smtp_user, email, msg.as_string())
                 
                 emails_enviados_count += 1
@@ -152,6 +247,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
     await sio.emit('progress', {'sent': total_emails, 'total': total_emails, 'percentage': 100, 'id_envio': db_envio.IdEnvio}, room=sid)
     db.refresh(db_envio)
     return db_envio
+
 
 # ... (restante do seu código)
 def get_all_envio_com_lista_campanha_detalhe(user_id:int, db: Session):
