@@ -142,10 +142,14 @@ const CreateEnvioExpPage: React.FC = () => {
             alert('Selecione qual conta irá enviar o email')
             return
         }
+
+        const token = crypto.randomUUID();
+
         const envioData = {
             Lista: IdLista,
             Campanha: IdCampanha,
-            UsuarioSmtp: selectedAccount?.IdUsuarioSmtp
+            UsuarioSmtp: selectedAccount?.IdUsuarioSmtp,
+            Token: token
         };
         navigate('/envio_progress', { state: { envioData } });
     };

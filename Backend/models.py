@@ -65,6 +65,7 @@ class Envio(Base):
     
     IdEnvio = Column(Integer, primary_key=True, nullable=False, index=True)
     Dt_Envio = Column(Date, nullable=False, default=func.now())
+    Token =  Column(String, nullable=True, unique=True, index=True)
 
     # Chave Estrangeira
     IdUsuario = Column(Integer, ForeignKey("usuario.IdUsuario"))

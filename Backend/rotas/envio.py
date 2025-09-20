@@ -48,6 +48,12 @@ async def start_envio(sid: str, data: dict):
 
         envio_data = schemas_envio.EnvioCreate(**data)
         
+        envio_id_existente = crud_envio.get_envio_id_by_token(token=envio_data.Token, db=db)
+        
+        if envio_id_existente:
+            await sio.emit('redirect', {'url': f"/envio_detail/{envio_id_existente}"}, room=sid)
+            return
+        
         await crud_envio.create_envio(user_id=user_id, db=db, envio=envio_data, sid=sid)
         
     except Exception as e:

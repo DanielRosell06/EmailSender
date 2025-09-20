@@ -12,6 +12,10 @@ interface ProgressData {
   id_envio: number;
 }
 
+interface RedirectData {
+  url: string;
+}
+
 const LoadingPage: React.FC = () => {
   const token = localStorage.getItem('token');
   const [progress, setProgress] = useState<ProgressData | null>(null);
@@ -20,47 +24,46 @@ const LoadingPage: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Extrai os dados de envio passados via 'state'
     const { envioData } = location.state || {};
 
-    // Cria a conexão WebSocket
     socketRef.current = io(SOCKET_URL);
 
     socketRef.current.on('connect', () => {
       console.log('Conectado ao WebSocket:', socketRef.current?.id);
-      // Envia os dados de envio para o backend, incluindo o sid
       if (envioData) {
         socketRef.current?.emit('start_envio', { ...envioData, sid: socketRef.current?.id, token: `Bearer ${token}`});
       }
     });
 
-    // Escuta por eventos de progresso
     socketRef.current.on('progress', (data: ProgressData) => {
       setProgress(data);
     });
 
-    // Escuta por eventos de erro, se necessário
     socketRef.current.on('envio_error', (data: { message: string }) => {
       console.error('Erro no envio:', data.message);
-      // Aqui você poderia exibir uma mensagem de erro para o usuário
     });
 
-    // Limpeza: desconecta o socket ao desmontar o componente
+    socketRef.current.on('redirect', (data: RedirectData) => {
+      console.log('Recebido evento de redirecionamento:', data.url);
+      navigate(data.url);
+    });
+
     return () => {
       if (socketRef.current) {
         socketRef.current.off('connect');
         socketRef.current.off('progress');
         socketRef.current.off('envio_error');
+        socketRef.current.off('redirect');
         socketRef.current.disconnect();
       }
     };
-  }, [location.state]);
+  }, [location.state, navigate]);
 
-  // Efeito para monitorar o progresso e navegar ao finalizar
+
   useEffect(() => {
     if (progress && progress.percentage >= 100) {
-      const mockEnvioId = progress.id_envio;
-      navigate(`/envio_detail/${mockEnvioId}`);
+      const envioId = progress.id_envio;
+      navigate(`/envio_detail/${envioId}`);
     }
   }, [progress, navigate]);
 

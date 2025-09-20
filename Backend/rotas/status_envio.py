@@ -22,7 +22,6 @@ def update_status_envio(token: Optional[str] = None, db: Session = Depends(get_d
     """
     Rota para contagem de abertura dos emails, retornando uma imagem transparente de 1x1.
     """
-    print(f'alterando o token {token}')
     crud_status_envio.update_status_envio(db, token)
 
     return StreamingResponse(io.BytesIO(TRANSPARENT_GIF_DATA), media_type="image/png")

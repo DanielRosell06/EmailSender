@@ -6,6 +6,7 @@ class EnvioCreate(BaseModel):
     Campanha: int
     Lista: int
     UsuarioSmtp: int
+    Token: str
 
 class Detalhe(BaseModel):
     IdDetalhe: int

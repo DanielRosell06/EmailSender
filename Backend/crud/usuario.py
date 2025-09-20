@@ -47,7 +47,6 @@ def create_usuario(db: Session, usuario: schema_usuario.Usuario):
         return 4  # 4: Erro no servidor
     
 def login_usuario(db: Session, usuario: schema_usuario.LoginUsuario):
-    print(f"Chave SECRETA de CRIAÇÃO: {USER_KEY}")
     try:
         db_usuario = db.query(
             models.Usuario).filter(
@@ -67,7 +66,6 @@ def login_usuario(db: Session, usuario: schema_usuario.LoginUsuario):
         
     except Exception as e:
         # Trata outros erros gerais do servidor
-        print(f"Ocorreu um erro inesperado no servidor: {e}")
         return "3"  # 3: Erro no servidor
     
 def get_usuario_by_id(db: Session, user_id: int):
