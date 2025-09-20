@@ -216,7 +216,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                     print(f"Erro ao enviar e-mail para {email_obj.Conteudo}: {e}")
 
                 progresso_emails_bruto = (emails_enviados_count / total_emails) * 80
-                progresso_atual = int(progresso_emails_bruto / 5) * 5
+                progresso_atual = int(progresso_emails_bruto)
                 
                 if progresso_atual > progresso_anterior:
                     progresso_total_barra = 10 + progresso_atual
