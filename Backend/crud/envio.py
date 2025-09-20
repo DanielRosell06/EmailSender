@@ -100,6 +100,8 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
     db.add(campanha)
     db.commit()
 
+    IdNewEnvio = db_envio.IdEnvio
+
     # --- ETAPA 1: INÍCIO DO PROCESSO (10% DA BARRA) ---
     await sio.emit('progress', {'sent': 0, 'total': total_emails, 'percentage': 10, 'id_envio': db_envio.IdEnvio}, room=sid)
 
@@ -153,6 +155,8 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
         except Exception as e:
             print(f"[embed_images] erro inesperado ao processar imagens: {e}")
             return html
+        
+    emails_enviados_count = 0
 
     try:
         contexto_ssl = ssl.create_default_context()
@@ -160,7 +164,6 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
             server.starttls(context=contexto_ssl)
             server.login(smtp_user, smtp_password)
 
-            emails_enviados_count = 0
             progresso_anterior = 0
 
             # --- ETAPA 2: ENVIO DE EMAILS (10% a 90% da barra) ---
@@ -211,6 +214,15 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                     db.add(db_status)
                     
                     emails_enviados_count += 1
+
+                except smtplib.SMTPDataError as e:
+                    if e.smtp_code == 452:
+                        print("Erro: Limite diário de envio de e-mails atingido. Finalizando o envio.")
+                        db.commit()
+                        await sio.emit('redirect', {'url': f"/envio_detail/{IdNewEnvio}"}, room=sid)
+                        break 
+                    else:
+                        print(f"Erro ao enviar e-mail para {email_obj.Conteudo}: {e}")
                 
                 except Exception as e:
                     print(f"Erro ao enviar e-mail para {email_obj.Conteudo}: {e}")
@@ -224,12 +236,23 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                     progresso_anterior = progresso_atual
 
     except smtplib.SMTPAuthenticationError:
+        if emails_enviados_count > 0:
+            db.commit()
         print("Erro de autenticação.")
+
     except smtplib.SMTPServerDisconnected:
+        if emails_enviados_count > 0:
+            db.commit()
         print("O servidor desconectou.")
+
     except ConnectionRefusedError:
+        if emails_enviados_count > 0:
+            db.commit()
         print("A conexão foi recusada.")
+
     except Exception as e:
+        if emails_enviados_count > 0:
+            db.commit()
         print(f"Ocorreu um erro inesperado: {e}")
 
     # --- ETAPA 3: FINALIZAÇÃO (90% a 100% da barra) ---
