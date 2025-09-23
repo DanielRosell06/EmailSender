@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Mail, Users, Send, Settings, Eye, CheckCircle, ArrowRight, Star, Shield, Zap, List, LayoutList, Rocket, Layers } from 'lucide-react';
+import { Mail, Users, Send, Settings, Eye, CheckCircle, ArrowRight, Star, Shield, Zap } from 'lucide-react';
 
 const LandingInicio = () => {
   const navigate = useNavigate();

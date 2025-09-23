@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Mail, Users, Send, Settings, ArrowRight, CheckCircle, Upload, Eye, Code, List, Rocket } from 'lucide-react';
+import { Mail, Users, Send, Settings, CheckCircle, Upload, Eye, Code, List, Rocket } from 'lucide-react';
 
 const LandingSaibaMais: React.FC = () => {
     const navigate = useNavigate();
