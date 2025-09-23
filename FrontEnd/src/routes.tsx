@@ -18,6 +18,8 @@ import ContaPage from "./pages/Conta/ContaPage.tsx";
 import CadastroPage from "./pages/Usuario/CadastroPage.tsx";
 import LoginPage from "./pages/Usuario/LoginPage.tsx";
 import RotaPrivada from "./components/Auth.tsx";
+import LandingInicio from "./pages/Landing/Inicio.tsx";
+import LandingSaibaMais from "./pages/Landing/SaibaMais.tsx";
 
 
 const router = createBrowserRouter([
@@ -93,6 +95,14 @@ const router = createBrowserRouter([
     {
         path: "login",
         element: <LoginPage />,
+    },
+    {
+        path: "inicio",
+        element: <LandingInicio />,
+    },
+    {
+        path: "saibamais",
+        element: <LandingSaibaMais />,
     },
 ]);
 
