@@ -176,6 +176,7 @@ const LixeiraCampanhasPage: React.FC = () => {
                                                     frameBorder="0"
                                                     scrolling="no"
                                                     title={`preview-${campanha.IdCampanha}`}
+                                                    sandbox=""
                                                 />
                                             </div>
                                         )}
@@ -219,6 +220,7 @@ const LixeiraCampanhasPage: React.FC = () => {
                                                                                 frameBorder="0"
                                                                                 scrolling="auto"
                                                                                 title={`preview-dialog-${campanha.IdCampanha}`}
+                                                                                sandbox=""
                                                                             />
                                                                         ) : (
                                                                             <div className="text-center text-gray-400 py-16">
@@ -298,6 +300,7 @@ const LixeiraCampanhasPage: React.FC = () => {
                                 frameBorder="0"
                                 scrolling="auto"
                                 title={`preview-full-${selectedCampanha.IdCampanha}`}
+                                sandbox=""
                             />
                         ) : (
                             <div className="flex items-center justify-center h-full text-center text-gray-500 p-4">

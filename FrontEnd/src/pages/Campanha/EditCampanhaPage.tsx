@@ -356,7 +356,7 @@ export default function EditCampanhaPage() {
                                         srcDoc={htmlCode}
                                         className="w-full h-full border-0"
                                         title="HTML Preview"
-                                        sandbox="allow-scripts allow-same-origin"
+                                        sandbox=""
                                     />
                                 </div>
                             </Card>

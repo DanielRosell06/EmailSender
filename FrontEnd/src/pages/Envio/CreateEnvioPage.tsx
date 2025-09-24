@@ -258,6 +258,7 @@ const CreateEnvioPage: React.FC = () => {
                                             frameBorder="0"
                                             scrolling="no"
                                             title={`preview-${campanha.IdCampanha}`}
+                                            sandbox=""
                                         />
                                     </div>
                                 )}
@@ -307,6 +308,7 @@ const CreateEnvioPage: React.FC = () => {
                                                             frameBorder="0"
                                                             scrolling="auto"
                                                             title={`preview-dialog-${campanha.IdCampanha}`}
+                                                            sandbox=""
                                                         />
                                                     ) : (
                                                         <div className="text-center text-gray-400 py-16">

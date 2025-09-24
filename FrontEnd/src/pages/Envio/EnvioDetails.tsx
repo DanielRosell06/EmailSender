@@ -123,6 +123,7 @@ const EnvioDetailsPage = () => {
                                     className="w-full h-full border-0"
                                     frameBorder="0"
                                     title="Preview da Campanha"
+                                    sandbox=""
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-center text-gray-500">

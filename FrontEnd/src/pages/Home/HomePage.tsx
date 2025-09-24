@@ -87,7 +87,6 @@ const HomePage: React.FC = () => {
     useEffect(() => {
         const fetchCampanhas = async () => {
             setLoadingCampanhas(true);
-            console.log("Backend =" + import.meta.env.VITE_BACKEND_URL);
 
             try {
                 // Usa a sua função 'api' para fazer a requisição
@@ -244,6 +243,7 @@ const HomePage: React.FC = () => {
                                     frameBorder="0"
                                     scrolling="no"
                                     title={`preview-${campanha.IdCampanha}`}
+                                    sandbox=""
                                 />
                             </div>
                         )}
@@ -288,6 +288,7 @@ const HomePage: React.FC = () => {
                                                                 frameBorder="0"
                                                                 scrolling="auto"
                                                                 title={`preview-dialog-${campanha.IdCampanha}`}
+                                                                sandbox=""
                                                             />
                                                         ) : (
                                                             <div className="text-center text-gray-400 py-16">

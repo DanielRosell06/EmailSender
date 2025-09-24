@@ -3,7 +3,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
-    const backendUrl = "";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -86,6 +86,7 @@ export default function LoginPage() {
                     setIsLoading(false);
                 })
                 .catch(() => {
+                    console.log(backendUrl)
                     setSubmitError('Não foi possível se conectar ao servidor. Tente novamente mais tarde!');
                     setIsLoading(false);
                 });

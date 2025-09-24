@@ -270,6 +270,7 @@ const CreateEnvioExpPage: React.FC = () => {
                         }}
                         frameBorder="0"
                         title={`preview-${campanha.IdCampanha}`}
+                        sandbox=""
                     />
                 </div>
             </div>
