@@ -39,6 +39,7 @@ const LixeiraCampanhasPage: React.FC = () => {
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCampanha, setSelectedCampanha] = useState<Campanha | null>(null);
+    const [undeletando, setUndeletando] = useState(false)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -91,6 +92,7 @@ const LixeiraCampanhasPage: React.FC = () => {
     };
 
     const handleUndeleteCampanha = async (id_campanha: number) => {
+        setUndeletando(true)
         try {
             // Usa a sua função 'api' e passa o método DELETE
             const res = await api(`/undelete_campanha/?id_campanha=${id_campanha}`, { method: "DELETE" });
@@ -102,8 +104,10 @@ const LixeiraCampanhasPage: React.FC = () => {
                     setSelectedCampanha(null);
                 }
             }
+            setUndeletando(false)
         } catch (error) {
             console.error("Erro ao restaurar campanha:", error);
+            setUndeletando(false)
         }
     };
 
@@ -266,6 +270,7 @@ const LixeiraCampanhasPage: React.FC = () => {
                                                                                 onClick={() => {
                                                                                     handleUndeleteCampanha(campanha.IdCampanha)
                                                                                 }}
+                                                                                disabled={undeletando}
                                                                             >
                                                                                 Confirmar
                                                                             </Button>

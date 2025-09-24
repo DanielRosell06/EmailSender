@@ -33,6 +33,7 @@ interface Lista {
 
 const LixeiraListasPage: React.FC = () => {
     const [listas, setListas] = useState<Lista[]>([]);
+    const [undeletando, setUndeletando] = useState(false)
 
     // Estados de carregamento individuais
     const [loadingListas, setLoadingListas] = useState(true);
@@ -70,6 +71,7 @@ const LixeiraListasPage: React.FC = () => {
     };
 
     const handleUndeleteLista = async (idLista: number) => {
+        setUndeletando(true)
         try {
             const res = await api(`/undelete_lista?id_lista=${idLista}`, { method: "DELETE" });
 
@@ -78,10 +80,12 @@ const LixeiraListasPage: React.FC = () => {
             }
 
             setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
+            setUndeletando(false)
 
         } catch (error) {
             console.error("Erro ao restaurar lista:", error);
             alert('Não foi possivel restaurar a lista, tente novamente mais tarde!');
+            setUndeletando(false)
         }
     };
 
@@ -155,6 +159,7 @@ const LixeiraListasPage: React.FC = () => {
                                                                             onClick={() => {
                                                                                 handleUndeleteLista(lista.IdLista)
                                                                             }}
+                                                                            disabled={undeletando}
                                                                         >
                                                                             Confirmar
                                                                         </Button>

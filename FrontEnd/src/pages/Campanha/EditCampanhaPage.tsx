@@ -65,6 +65,7 @@ export default function EditCampanhaPage() {
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true) // Novo estado de carregamento
     const navigate = useNavigate();
+    const [editando, setEditando] = useState(false)
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
@@ -109,6 +110,7 @@ export default function EditCampanhaPage() {
 
     // Modificado: Agora faz uma requisição PUT para a rota de edição
     const saveCampaign = async () => {
+        setEditando(true)
         try {
             const campanha_data = {
                 Titulo: campaignTitle || "Campanha sem título",
@@ -132,9 +134,12 @@ export default function EditCampanhaPage() {
 
             navigate(-1);
 
+            setEditando(false)
+
         } catch (error) {
             console.error('Erro ao atualizar campanha:', error);
             alert('Erro ao atualizar campanha. Tente novamente.');
+            setEditando(false)
         }
     };
 
@@ -371,7 +376,7 @@ export default function EditCampanhaPage() {
                         className="px-8 bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500 text-white font-bold
                             hover:from-blue-600 hover:via-cyan-600 hover:to-emerald-600
                             transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 hover:cursor-pointer"
-                        disabled={isLoading} // Desabilita o botão enquanto carrega
+                        disabled={isLoading || editando}
                     >
                         <Save className="w-5 h-5 mr-2" />
                         Salvar Campanha

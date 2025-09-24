@@ -22,6 +22,7 @@ const CreateListModal = () => {
   const [emailInput, setEmailInput] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [salvando, setSalvando] = useState(false)
 
   // Função para adicionar um e-mail ao estado
   const handleAddEmail = () => {
@@ -38,6 +39,7 @@ const CreateListModal = () => {
 
   // Função para criar a lista na API
   const handleSaveList = async () => {
+    setSalvando(true)
     try {
       const newLista = {
         Titulo: listaTitle,
@@ -56,9 +58,11 @@ const CreateListModal = () => {
       setListaTitle('');
       setEmails([]);
       setIsModalOpen(false)
+      setSalvando(false)
 
     } catch (error) {
       console.error("Erro ao salvar a lista:", error);
+      setSalvando(false)
     }
   };
 
@@ -180,6 +184,7 @@ const CreateListModal = () => {
                 onClick={() => {
                   handleSaveList()
                 }}
+                disabled={salvando}
               >
                 Salvar
               </Button>

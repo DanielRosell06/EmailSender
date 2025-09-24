@@ -61,6 +61,7 @@ interface Envio {
 const ListasPage: React.FC = () => {
     const [listas, setListas] = useState<Lista[]>([]);
     const [enviosRecentes, setEnviosRecentes] = useState<Envio[]>([]);
+    const [deletando, setDeletando] = useState(false)
 
     // Estados de carregamento individuais
     const [loadingListas, setLoadingListas] = useState(true);
@@ -124,6 +125,7 @@ const ListasPage: React.FC = () => {
     };
 
     const handleDeleteLista = async (idLista: number) => {
+        setDeletando(true)
         try {
             const res = await api(`/delete_lista?id_lista=${idLista}`, { method: "DELETE" });
 
@@ -132,10 +134,12 @@ const ListasPage: React.FC = () => {
             }
 
             setListas(prev => prev.filter(lista => lista.IdLista !== idLista));
+            setDeletando(false)
 
         } catch (error) {
             console.error("Erro ao deletar lista:", error);
             alert('Não foi possivel mover a lista para a lixeira, tente novamente mais tarde!');
+            setDeletando(false)
         }
     };
 
@@ -226,6 +230,7 @@ const ListasPage: React.FC = () => {
                                                                         onClick={() => {
                                                                             handleDeleteLista(lista.IdLista)
                                                                         }}
+                                                                        disabled={deletando}
                                                                     >
                                                                         Confirmar
                                                                     </Button>

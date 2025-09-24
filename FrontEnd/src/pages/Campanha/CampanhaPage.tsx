@@ -41,6 +41,7 @@ const CampanhasPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [selectedCampanha, setSelectedCampanha] = useState<Campanha | null>(null);
     const navigate = useNavigate();
+    const [deletando, setDeletando] = useState(false)
 
     useEffect(() => {
         const fetchCampanhas = async () => {
@@ -89,6 +90,7 @@ const CampanhasPage: React.FC = () => {
     };
 
     const handleDeleteCampanha = async (id_campanha: number) => {
+        setDeletando(true)
         try {
             // Usa a sua função 'api' e passa o método DELETE
             const res = await api(`/delete_campanha/?id_campanha=${id_campanha}`, { method: "DELETE" });
@@ -100,8 +102,10 @@ const CampanhasPage: React.FC = () => {
                     setSelectedCampanha(null);
                 }
             }
+            setDeletando(false)
         } catch (error) {
             console.error("Erro ao deletar campanha:", error);
+            setDeletando(false)
         }
     };
 
@@ -278,6 +282,7 @@ const CampanhasPage: React.FC = () => {
                                                                                 onClick={() => {
                                                                                     handleDeleteCampanha(campanha.IdCampanha)
                                                                                 }}
+                                                                                disabled={deletando}
                                                                             >
                                                                                 Confirmar
                                                                             </Button>

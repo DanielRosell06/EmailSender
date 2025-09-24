@@ -26,6 +26,7 @@ interface Slide {
 export default function CadastroPage() {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const navigate = useNavigate();
+    const [criando, setCriando] = useState(false)
 
     const [formData, setFormData] = useState<FormDataState>({
         name: '',
@@ -128,6 +129,7 @@ export default function CadastroPage() {
     };
 
     const handleSubmit = (e: React.FormEvent) => {
+        setCriando(true)
         e.preventDefault();
         const UsuarioObj = {
             "Nome": formData.name,
@@ -161,18 +163,22 @@ export default function CadastroPage() {
                         case 2:
                             // E-mail já cadastrado
                             setSubmitError('O e-mail informado já está cadastrado.');
+                            setCriando(false)
                             break;
                         case 3:
                             // Erro no banco de dados
                             setSubmitError('Ocorreu um erro no banco de dados. Tente novamente!');
+                            setCriando(false)
                             break;
                         case 4:
                             // Erro no servidor
                             setSubmitError('Erro no Servidor. Tente novamente mais tarde.');
+                            setCriando(false)
                             break;
                         default:
                             // Valor inesperado
                             setSubmitError('Ocorreu um erro inesperado. Tente novamente!');
+                            setCriando(false)
                             break;
                     }
                 })
@@ -180,6 +186,7 @@ export default function CadastroPage() {
                     // Trata erros de requisição
                     console.error('Erro de requisição:', error);
                     setSubmitError('Não foi possível se conectar ao servidor. Tente novamente mais tarde!');
+                    setCriando(false)
                 });
         }
     };
@@ -226,9 +233,8 @@ export default function CadastroPage() {
                             {slides.map((slide, index) => (
                                 <div
                                     key={index}
-                                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out flex flex-col items-center justify-center ${
-                                        index === currentSlide ? 'opacity-100 z-10' : 'opacity-0'
-                                    }`}
+                                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out flex flex-col items-center justify-center ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0'
+                                        }`}
                                 >
                                     <div className="text-center lg:text-left">
                                         <h1 className="text-4xl lg:text-5xl font-bold mb-6">
@@ -288,9 +294,8 @@ export default function CadastroPage() {
                                     <button
                                         key={index}
                                         onClick={() => setCurrentSlide(index)}
-                                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                                            index === currentSlide ? 'bg-indigo-600 w-6' : 'bg-gray-400'
-                                        }`}
+                                        className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-indigo-600 w-6' : 'bg-gray-400'
+                                            }`}
                                     />
                                 ))}
                             </div>
@@ -445,6 +450,7 @@ export default function CadastroPage() {
                                     {/* Submit Button */}
                                     <button
                                         onClick={handleSubmit}
+                                        disabled={criando}
                                         className="w-full flex items-center justify-center py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
                                     >
                                         <div className="flex items-center">

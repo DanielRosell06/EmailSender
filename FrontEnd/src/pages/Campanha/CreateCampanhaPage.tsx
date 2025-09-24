@@ -56,6 +56,7 @@ const tailwindColors = [
 ]
 
 export default function CreateCampanhaPage() {
+    const [salvando, setSalvando] = useState(false)
     const [htmlCode, setHtmlCode] = useState(defaultHtml)
     const [campaignTitle, setCampaignTitle] = useState("")
     const [campaignSubject, setCampaignSubject] = useState("")
@@ -68,6 +69,7 @@ export default function CreateCampanhaPage() {
     }
 
     const saveCampaign = async () => {
+        setSalvando(true)
         try {
             const campanha_data = {
                 Titulo: campaignTitle || "Campanha sem título",
@@ -90,10 +92,13 @@ export default function CreateCampanhaPage() {
             setHtmlCode(defaultHtml);
             setSelectedColor(tailwindColors[0]);
             navigate(-1);
+            setSalvando(false)
 
         } catch (error) {
             console.error('Erro ao salvar campanha:', error);
             alert('Erro ao salvar campanha. Tente novamente.');
+            setSalvando(false)
+
         }
     };
 
@@ -296,6 +301,7 @@ export default function CreateCampanhaPage() {
                         className="px-8 bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500 text-white font-bold 
                             hover:from-blue-600 hover:via-cyan-600 hover:to-emerald-600 
                             transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 hover:cursor-pointer"
+                        disabled={salvando}
                     >
                         <Save className="w-5 h-5 mr-2" />
                         Salvar Campanha

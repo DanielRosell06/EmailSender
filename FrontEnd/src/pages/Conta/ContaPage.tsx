@@ -40,6 +40,8 @@ const ContaPage: React.FC = () => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
+    const [criando, setCriando] = useState(false)
+
     // Exemplo de estado com contas SMTP simuladas
     const [accounts, setAccounts] = useState<SmtpAccountWithId[]>([]);
     const [loadingAccounts, setLoadingAccounts] = useState<boolean>(true)
@@ -117,6 +119,7 @@ const ContaPage: React.FC = () => {
     };
 
     const handleAddAccount = async () => {
+        setCriando(true)
         if (!newAccount.Dominio || !newAccount.Usuario || !newAccount.Senha || !newAccount.Porta) {
             alert('Por favor, preencha todos os campos.');
             return;
@@ -135,10 +138,12 @@ const ContaPage: React.FC = () => {
 
             reloadAccounts();
             setNewAccount({ Dominio: '', Porta: '587', Usuario: '', Senha: '' });
+            setCriando(false)
 
         } catch (error) {
             console.error("Erro ao adicionar conta:", error);
             alert('Não foi possivel adicionar conta, tente novamente mais tarde!');
+            setCriando(false)
         }
     };
 
@@ -206,6 +211,7 @@ const ContaPage: React.FC = () => {
                 <Button
                     onClick={handleAddAccount}
                     className="w-full bg-gradient-to-r from-orange-500/80 via-yellow-500/80 to-red-500/80 text-white font-semibold rounded-xl shadow hover:from-orange-600 hover:via-yellow-600 hover:to-red-600 transition-all"
+                    disabled={criando}
                 >
                     <FaWrench className="mr-2" />
                     Adicionar Conta

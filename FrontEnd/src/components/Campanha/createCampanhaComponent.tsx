@@ -54,6 +54,7 @@ const tailwindColors = [
 ]
 
 export default function HtmlEditor() {
+  const [criando, setCriando] = useState(false)
   const [htmlCode, setHtmlCode] = useState(defaultHtml)
   const [campaignTitle, setCampaignTitle] = useState("")
   const [selectedColor, setSelectedColor] = useState(tailwindColors[0])
@@ -64,6 +65,7 @@ export default function HtmlEditor() {
   }
 
   const saveCampaign = async () => {
+    setCriando(true)
     try {
       const campanha_data = {
         Titulo: campaignTitle || "Campanha sem título",
@@ -84,10 +86,13 @@ export default function HtmlEditor() {
       setCampaignTitle("");
       setHtmlCode(defaultHtml);
       setSelectedColor(tailwindColors[0]);
+      setCriando(false)
+
 
     } catch (error) {
       console.error('Erro ao salvar campanha:', error);
       alert('Erro ao salvar campanha. Tente novamente.');
+      setCriando(false)
     }
   };
 
@@ -263,6 +268,7 @@ export default function HtmlEditor() {
         <div className="mt-6 flex justify-center">
           <Button
             onClick={saveCampaign}
+            disabled={criando}
             size="lg"
             className="px-8 bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500 text-white font-bold 
               hover:from-blue-600 hover:via-cyan-600 hover:to-emerald-600 

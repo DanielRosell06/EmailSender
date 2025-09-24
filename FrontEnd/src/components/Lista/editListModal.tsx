@@ -40,6 +40,7 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
   const [loading, setLoading] = useState(true);
   const [newEmails, setNewEmails] = useState<string[]>([]);
   const [deletedEmails, setDeletedEmails] = useState<number[]>([]);
+  const [salvando, setSalvando] = useState(false)
 
   useEffect(() => {
     const fetchListaData = async () => {
@@ -86,6 +87,7 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
   };
 
   const handleSaveList = async () => {
+    setSalvando(true)
     const promises = [];
 
     if (listaTitle !== oldListaTitle) {
@@ -145,9 +147,11 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
       setDeletedEmails([]);
       setNewEmails([]);
       onClose();
+      setSalvando(false)
 
     } catch (error) {
       alert((error as Error).message);
+      setSalvando(false)
     }
   };
 
@@ -282,6 +286,7 @@ const EditListModal: React.FC<EditListModalProps> = ({ isModalOpen, openModal, o
                   bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 
                   via-fuchsia-500 to-red-500/50'
                   onClick={handleSaveList}
+                  disabled={salvando}
                 >
                   Salvar
                 </Button>
