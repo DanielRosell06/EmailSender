@@ -55,7 +55,7 @@ const Layout: React.FC = () => {
     <div className="min-h-screen">
       {/* Navbar */}
       <nav className="bg-white/85 text-slate-700 p-4 shadow-lg fixed z-10 w-[100vw] top-0 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
+        <div className="w-[90vw] ml-auto mr-auto flex items-center justify-between">
           <button
             onClick={toggleSidebar}
             className="p-2 hover:bg-slate-200 rounded-md transition-colors duration-200"
@@ -75,8 +75,14 @@ const Layout: React.FC = () => {
               />
             </svg>
           </button>
-          <h1 className="text-xl font-bold">Header</h1>
-          <div></div>
+          <div className="flex items-center space-x-4">
+            <button onClick={() => {
+              localStorage.removeItem('token')
+              navigate("/login")
+            }} className="hover:cursor-pointer px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium hover:scale-110 transition-all duration-200">
+              Sair
+            </button>
+          </div>
         </div>
       </nav>
 
