@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV } from "react-icons/fa";
+import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV, FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api.ts';
@@ -139,7 +139,7 @@ const CampanhasPage: React.FC = () => {
                 <div className="flex justify-between items-center">
                     <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
                         <span className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500">
-                            <FaPaperPlane className="text-white text-lg" />
+                            <FaEnvelope className="text-white text-lg" />
                         </span>
                         Minhas Campanhas
                     </h1>

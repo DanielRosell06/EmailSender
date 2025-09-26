@@ -1,13 +1,32 @@
 // src/components/layout/Layout.tsx
-import React, { useState } from 'react';
-import { FaEnvelope, FaPaperPlane, FaUsers, FaChevronDown, FaChevronRight, FaHome, FaPersonBooth } from 'react-icons/fa';
+import { Mail } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { FaEnvelope, FaPaperPlane, FaUsers, FaChevronDown, FaChevronRight, FaHome, FaPersonBooth, FaCog } from 'react-icons/fa';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { api } from './services/api';
+
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+
+interface UserData {
+  Nome: String,
+  Email: String
+}
 
 const Layout: React.FC = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [listasExpanded, setListasExpanded] = useState(false);
   const [campanhasExpanded, setCampanhasExpanded] = useState(false);
   const [activePath, setActivePath] = useState('/create_envio'); // Exemplo de estado ativo
+  const [loadingUserData, setLoadingUserData] = useState(false)
+  const [userData, setUserData] = useState<UserData>({
+    Nome: "", // Inicialização com string vazia
+    Email: "" // Inicialização com string vazia
+  })
 
   const navigate = useNavigate();
 
@@ -51,14 +70,36 @@ const Layout: React.FC = () => {
     'Campanha Boas-vindas'
   ];
 
+  useEffect(() => {
+    const fetchUserName = async () => {
+      setLoadingUserData(true);
+      if (backendUrl === "") {
+        return;
+      }
+      try {
+        const res = await api(`/get_dados_usuario_by_token`);
+        const userReceivedData = await res.json();
+        setUserData(userReceivedData);
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuario:", error);
+        setUserData({ Nome: "", Email: "" });
+      } finally {
+        console.log("Dados: " + userData)
+        setLoadingUserData(false);
+      }
+    };
+
+    fetchUserName();
+  }, [backendUrl]);
+
   return (
     <div className="min-h-screen">
       {/* Navbar */}
       <nav className="bg-white/85 text-slate-700 p-4 shadow-lg fixed z-10 w-[100vw] top-0 backdrop-blur-sm">
-        <div className="w-[90vw] ml-auto mr-auto flex items-center justify-between">
+        <div className="w-[90vw] ml-auto mr-auto flex items-center justify-between relative">
           <button
             onClick={toggleSidebar}
-            className="p-2 hover:bg-slate-200 rounded-md transition-colors duration-200"
+            className="p-2 hover:bg-slate-200 rounded-md transition-colors duration-200 z-20"
             aria-label="Abrir menu"
           >
             <svg
@@ -75,7 +116,23 @@ const Layout: React.FC = () => {
               />
             </svg>
           </button>
-          <div className="flex items-center space-x-4">
+
+          <div className="flex items-center space-x-2 absolute left-1/2 transform -translate-x-1/2 z-10">
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Mail className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              EmailSender
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-4 z-20">
+            <HoverCard>
+              <HoverCardTrigger>Olá <span className='hover:underline hover:cursor-pointer'>{userData.Nome}</span></HoverCardTrigger>
+              <HoverCardContent className='bg-white border-none'>
+                {userData.Email}
+              </HoverCardContent>
+            </HoverCard>
             <button onClick={() => {
               localStorage.removeItem('token')
               navigate("/login")
@@ -125,7 +182,7 @@ const Layout: React.FC = () => {
           </div>
 
           <div className='flex flex-col gap-2'>
-            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
+            <button className={`hover:bg-gradient-to-br from-indigo-500 to-purple-600 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/' ? 'bg-gray-200' : ''
               }`}
               onClick={() => {
                 handleNavigate('/')
@@ -134,83 +191,27 @@ const Layout: React.FC = () => {
               <FaHome className='w-[20px] h-[20px] mr-3' />
               <h1 className='text-[18px]'>Home</h1>
             </button>
-            <div className='flex flex-col'>
-              <div
-                onClick={() => handleNavigate('/lista')}
-                className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/lista' ? 'bg-gray-200' : 'hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 hover:text-white'
-                  }`}
-              >
-                <div className='flex flex-row items-center'>
-                  <FaUsers className='w-[20px] h-[20px] mr-3' />
-                  <h1 className='text-[18px]'>Listas</h1>
-                </div>
-                <button
-                  onClick={toggleListas}
-                  className="p-1 rounded-full hover:bg-gray-300/50"
-                  aria-label="Expandir listas"
-                >
-                  {listasExpanded ?
-                    <FaChevronDown className='w-[12px] h-[12px]' /> :
-                    <FaChevronRight className='w-[12px] h-[12px]' />
-                  }
-                </button>
+            <button
+              onClick={() => handleNavigate('/lista')}
+              className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/lista' ? 'bg-gray-200' : 'hover:bg-gradient-to-br from-indigo-600/50 via-fuchsia-500 to-red-500/50 hover:text-white'
+                }`}
+            >
+              <div className='flex flex-row items-center'>
+                <FaUsers className='w-[20px] h-[20px] mr-3' />
+                <h1 className='text-[18px]'>Listas</h1>
               </div>
-
-              {/* Submenu de Listas */}
-              <div className={`overflow-hidden transition-all duration-300 ${listasExpanded ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="pl-8 pt-2">
-                  {listas.map((lista, index) => (
-                    <button
-                      key={index}
-                      className="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    >
-                      {lista}
-                    </button>
-                  ))}
-                </div>
+            </button>
+            <button
+              onClick={() => handleNavigate('/campanha')}
+              className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/campanha' ? 'bg-gray-200' : 'hover:bg-gradient-to-br from-blue-600/60 via-indigo-500 to-cyan-500/60 hover:text-white'
+                }`}
+            >
+              <div className='flex flex-row items-center'>
+                <FaEnvelope className='w-[20px] h-[20px] mr-3' />
+                <h1 className='text-[18px]'>Campanhas</h1>
               </div>
-            </div>
-
-            {/* Botão Campanhas */}
-            <div className='flex flex-col'>
-              <div
-                onClick={() => handleNavigate('/campanha')}
-                className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/create_campanha' ? 'bg-gray-200' : 'hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-blue-600/60 via-indigo-500 to-cyan-500/60 hover:text-white'
-                  }`}
-              >
-                <div className='flex flex-row items-center'>
-                  <FaEnvelope className='w-[20px] h-[20px] mr-3' />
-                  <h1 className='text-[18px]'>Campanhas</h1>
-                </div>
-                <button
-                  onClick={toggleCampanhas}
-                  className="p-1 rounded-full hover:bg-gray-300/50"
-                  aria-label="Expandir campanhas"
-                >
-                  {campanhasExpanded ?
-                    <FaChevronDown className='w-[12px] h-[12px]' /> :
-                    <FaChevronRight className='w-[12px] h-[12px]' />
-                  }
-                </button>
-              </div>
-
-              {/* Submenu de Campanhas */}
-              <div className={`overflow-hidden transition-all duration-300 ${campanhasExpanded ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="pl-8 pt-2">
-                  {campanhas.map((campanha, index) => (
-                    <button
-                      key={index}
-                      className="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    >
-                      {campanha}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Botão Enviar (sem submenu) */}
-            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
+            </button>
+            <button className={`hover:bg-gradient-to-br from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
               }`}
               onClick={() => {
                 handleNavigate('/create_envio')
@@ -219,13 +220,13 @@ const Layout: React.FC = () => {
               <FaPaperPlane className='w-[20px] h-[20px] mr-3' />
               <h1 className='text-[18px]'>Enviar</h1>
             </button>
-            <button className={`hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-red-400/60 via-yellow-500 to-orange-400/40 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/conta_page' ? 'bg-gray-200' : ''
+            <button className={`hover:bg-gradient-to-br from-red-400/60 via-yellow-500 to-orange-400/40 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/conta_page' ? 'bg-gray-200' : ''
               }`}
               onClick={() => {
                 handleNavigate('/conta_page')
               }}
             >
-              <FaPersonBooth className='w-[20px] h-[20px] mr-3' />
+              <FaCog className='w-[20px] h-[20px] mr-3' />
               <h1 className='text-[18px]'>Contas</h1>
             </button>
           </div>

@@ -49,3 +49,21 @@ def verificar_autenticacao(user_id: int = Depends(verificar_token), db: Session 
 
     # Se o usuário for encontrado, retorna uma mensagem de sucesso
     return {"status": "ok", "message": "Token é válido."}
+
+@router.get("/get_dados_usuario_by_token", response_model=schemas_usuario.UsuarioSemSenha)
+def verificar_autenticacao(user_id: int = Depends(verificar_token), db: Session = Depends(get_db)):
+    """
+    Verifica se o usuário está autenticado e com um token válido.
+    """
+    # Procura o usuário no banco de dados com base no ID do token
+    db_usuario = crud_usuario.get_usuario_by_id(db, user_id)
+
+    # Se o usuário não for encontrado (ID inválido), retorna 401
+    if not db_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido"
+        )
+
+    # Se o usuário for encontrado, retorna uma mensagem de sucesso
+    return db_usuario
