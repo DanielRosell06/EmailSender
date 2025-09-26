@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaEllipsisV } from "react-icons/fa";
+import { FaPlus, FaPaperPlane, FaCalendarAlt, FaEnvelopeOpenText, FaUsers, FaArrowRight, FaChartBar, FaUserShield, FaEllipsisV, FaEnvelope } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api.ts';
 
@@ -427,7 +427,7 @@ const HomePage: React.FC = () => {
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                             <span className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500">
-                                <FaPaperPlane className="text-white text-lg" />
+                                <FaEnvelope className="text-white text-lg" />
                             </span>
                             Campanhas Acessadas Recentemente
                         </h2>

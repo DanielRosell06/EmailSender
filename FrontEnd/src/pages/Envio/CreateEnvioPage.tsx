@@ -4,7 +4,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FaEnvelope, FaUsers, FaStar, FaCalendarAlt, FaPaperPlane, FaSearch, FaExpand } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
-import { api } from '@/services/api.ts';
 
 import {
     Dialog,
@@ -16,6 +15,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { api } from "@/services/api";
 
 
 interface Lista {
@@ -145,7 +145,7 @@ const CreateEnvioPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between gap-3 mb-6">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 rounded-lg flex items-center justify-center">
                         <FaUsers className="text-white text-sm" />
                     </div>
                     <h2 className="text-2xl font-semibold text-gray-800">Listas de E-mails</h2>
@@ -167,23 +167,23 @@ const CreateEnvioPage: React.FC = () => {
                         <Skeleton key={i} className="h-28 w-full bg-gray-200" />
                     ))
                 ) : filteredListas.length > 0 ? (
-                    filteredListas.filter(a => a.Lixeira == false).slice(0, 5).map((lista) => (
+                    filteredListas.filter(a => a.Lixeira === false).slice(0, 5).map((lista) => (
                         <div
                             key={lista.IdLista}
                             className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-lg ${selectedLista === lista.IdLista
-                                ? "border-purple-500 bg-purple-50 shadow-lg"
-                                : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-200"
+                                ? "border-white/50 bg-white/80 backdrop-blur-sm shadow-xl ring-2 ring-fuchsia-500"
+                                : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-indigo-200"
                                 }`}
                             onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
                         >
-                            <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 p-4 border-b border-purple-100">
+                            <div className="bg-fuchsia-500/20 p-4 border-b border-indigo-100">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                                        <FaEnvelope className="text-purple-500" />
+                                    <h3 className="text-lg font-semibold text-black drop-shadow-lg flex items-center gap-2">
+                                        <FaUsers className="text-fuchsia-600" />
                                         {lista.Titulo}
                                     </h3>
                                     {selectedLista === lista.IdLista && (
-                                        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                        <div className="w-6 h-6 bg-fuchsia-500 rounded-full flex items-center justify-center">
                                             <div className="w-2 h-2 bg-white rounded-full"></div>
                                         </div>
                                     )}
@@ -211,7 +211,7 @@ const CreateEnvioPage: React.FC = () => {
             <div className="flex items-center justify-between gap-3 mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                        <FaPaperPlane className="text-white text-sm" />
+                        <FaEnvelope className="text-white text-sm" />
                     </div>
                     <h2 className="text-2xl font-semibold text-gray-800">Campanhas</h2>
                 </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FaEnvelope, FaUsers, FaPaperPlane, FaChevronLeft, FaSearch, FaCheckCircle, FaChevronUp } from "react-icons/fa";
+import { FaEnvelope, FaUsers, FaPaperPlane, FaChevronLeft, FaSearch, FaCheckCircle, FaChevronUp, FaUser } from "react-icons/fa";
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -210,7 +210,7 @@ const CreateEnvioExpPage: React.FC = () => {
                                     key={index}
                                     className="flex items-center p-2 rounded-lg bg-stone-100 bg-opacity-60 text-stone-800 shadow-sm transition-transform transform hover:scale-[1.01]"
                                 >
-                                    <FaEnvelope className="text-purple-500 mr-3" />
+                                    <FaUser className="text-purple-500 mr-3" />
                                     <span className="text-sm font-medium">{email.Conteudo}</span>
                                 </li>
                             ))}
@@ -230,7 +230,7 @@ const CreateEnvioExpPage: React.FC = () => {
                     <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                                <FaPaperPlane className="text-white text-sm" />
+                                <FaEnvelope className="text-white text-sm" />
                             </div>
                             <h2 className="text-2xl font-semibold text-gray-800">Campanha</h2>
                         </div>
@@ -249,7 +249,7 @@ const CreateEnvioExpPage: React.FC = () => {
                 <div className="flex items-center justify-between gap-3 mb-6">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                            <FaPaperPlane className="text-white text-sm" />
+                            <FaEnvelope className="text-white text-sm" />
                         </div>
                         <div className="flex flex-col">
                             <h2 className="text-2xl font-semibold text-gray-800">
