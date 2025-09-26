@@ -1,7 +1,7 @@
 // src/components/layout/Layout.tsx
 import { Mail } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { FaEnvelope, FaPaperPlane, FaUsers, FaChevronDown, FaChevronRight, FaHome, FaPersonBooth, FaCog } from 'react-icons/fa';
+import { FaEnvelope, FaPaperPlane, FaUsers, FaHome, FaCog } from 'react-icons/fa';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { api } from './services/api';
 
@@ -19,10 +19,7 @@ interface UserData {
 const Layout: React.FC = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [listasExpanded, setListasExpanded] = useState(false);
-  const [campanhasExpanded, setCampanhasExpanded] = useState(false);
   const [activePath, setActivePath] = useState('/create_envio'); // Exemplo de estado ativo
-  const [loadingUserData, setLoadingUserData] = useState(false)
   const [userData, setUserData] = useState<UserData>({
     Nome: "", // Inicialização com string vazia
     Email: "" // Inicialização com string vazia
@@ -38,41 +35,14 @@ const Layout: React.FC = () => {
     setSidebarOpen(false);
   };
 
-  const toggleListas = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setListasExpanded(!listasExpanded);
-  };
-
-  const toggleCampanhas = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCampanhasExpanded(!campanhasExpanded);
-  };
-
   const handleNavigate = (path: string) => {
     navigate(path);
     setActivePath(path); // Atualiza o caminho ativo
     closeSidebar();
   }
 
-  const listas = [
-    'Lista de Clientes VIP',
-    'Lista de Prospects',
-    'Lista de Newsletter',
-    'Lista de Eventos',
-    'Lista de Parceiros'
-  ];
-
-  const campanhas = [
-    'Campanha Black Friday',
-    'Campanha Natal 2024',
-    'Campanha Lançamento Produto',
-    'Campanha Re-engajamento',
-    'Campanha Boas-vindas'
-  ];
-
   useEffect(() => {
     const fetchUserName = async () => {
-      setLoadingUserData(true);
       if (backendUrl === "") {
         return;
       }
@@ -85,7 +55,6 @@ const Layout: React.FC = () => {
         setUserData({ Nome: "", Email: "" });
       } finally {
         console.log("Dados: " + userData)
-        setLoadingUserData(false);
       }
     };
 

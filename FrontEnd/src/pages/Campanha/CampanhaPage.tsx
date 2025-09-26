@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaPaperPlane, FaCalendarAlt, FaArrowRight, FaEllipsisV, FaEnvelope } from "react-icons/fa";
+import { FaPlus, FaCalendarAlt, FaArrowRight, FaEllipsisV, FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api.ts';
