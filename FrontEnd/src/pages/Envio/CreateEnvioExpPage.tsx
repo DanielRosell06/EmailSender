@@ -179,7 +179,7 @@ const CreateEnvioExpPage: React.FC = () => {
             <div className="space-y-6">
                 <div className="flex items-center justify-between gap-3 mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 rounded-lg flex items-center justify-center">
                             <FaUsers className="text-white text-sm" />
                         </div>
                         <div className="flex flex-col">
@@ -210,7 +210,7 @@ const CreateEnvioExpPage: React.FC = () => {
                                     key={index}
                                     className="flex items-center p-2 rounded-lg bg-stone-100 bg-opacity-60 text-stone-800 shadow-sm transition-transform transform hover:scale-[1.01]"
                                 >
-                                    <FaUser className="text-purple-500 mr-3" />
+                                    <FaUser className="text-fuchsia-600 mr-3" />
                                     <span className="text-sm font-medium">{email.Conteudo}</span>
                                 </li>
                             ))}
