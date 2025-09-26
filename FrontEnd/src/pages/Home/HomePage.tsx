@@ -344,8 +344,8 @@ const HomePage: React.FC = () => {
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center border border-white/50">
-                                    <FaEnvelopeOpenText className="text-indigo-600 text-lg" />
+                                <div className="w-10 h-10 bg-fuchsia-600/20 rounded-lg flex items-center justify-center border border-white/50">
+                                    <FaEnvelopeOpenText className="text-fuchsia-600 text-lg" />
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-800">{lista.Titulo}</h3>
@@ -448,7 +448,7 @@ const HomePage: React.FC = () => {
                     <div className="py-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                                <span className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500">
+                                <span className="p-2 rounded-lg bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50">
                                     <FaUsers className="text-white text-lg" />
                                 </span>
                                 Listas Acessadas Recentemente
