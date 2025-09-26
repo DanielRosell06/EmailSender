@@ -176,7 +176,7 @@ const CreateEnvioPage: React.FC = () => {
                                 }`}
                             onClick={() => setSelectedLista(selectedLista === lista.IdLista ? null : lista.IdLista)}
                         >
-                            <div className="bg-fuchsia-500/20 p-4 border-b border-indigo-100">
+                            <div className="bg-slate-500/20 p-4 border-b border-indigo-100">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-semibold text-black drop-shadow-lg flex items-center gap-2">
                                         <FaUsers className="text-fuchsia-600" />
