@@ -319,9 +319,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
     return db_envio
 
 
-# ... (restante do seu código)
 def get_all_envio_com_lista_campanha_detalhe(user_id:int, db: Session):
-    # ... (seu código atual, sem alterações)
     envios_com_relacoes = (
         db.query(models.Envio)
         .filter(models.Envio.IdUsuario == user_id)
