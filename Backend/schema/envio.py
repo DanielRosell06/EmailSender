@@ -10,7 +10,7 @@ class EnvioCreate(BaseModel):
 
 class Detalhe(BaseModel):
     IdDetalhe: int
-    Conteudo: str
+    Conteudo: Optional[str] = None
     
     class Config:
         from_attributes = True
