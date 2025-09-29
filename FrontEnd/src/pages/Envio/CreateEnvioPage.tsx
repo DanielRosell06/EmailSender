@@ -150,15 +150,22 @@ const CreateEnvioPage: React.FC = () => {
                     </div>
                     <h2 className="text-2xl font-semibold text-gray-800">Listas de E-mails</h2>
                 </div>
-                <div className="w-1/2 relative">
-                    <Input
-                        type="text"
-                        placeholder="Pesquisar lista..."
-                        value={searchTermLista}
-                        onChange={(e) => setSearchTermLista(e.target.value)}
-                        className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors"
-                    />
-                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <div className="flex justify-between">
+                    <div className="w-[68%] relative">
+                        <Input
+                            type="text"
+                            placeholder="Pesquisar lista..."
+                            value={searchTermLista}
+                            onChange={(e) => setSearchTermLista(e.target.value)}
+                            className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors"
+                        />
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                    <button
+                        onClick={() => navigate("/lista")}
+                        className="rounded-full border-[2px] border-gray-300 pl-2 pr-2 text-gray-800 hover:cursor-pointer hover:bg-[linear-gradient(160deg,var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to))] from-indigo-600/50 via-fuchsia-500 to-red-500/50 hover:text-white hover:border-none hover:pl-[10px] hover:pr-[10px] transition-colors ease-in-out ">
+                        Adicionar +
+                    </button>
                 </div>
             </div>
             <div className="grid gap-4">
@@ -215,15 +222,22 @@ const CreateEnvioPage: React.FC = () => {
                     </div>
                     <h2 className="text-2xl font-semibold text-gray-800">Campanhas</h2>
                 </div>
-                <div className="w-1/2 relative">
-                    <Input
-                        type="text"
-                        placeholder="Pesquisar campanha..."
-                        value={searchTermCampanha}
-                        onChange={(e) => setSearchTermCampanha(e.target.value)}
-                        className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors"
-                    />
-                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <div className="flex justify-between">
+                    <div className="w-[68%] relative">
+                        <Input
+                            type="text"
+                            placeholder="Pesquisar campanha..."
+                            value={searchTermCampanha}
+                            onChange={(e) => setSearchTermCampanha(e.target.value)}
+                            className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors"
+                        />
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                    <button
+                        onClick={() => navigate("/create_campanha")}
+                        className="rounded-full border-[2px] border-gray-300 pl-2 pr-2 text-gray-800 hover:cursor-pointer hover:bg-gradient-to-r from-blue-500 to-cyan-500 hover:text-white hover:border-none hover:pl-[10px] hover:pr-[10px] transition-colors ease-in-out ">
+                        Adicionar +
+                    </button>
                 </div>
             </div>
             <div className="grid grid-cols-2 gap-4">

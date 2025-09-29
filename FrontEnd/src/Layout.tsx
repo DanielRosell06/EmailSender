@@ -19,7 +19,7 @@ interface UserData {
 const Layout: React.FC = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activePath, setActivePath] = useState('/create_envio'); // Exemplo de estado ativo
+  const [activePath, setActivePath] = useState('/'); // Exemplo de estado ativo
   const [userData, setUserData] = useState<UserData>({
     Nome: "", // Inicialização com string vazia
     Email: "" // Inicialização com string vazia
@@ -35,11 +35,10 @@ const Layout: React.FC = () => {
     setSidebarOpen(false);
   };
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-    setActivePath(path); // Atualiza o caminho ativo
-    closeSidebar();
-  }
+  useEffect(() => {
+    // Garante que activePath seja sempre o caminho atual da URL
+    setActivePath(location.pathname);
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -154,14 +153,18 @@ const Layout: React.FC = () => {
             <button className={`hover:bg-gradient-to-br from-indigo-500 to-purple-600 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/' ? 'bg-gray-200' : ''
               }`}
               onClick={() => {
-                handleNavigate('/')
+                closeSidebar()
+                navigate('/')
               }}
             >
               <FaHome className='w-[20px] h-[20px] mr-3' />
               <h1 className='text-[18px]'>Home</h1>
             </button>
             <button
-              onClick={() => handleNavigate('/lista')}
+              onClick={() => {
+                closeSidebar()
+                navigate('/lista')
+              }}
               className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/lista' ? 'bg-gray-200' : 'hover:bg-gradient-to-br from-indigo-600/50 via-fuchsia-500 to-red-500/50 hover:text-white'
                 }`}
             >
@@ -171,7 +174,10 @@ const Layout: React.FC = () => {
               </div>
             </button>
             <button
-              onClick={() => handleNavigate('/campanha')}
+              onClick={() => {
+                closeSidebar()
+                navigate('/campanha')
+              }}
               className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/campanha' ? 'bg-gray-200' : 'hover:bg-gradient-to-br from-blue-600/60 via-indigo-500 to-cyan-500/60 hover:text-white'
                 }`}
             >
@@ -183,7 +189,8 @@ const Layout: React.FC = () => {
             <button className={`hover:bg-gradient-to-br from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
               }`}
               onClick={() => {
-                handleNavigate('/create_envio')
+                closeSidebar()
+                navigate('/create_envio')
               }}
             >
               <FaPaperPlane className='w-[20px] h-[20px] mr-3' />
@@ -192,7 +199,8 @@ const Layout: React.FC = () => {
             <button className={`hover:bg-gradient-to-br from-red-400/60 via-yellow-500 to-orange-400/40 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/conta_page' ? 'bg-gray-200' : ''
               }`}
               onClick={() => {
-                handleNavigate('/conta_page')
+                closeSidebar()
+                navigate('/conta_page')
               }}
             >
               <FaCog className='w-[20px] h-[20px] mr-3' />
@@ -213,7 +221,7 @@ const Layout: React.FC = () => {
       <footer className="bg-gray-100 p-4 mt-auto">
         <p className="text-center text-gray-600">© 2025 Meu App Incrível</p>
       </footer>
-    </div>
+    </div >
   );
 };
 
