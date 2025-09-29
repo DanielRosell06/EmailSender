@@ -217,15 +217,72 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
 
                 except smtplib.SMTPDataError as e:
                     if e.smtp_code == 452:
-                        print("Erro: Limite diário de envio de e-mails atingido. Finalizando o envio.")
+                        db_detalhe = models.Detalhe(
+                            Conteudo = "nEnviado " + emails_enviados_count,
+                            Tipo = 1,
+                            Codigo = 452,
+                            Envio = db_envio.IdEnvio
+                        )
+                        db.add(db_detalhe)
                         db.commit()
                         await sio.emit('redirect', {'url': f"/envio_detail/{IdNewEnvio}"}, room=sid)
                         break 
                     else:
-                        print(f"Erro ao enviar e-mail para {email_obj.Conteudo}: {e}")
-                
+                        emails_enviados_count += 1
+                        error_code = e.smtp_code
+                        print(f"Erro SMTPDataError ao enviar e-mail para {email_obj.Conteudo}: {e}")
+                        
+                        db_detalhe = models.Detalhe(
+                            Tipo = 1,
+                            Codigo = error_code,
+                            Envio = db_envio.IdEnvio,
+                            Email = email_obj.IdEmail
+                        )
+                        db.add(db_detalhe)
+                        db.commit()
+
+                except smtplib.SMTPRecipientsRefused as e:
+                    emails_enviados_count += 1
+                    error_code = 0
+                    
+                    if e.recipients:
+                        first_recipient = list(e.recipients.values())[0]
+                        if isinstance(first_recipient, tuple) and len(first_recipient) > 0:
+                            error_code = first_recipient[0]  # Vai capturar 553, 550, etc.
+                    
+                    print(f"Erro SMTPRecipientsRefused: {error_code} com o email {email_obj.Conteudo}")
+                    
+                    db_detalhe = models.Detalhe(
+                        Tipo = 1,
+                        Codigo = error_code,
+                        Envio = db_envio.IdEnvio,
+                        Email = email_obj.IdEmail
+                    )
+                    db.add(db_detalhe)
+                    db.commit()
+
                 except Exception as e:
-                    print(f"Erro ao enviar e-mail para {email_obj.Conteudo}: {e}")
+                    emails_enviados_count += 1
+                    error_code = 0
+                    
+                    # Para qualquer outro tipo de erro, tentamos extrair o código de forma genérica
+                    if hasattr(e, 'smtp_code'):
+                        error_code = e.smtp_code
+                    elif hasattr(e, 'code'):
+                        error_code = e.code
+                    elif hasattr(e, 'status_code'):
+                        error_code = e.status_code
+                    
+                    print(f"Erro genérico: {error_code} com o email {email_obj.Conteudo}: {e}")
+                    
+                    db_detalhe = models.Detalhe(
+                        Tipo = 1,
+                        Codigo = error_code,
+                        Envio = db_envio.IdEnvio,
+                        Email = email_obj.IdEmail
+                    )
+                    db.add(db_detalhe)
+                    db.commit()
 
                 progresso_emails_bruto = (emails_enviados_count / total_emails) * 80
                 progresso_atual = int(progresso_emails_bruto)

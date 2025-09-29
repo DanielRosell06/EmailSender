@@ -59,6 +59,7 @@ class Email(Base):
     
     # Relacionamento de volta para Lista
     lista_pai = relationship("Lista", back_populates="emails")
+    detalhes = relationship("Detalhe", back_populates="email_pai")
 
 class Envio(Base):
     __tablename__ = "envio"
@@ -86,13 +87,17 @@ class Detalhe(Base):
     __tablename__ = "detalhe"
     
     IdDetalhe = Column(Integer, primary_key=True, nullable=False, index=True)
-    Conteudo = Column(String, nullable=False)
+    Conteudo = Column(String, nullable=True)
+    Tipo = Column(Integer, nullable=False)
+    Codigo = Column(Integer, nullable=True)
     
     # Chave Estrangeira
-    Envio = Column(Integer, ForeignKey("envio.IdEnvio"))
+    Envio = Column(Integer, ForeignKey("envio.IdEnvio"), nullable=False, index=True)
+    Email = Column(Integer, ForeignKey("email.IdEmail"), nullable=True, index=True)
     
     # Relacionamento de volta para Envio
     envio_pai = relationship("Envio", back_populates="detalhes")
+    email_pai = relationship("Email", back_populates="detalhes")
 
 class StatusEnvio(Base):
     __tablename__ = "status_envio"
