@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { api } from '@/services/api.ts';
+import { FiAlertTriangle } from "react-icons/fi";
 
 // Interfaces para os dados
 interface EmailStatus {
@@ -140,6 +141,18 @@ const EnvioDetailsPage = () => {
                     <div className="w-24"></div>
                 </div>
 
+                {detailsData.filter(detalhe => detalhe.Codigo == 452).length > 0 && (
+                    <div className="w-full text-center">
+                        <div className="bg-red-100 border-[2px] border-red-200 w-[500px] h-[70px] flex ml-auto mr-auto mb-10 pl-4 pr-4 text-left rounded-[16px]">
+                            <FiAlertTriangle className="mt-auto mb-auto mr-4 text-5xl text-red-400"></FiAlertTriangle>
+                            {detailsData.filter(detalhe => detalhe.Codigo == 452).map((detalhe, index) => (
+                                <h1 key={index} className="mt-auto mb-auto text-red-500">
+                                    O servidor SMTP que a sua conta utiliza bloqueou o envio de emails a partir do {detalhe.Conteudo?.replace(/nEnviado\s*(\d+).*/, '$1')}° email da lista.                                </h1>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Painel Esquerdo - Visualização da Campanha */}
                     <div className="space-y-6">
@@ -205,7 +218,7 @@ const EnvioDetailsPage = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border-2 border-gray-100 shadow-lg h-[600px] overflow-y-auto space-y-2">
+                        <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border-2 border-gray-100 shadow-lg h-[515px] overflow-y-auto space-y-2">
                             {filteredEmails.length > 0 ? (
                                 filteredEmails.map((email, index) => (
                                     <div
@@ -251,7 +264,7 @@ const EnvioDetailsPage = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

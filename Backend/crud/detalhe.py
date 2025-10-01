@@ -13,13 +13,14 @@ def get_detalhe_by_envio(id_envio: int, db: Session):
 
 
 def get_detalhe_by_envio_com_email(id_envio: int, db: Session) -> List[DetalheComEmail]:
-    # Busca os detalhes com JOIN na tabela Email
+    # Busca os detalhes com LEFT OUTER JOIN na tabela Email
+    # Isso garante que todos os Detalhes sejam retornados, mesmo sem Email
     db_detalhes_com_email = (
         db.query(
             models.Detalhe,
-            models.Email.Conteudo.label('ConteudoEmail')  # Pega o Conteudo do Email
+            models.Email.Conteudo.label('ConteudoEmail')  # Pega o Conteudo do Email (pode ser NULL)
         )
-        .join(models.Email, models.Detalhe.Email == models.Email.IdEmail)
+        .outerjoin(models.Email, models.Detalhe.Email == models.Email.IdEmail)
         .filter(models.Detalhe.Envio == id_envio)
         .all()
     )
@@ -34,7 +35,7 @@ def get_detalhe_by_envio_com_email(id_envio: int, db: Session) -> List[DetalheCo
             Codigo=detalhe.Codigo,
             Envio=detalhe.Envio,
             Email=detalhe.Email,
-            ConteudoEmail=conteudo_email  # Conteúdo do email relacionado
+            ConteudoEmail=conteudo_email 
         )
         resultados.append(resultado)
     
