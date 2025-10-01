@@ -36,7 +36,6 @@ const EnvioDetailsPage = () => {
     const { IdEnvio } = useLoaderData() as { IdEnvio: string };
     const [envioData, setEnvioData] = useState<EnvioData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [loadingDetails, setLoadingDetails] = useState(true)
     const [detailsData, setDetailsData] = useState<DetalheComEmail[]>([])
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
@@ -67,8 +66,6 @@ const EnvioDetailsPage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoadingDetails(true);
-
             try {
                 // Usa a sua função 'api' para fazer a requisição
                 const response = await api(`/get_detalhe_by_envio_com_email?id_envio=${idEnvio}`);
@@ -80,8 +77,6 @@ const EnvioDetailsPage = () => {
 
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
-            } finally {
-                setLoadingDetails(false);
             }
         };
 
