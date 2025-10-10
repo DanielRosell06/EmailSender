@@ -353,8 +353,8 @@ const CreateEnvioPage: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen ">
+            <div className="max-w-[95vw] mx-auto ml-auto mr-auto">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-gray-800 mb-4">
                         Envio de Campanhas

@@ -189,11 +189,16 @@ const HomePage: React.FC = () => {
     };
 
     const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
+        const localDateString = dateString + 'T12:00:00';        
+        const date = new Date(localDateString);
+        
+        if (isNaN(date.getTime())) {
+            return dateString; 
+        }
+
         return date.toLocaleDateString('pt-BR');
     };
 
-    // Função para navegar para a página de detalhes do envio
     const handleEnvioClick = (idEnvio: number) => {
         navigate(`/envio_detail/${idEnvio}`);
     };
