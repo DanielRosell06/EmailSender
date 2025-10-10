@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { FaPaperPlane, FaCheckCircle, FaChartBar, FaEnvelopeOpenText, FaChartLine } from "react-icons/fa";
+import { FaPaperPlane, FaCheckCircle, FaChartBar, FaEnvelopeOpenText, FaChartLine, FaSearch } from "react-icons/fa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/services/api"; 
+import { Input } from "@/components/ui/input"; // Importado o Input
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Importado o Select
 
 // Renomeando o Tooltip do Recharts para evitar conflito com o Tooltip do shadcn/ui
 import { 
@@ -34,7 +36,7 @@ interface Envio {
     IdEnvio: number;
     IdCampanha: number;
     IdLista: number;
-    Dt_Envio: string;
+    Dt_Envio: string; // Nome do campo de data
     Lista: Lista;
     Campanha: Campanha;
 }
@@ -49,10 +51,11 @@ interface EnvioComMetricas extends Envio {
     aberturas: number;
 }
 
+// Tipo para o Select de pesquisa
+type SearchType = 'Dt_Envio' | 'Campanha' | 'Lista';
 
 // --- Funções Auxiliares ---
 
-// Sua função, usada para a data curta (ex: 10/01/2025)
 const formatDate = (dateString: string) => {
     const localDateString = dateString + 'T12:00:00';        
     const date = new Date(localDateString);
@@ -64,8 +67,6 @@ const formatDate = (dateString: string) => {
     return date.toLocaleDateString('pt-BR');
 };
 
-
-// Função para a data completa no tooltip (ajustada para garantir o parse correto)
 const formatFullDate = (dateString: string) => {
     const localDateString = dateString + 'T12:00:00';
     const date = new Date(localDateString);
@@ -94,6 +95,11 @@ const DASHBOARD_COLORS = {
 const DashboardPage: React.FC = () => {
     const [enviosRecentes, setEnviosRecentes] = useState<EnvioComMetricas[]>([]);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
+    
+    // NOVOS ESTADOS PARA PESQUISA
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchType, setSearchType] = useState<SearchType>('Dt_Envio');
+    const [filteredEnvios, setFilteredEnvios] = useState<EnvioComMetricas[]>([]);
 
     useEffect(() => {
         const fetchEnviosData = async () => {
@@ -112,10 +118,11 @@ const DashboardPage: React.FC = () => {
                     })
                 );
                 setEnviosRecentes(enviosComContagem);
-                console.log(enviosComContagem)
+                setFilteredEnvios(enviosComContagem); // Inicializa com todos os envios
             } catch (error) {
                 console.error("Erro ao carregar envios recentes:", error);
                 setEnviosRecentes([]);
+                setFilteredEnvios([]);
             } finally {
                 setLoadingEnvios(false);
             }
@@ -123,6 +130,32 @@ const DashboardPage: React.FC = () => {
 
         fetchEnviosData();
     }, []);
+
+    // EFEITO PARA FILTRAR OS ENVIOS
+    useEffect(() => {
+        if (!searchTerm) {
+            setFilteredEnvios(enviosRecentes);
+            return;
+        }
+
+        const term = searchTerm.toLowerCase();
+        
+        const results = enviosRecentes.filter(envio => {
+            if (searchType === 'Dt_Envio') {
+                const dataFormatada = formatDate(envio.Dt_Envio);
+                return dataFormatada.toLowerCase().includes(term);
+            }
+            if (searchType === 'Campanha') {
+                return envio.Campanha.Titulo.toLowerCase().includes(term);
+            }
+            if (searchType === 'Lista') {
+                return envio.Lista.Titulo.toLowerCase().includes(term);
+            }
+            return false;
+        });
+
+        setFilteredEnvios(results);
+    }, [searchTerm, searchType, enviosRecentes]);
 
 
     const { 
@@ -149,11 +182,11 @@ const DashboardPage: React.FC = () => {
 
         
         const uniqueCampaigns = Array.from(new Set(enviosRecentes.map(e => e.Campanha.Titulo)));
-        const recentFiveCampaignNames = uniqueCampaigns.slice(0, 5); // Pega os 5 primeiros
+        const recentFiveCampaignNames = uniqueCampaigns.slice(0, 5);
         
         const dadosParaGraficoBarra = Object.values(metricasPorCampanha)
             .filter(item => recentFiveCampaignNames.includes(item.name))
-            .slice(0, 5); // Garante apenas 5 itens, caso o filtro retorne mais (embora não deva)
+            .slice(0, 5);
             
         const dadosParaGraficoLinha = enviosRecentes
             .slice(0, 15)
@@ -197,9 +230,37 @@ const DashboardPage: React.FC = () => {
     const renderRecentEnvios = () => (
         <Card className="col-span-1 lg:col-span-2 overflow-hidden bg-white/90 backdrop-blur-sm hover:shadow-xl shadow-md">
             <CardHeader>
-                <CardTitle className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-                    <FaPaperPlane className="text-red-500" /> Todos os Envios
-                </CardTitle>
+                <div className="flex justify-between items-center mb-4">
+                    <CardTitle className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+                        <FaPaperPlane className="text-red-500" /> Todos os Envios
+                    </CardTitle>
+                    {/* NOVO BLOCO DE PESQUISA */}
+                    <div className="flex items-center gap-2">
+                        <div className="relative w-64">
+                            <Input
+                                type="text"
+                                placeholder={`Pesquisar por ${searchType === 'Dt_Envio' ? 'Data (DD/MM/AAAA)' : searchType}...`}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 border-gray-300 rounded-lg focus:ring-0 focus:ring-offset-0 transition-colors"
+                            />
+                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                        </div>
+                        <Select
+                            value={searchType}
+                            onValueChange={(value: string) => setSearchType(value as SearchType)}
+                        >
+                            <SelectTrigger className="w-[140px] border-gray-300 rounded-lg">
+                                <SelectValue placeholder="Data" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Dt_Envio">Data</SelectItem>
+                                <SelectItem value="Campanha">Campanha</SelectItem>
+                                <SelectItem value="Lista">Lista</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
             </CardHeader>
             <CardContent className="p-0">
                 {loadingEnvios ? (
@@ -208,7 +269,7 @@ const DashboardPage: React.FC = () => {
                             <Skeleton key={i} className="h-10 w-full bg-gray-200" />
                         ))}
                     </div>
-                ) : enviosRecentes.length > 0 ? (
+                ) : filteredEnvios.length > 0 ? ( // Renderiza os envios filtrados
                     <TooltipProvider>
                         <Table>
                             <TableHeader>
@@ -221,7 +282,7 @@ const DashboardPage: React.FC = () => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {enviosRecentes.map((envio) => {
+                                {filteredEnvios.map((envio) => { // Mapeia os envios filtrados
                                     const taxaAbertura = envio.entregas > 0 ? ((envio.aberturas / envio.entregas) * 100).toFixed(1) : 0;
                                     return (
                                         <TableRow key={envio.IdEnvio} className="hover:bg-red-50/30 transition-colors">
@@ -232,7 +293,7 @@ const DashboardPage: React.FC = () => {
                                             <TableCell className="text-center text-red-500 font-semibold">{envio.entregas}</TableCell>
                                             <TableCell className="text-center text-orange-600 font-semibold">{envio.aberturas}</TableCell>
                                             <TableCell className="text-center">
-                                                <Badge  onClick={() => (console.log(envio.Dt_Envio))} className={`px-2 py-0.5 ${DASHBOARD_COLORS.BADGE_BG} text-white font-mono`}>
+                                                <Badge className={`px-2 py-0.5 ${DASHBOARD_COLORS.BADGE_BG} text-white font-mono`}>
                                                     {taxaAbertura}%
                                                 </Badge>
                                             </TableCell>
@@ -255,7 +316,7 @@ const DashboardPage: React.FC = () => {
                         </Table>
                     </TooltipProvider>
                 ) : (
-                    <p className="text-center text-gray-500 py-10">Nenhum envio recente encontrado.</p>
+                    <p className="text-center text-gray-500 py-10">Nenhum envio encontrado.</p>
                 )}
             </CardContent>
         </Card>
@@ -264,7 +325,6 @@ const DashboardPage: React.FC = () => {
     const renderBarChart = () => (
         <Card className="col-span-1 bg-white/90 backdrop-blur-sm hover:shadow-xl shadow-md">
             <CardHeader>
-                {/* TÍTULO E SUBTÍTULO ATUALIZADOS */}
                 <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                     <FaChartBar className="text-orange-500" /> Desempenho por Campanha (5 Mais Recentes)
                 </CardTitle>
