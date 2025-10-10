@@ -20,6 +20,7 @@ import LoginPage from "./pages/Usuario/LoginPage.tsx";
 import RotaPrivada from "./components/Auth.tsx";
 import LandingInicio from "./pages/Landing/Inicio.tsx";
 import LandingSaibaMais from "./pages/Landing/SaibaMais.tsx";
+import DashboardPage from "./pages/Dashboard/DashboardPage.tsx";
 
 
 const router = createBrowserRouter([
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
             {
                 path: "conta_page",
                 element: <ContaPage />,
+            },
+            {
+                path: "dashboard_page",
+                element: <DashboardPage />,
             },
 
         ],

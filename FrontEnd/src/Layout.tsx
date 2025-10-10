@@ -1,7 +1,7 @@
 // src/components/layout/Layout.tsx
 import { Mail } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { FaEnvelope, FaPaperPlane, FaUsers, FaHome, FaCog } from 'react-icons/fa';
+import { FaEnvelope, FaPaperPlane, FaUsers, FaHome, FaCog, FaChartBar } from 'react-icons/fa';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { api } from './services/api';
 
@@ -195,6 +195,16 @@ const Layout: React.FC = () => {
             >
               <FaPaperPlane className='w-[20px] h-[20px] mr-3' />
               <h1 className='text-[18px]'>Enviar</h1>
+            </button>
+            <button className={`hover:bg-gradient-to-br from-red-500 to-orange-500 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/dashboard_page' ? 'bg-gray-200' : ''
+              }`}
+              onClick={() => {
+                closeSidebar()
+                navigate('/dashboard_page')
+              }}
+            >
+              <FaChartBar className='w-[20px] h-[20px] mr-3' />
+              <h1 className='text-[18px]'>Dashboard</h1>
             </button>
             <button className={`hover:bg-gradient-to-br from-red-400/60 via-yellow-500 to-orange-400/40 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/conta_page' ? 'bg-gray-200' : ''
               }`}

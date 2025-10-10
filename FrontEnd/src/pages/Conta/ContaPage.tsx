@@ -311,7 +311,7 @@ const ContaPage: React.FC = () => {
             </div>
             <div className="p-6 pt-0">
                 <Button
-                    onClick={() => window.open('https://www.hostinger.com.br/tutoriais/o-que-e-smtp', '_blank')}
+                    onClick={() => window.open('https://aws.amazon.com/pt/what-is/smtp/', '_blank')}
                     className="w-full bg-gradient-to-r from-orange-600 via-yellow-500 to-red-500 text-white font-semibold rounded-xl shadow transition-all hover:from-orange-700 hover:via-yellow-600 hover:to-red-600"
                 >
                     Veja um Tutorial para criar sua conta
