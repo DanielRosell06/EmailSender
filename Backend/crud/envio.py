@@ -175,7 +175,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                     # Cria uma mensagem multiparte relacionada (html + imagens inline)
                     # A mensagem base agora é criada dentro do loop para cada email
                     msg = MIMEMultipart("related")
-                    msg['From'] = smtp_user
+                    msg['From'] = "naoresponda@tripower.com.br"
                     msg['Subject'] = campanha.Assunto
                     
                     # Cria a parte alternativa
@@ -204,7 +204,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                     msg['To'] = email
 
                     # envia o email e, se for bem-sucedido, registra o status
-                    server.sendmail(smtp_user, email, msg.as_string())
+                    server.sendmail("naoresponda@tripower.com.br", email, msg.as_string())
 
                     db_status = models.StatusEnvio(
                         IdEnvio = db_envio.IdEnvio,

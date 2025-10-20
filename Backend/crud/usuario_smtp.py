@@ -30,6 +30,7 @@ def create_user_smtp(user_id: int, db: Session, new_usuario_smtp: schema_usuario
         Usuario=new_usuario_smtp.Usuario,
         Senha=encrypted_password, # Salva a senha encriptada
         Dominio=new_usuario_smtp.Dominio,
+        EmailFrom=new_usuario_smtp.EmailFrom,
         Porta=new_usuario_smtp.Porta,
         IdUsuario=user_id
     )
@@ -44,6 +45,7 @@ def get_user_smtp_sem_senha(user_id:int, db: Session):
         models.UsuarioSmtp.IdUsuarioSmtp,
         models.UsuarioSmtp.Dominio,
         models.UsuarioSmtp.Usuario,
+        models.UsuarioSmtp.EmailFrom,
         models.UsuarioSmtp.Porta
     ).filter(models.UsuarioSmtp.IdUsuario == user_id).all()
 

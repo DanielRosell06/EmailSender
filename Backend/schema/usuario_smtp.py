@@ -6,10 +6,12 @@ class UsuarioSmtp(BaseModel):
     Usuario: str
     Senha: str
     Dominio: str
+    EmailFrom: Optional[str] = None
     Porta: str
 
 class UsuarioSmtpComIdUsuarioSmtpSemSenha(BaseModel):
     IdUsuarioSmtp: int
     Usuario: str
     Dominio: str
+    EmailFrom: Optional[str] = None
     Porta: str

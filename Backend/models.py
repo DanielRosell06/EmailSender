@@ -126,6 +126,7 @@ class UsuarioSmtp(Base):
 
     #Colunas de conta do usuario
     Usuario = Column(String, nullable=False)
+    EmailFrom = Column(String, nullable=True)
     Senha = Column(String, nullable=False)
 
     #Colunas de configuracao do envio

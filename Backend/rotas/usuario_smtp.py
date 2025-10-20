@@ -18,7 +18,7 @@ router = APIRouter()
 @router.post("/create_user_smtp", response_model=schema_usuario_smtp.UsuarioSmtp)
 def create_user_smtp(user_smtp: schema_usuario_smtp.UsuarioSmtp, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
     """
-    Cria um create_user_smtp
+    Cria um UserSmtp
     """
     response = crud_usuario_smtp.create_user_smtp(user_id=user_id, db=db, new_usuario_smtp=user_smtp)
      

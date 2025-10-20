@@ -25,6 +25,7 @@ interface SmtpAccount {
     Usuario: string;
     Senha?: string;
     Dominio: string;
+    EmailFrom: string;
     Porta: string;
 }
 
@@ -33,6 +34,7 @@ interface SmtpAccountWithId {
     Usuario: string;
     Senha?: string;
     Dominio: string;
+    EmailFrom?: string;
     Porta: string;
 }
 
@@ -56,6 +58,7 @@ const ContaPage: React.FC = () => {
         Usuario: '',
         Senha: '',
         Dominio: '',
+        EmailFrom: '',
         Porta: '587',
     });
 
@@ -120,11 +123,10 @@ const ContaPage: React.FC = () => {
 
     const handleAddAccount = async () => {
         setCriando(true)
-        if (!newAccount.Dominio || !newAccount.Usuario || !newAccount.Senha || !newAccount.Porta) {
+        if (!newAccount.Dominio || !newAccount.Usuario || !newAccount.Senha || !newAccount.EmailFrom || !newAccount.Porta) {
             alert('Por favor, preencha todos os campos.');
             return;
         }
-        console.log(newAccount);
 
         try {
             const res = await api('/create_user_smtp', {
@@ -137,7 +139,7 @@ const ContaPage: React.FC = () => {
             }
 
             reloadAccounts();
-            setNewAccount({ Dominio: '', Porta: '587', Usuario: '', Senha: '' });
+            setNewAccount({ Dominio: '', Porta: '587', Usuario: '', EmailFrom: '', Senha: '' });
             setCriando(false)
 
         } catch (error) {
@@ -183,13 +185,27 @@ const ContaPage: React.FC = () => {
                         />
                     </div>
                     <div className="grid w-full items-center gap-2">
-                        <Label htmlFor="Usuario" className="text-sm text-gray-600">Usuário (Email)</Label>
+                        <Label htmlFor="Usuario" className="text-sm text-gray-600">Usuário SMTP</Label>
                         <Input
                             id="Usuario"
                             name="Usuario"
                             value={newAccount.Usuario}
                             onChange={handleInputChange}
                             className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-yellow-500"
+                            placeholder="Seu usuário SMTP"
+                        />
+                    </div>
+                </div>
+                <div className="grid w-full items-center gap-2">
+                    <Label htmlFor="Senha" className="text-sm text-gray-600">Endereço de E-mail</Label>
+                    <div className="relative">
+                        <Input
+                            id="EmailFrom"
+                            name="EmailFrom"
+                            type="EmailFrom"
+                            value={newAccount.EmailFrom}
+                            onChange={handleInputChange}
+                            className="bg-gray-100/50 backdrop-blur-sm border-gray-200 focus:border-yellow-500 pr-10"
                             placeholder="Ex: seuemail@dominio.com"
                         />
                     </div>
@@ -239,8 +255,18 @@ const ContaPage: React.FC = () => {
                             className="flex items-center justify-between h-20 pr-4 pl-4 rounded-xl border-2 border-slate-200 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-sm hover:border-yellow-500"
                         >
                             <div className="flex flex-col">
-                                <span className="font-semibold text-gray-800">{account.Usuario}</span>
-                                <span className="text-sm text-gray-500">{account.Dominio}:{account.Porta}</span>
+                                {account.EmailFrom != null ?
+                                    <>
+                                        <span className="font-semibold text-gray-800">{account.EmailFrom}</span>
+                                        <span className="text-sm text-gray-500 mt-1">{account.Usuario}</span>
+                                        <span className="text-sm text-gray-500">{account.Dominio}:{account.Porta}</span>
+                                    </>
+                                    : 
+                                    <>
+                                        <span className="font-semibold text-gray-800">{account.Usuario}</span>
+                                        <span className="text-sm text-gray-500">{account.Dominio}:{account.Porta}</span>
+                                    </>}
+
                             </div>
                             <div className="flex flex-row">
                                 {loadingSenha.IdUserSmtp == account.IdUsuarioSmtp ? (loadingSenha.Loading == true ? <>
