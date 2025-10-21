@@ -279,7 +279,7 @@ const CreateEnvioExpPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen max-w-[92vw] ml-auto mr-auto">
             <div className="max-w-7xl mx-auto mt-30">
                 <div className="flex items-center justify-between mb-12">
                     <Button
