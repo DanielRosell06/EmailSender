@@ -38,6 +38,7 @@ interface SmtpAccount {
     Usuario: string;
     Senha?: string;
     Dominio: string;
+    EmailFrom?: string;
     Porta: string;
 }
 
@@ -317,7 +318,7 @@ const CreateEnvioExpPage: React.FC = () => {
                                     {selectedAccount ? (
                                         <div className="flex items-center gap-2">
                                             <FaEnvelope className="text-slate-600" />
-                                            <span>{selectedAccount.Usuario}</span>
+                                            <span>{selectedAccount.EmailFrom ? selectedAccount.EmailFrom : selectedAccount.Usuario}</span>
                                         </div>
                                     ) : (
                                         <span>Selecione uma conta</span>
@@ -338,10 +339,22 @@ const CreateEnvioExpPage: React.FC = () => {
                                             className="mb-2 p-3 cursor-pointer flex items-center justify-between hover:bg-slate-200"
                                         >
                                             <div className="flex flex-col">
-                                                <span className="font-medium ">{conta.Usuario}</span>
-                                                <span className="text-xs text-stone-400">
-                                                    {conta.Dominio}:{conta.Porta}
-                                                </span>
+                                                {conta.EmailFrom ?
+                                                    <>
+                                                        <span className="font-medium ">{conta.EmailFrom}</span>
+                                                        <span className="text-xs text-stone-400">
+                                                            {conta.Usuario}@{conta.Dominio}:{conta.Porta}
+                                                        </span>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <span className="font-medium ">{conta.Usuario}</span>
+                                                        <span className="text-xs text-stone-400">
+                                                            {conta.Dominio}:{conta.Porta}
+                                                        </span>
+                                                    </>
+                                                }
+
                                             </div>
                                             {selectedAccount && selectedAccount.IdUsuarioSmtp === conta.IdUsuarioSmtp && (
                                                 <FaCheckCircle className="text-green-500 ml-2" />
