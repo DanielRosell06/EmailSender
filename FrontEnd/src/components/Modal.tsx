@@ -47,6 +47,8 @@ function Modal({ buttonClassName, buttonTitle, modalTitle, children, onClose, is
                                     ? 'from-indigo-600/60 via-fuchsia-500/60 to-red-500/60 text-white'
                                     : color === 'blue'
                                     ? 'from-blue-500/60 via-cyan-500/60 to-emerald-500/60 text-white'
+                                    : color === 'yellow'
+                                    ? 'from-orange-600/50 via-yellow-500 to-red-500/50 text-white'
                                     : ''
                             }
                             `}

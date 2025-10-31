@@ -418,8 +418,8 @@ const ContaPage: React.FC = () => {
                 onClose={closeDeleteModal}
                 modalTitle="Confirmar Exclusão"
                 width={450}
-                color='blue' // Usando 'blue' para uma cor neutra no modal de confirmação.
-                buttonClassName='hidden' // Esconder o botão de abertura, já que o modal é aberto pelo ícone FaTrash
+                color='yellow' 
+                buttonClassName='hidden'
                 buttonTitle={<></>}
             >
                 <div className='flex flex-col gap-4 p-2'>
