@@ -52,7 +52,6 @@ def get_user_smtp_sem_senha(user_id:int, db: Session):
     return usuario
 
 def get_user_smtp_senha(user_id: int, id_user_smtp: int, db: Session):
-    print(id_user_smtp)
     password = db.query(
             models.UsuarioSmtp.Senha
         ).filter(
@@ -61,3 +60,13 @@ def get_user_smtp_senha(user_id: int, id_user_smtp: int, db: Session):
         ).first().Senha
     decripted_password = decrypt_password(password)
     return decripted_password
+
+def delete_user_smtp(user_id: int, id_user_smtp: int, db: Session):
+    result = db.query(
+        models.UsuarioSmtp
+    ).filter(
+        models.UsuarioSmtp.IdUsuarioSmtp == id_user_smtp,
+        models.UsuarioSmtp.IdUsuario == user_id
+    ).delete(synchronize_session=False)
+    db.commit()
+    return result

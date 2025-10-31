@@ -41,3 +41,12 @@ def get_all_user_smtp(id_user_smtp: int, db: Session = Depends(get_db), user_id:
     response = crud_usuario_smtp.get_user_smtp_senha(user_id=user_id, id_user_smtp=id_user_smtp, db=db)
      
     return response
+
+@router.delete("/delete_user_smtp", response_model=int)
+def delete_user_smtp(id_user_smtp: int, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
+    """
+    Deleta o usuário SMTP
+    """
+    response = crud_usuario_smtp.delete_user_smtp(user_id=user_id, id_user_smtp=id_user_smtp, db=db)
+     
+    return response

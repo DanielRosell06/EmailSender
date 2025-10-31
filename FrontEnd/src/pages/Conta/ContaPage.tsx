@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaEye, FaRegEnvelope, FaWrench, FaEyeSlash } from 'react-icons/fa';
+import { FaPlus, FaEye, FaRegEnvelope, FaWrench, FaEyeSlash, FaTrash } from 'react-icons/fa';
 import { api } from '@/services/api.ts';
 
 import {
@@ -13,6 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// 1. Importar o componente Modal
+import Modal from '@/components/Modal';
+
 
 interface LoadingSenha {
     IdUserSmtp: number;
@@ -61,6 +65,20 @@ const ContaPage: React.FC = () => {
         EmailFrom: '',
         Porta: '587',
     });
+
+    // 2. Estados para controle do Modal de Exclusão
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [accountToDelete, setAccountToDelete] = useState<number | null>(null);
+
+    const openDeleteModal = (accountId: number) => {
+        setAccountToDelete(accountId);
+        setIsDeleteModalOpen(true);
+    };
+
+    const closeDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+        setAccountToDelete(null);
+    };
 
     function reloadAccounts() {
         setReloadAccountsVar(reloadAccountsVar * -1)
@@ -148,6 +166,31 @@ const ContaPage: React.FC = () => {
             setCriando(false)
         }
     };
+    
+    // 3. Criar a função para excluir a conta
+    const handleDeleteAccount = async () => {
+        if (accountToDelete === null) return;
+        
+        try {
+            const res = await api(`/delete_user_smtp?id_user_smtp=${accountToDelete}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok) {
+                throw new Error('Erro na requisição para excluir conta SMTP.');
+            }
+            
+            // Recarregar a lista de contas e fechar o modal
+            reloadAccounts();
+            closeDeleteModal();
+
+        } catch (error) {
+            console.error("Erro ao excluir conta:", error);
+            alert('Não foi possível excluir a conta. Tente novamente mais tarde!');
+            closeDeleteModal();
+        }
+    };
+
 
     const renderAddAccountSection = () => (
         <Card className="bg-white/50 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg transition-all duration-300 transform">
@@ -301,6 +344,13 @@ const ContaPage: React.FC = () => {
                                     </Button>
                                 </>
                                 }
+                                <div className='flex'>
+                                    {/* 4. Abrir o modal ao clicar na lixeira */}
+                                    <FaTrash 
+                                        className='mt-auto mb-auto ml-5 hover:text-red-500 hover:text-xl transition-all ease-in-out cursor-pointer'
+                                        onClick={() => openDeleteModal(account.IdUsuarioSmtp)}
+                                    ></FaTrash>
+                                </div>
                             </div>
                         </div>
                     ))
@@ -360,6 +410,43 @@ const ContaPage: React.FC = () => {
                     {renderRightPanel()}
                 </div>
             </div>
+
+            {/* 5. Adicionar o Modal de Confirmação de Exclusão */}
+            <Modal
+                isModalOpen={isDeleteModalOpen}
+                openModal={() => setIsDeleteModalOpen(true)} // A função openModal aqui não é usada, mas é obrigatória pelo componente Modal.
+                onClose={closeDeleteModal}
+                modalTitle="Confirmar Exclusão"
+                width={450}
+                color='blue' // Usando 'blue' para uma cor neutra no modal de confirmação.
+                buttonClassName='hidden' // Esconder o botão de abertura, já que o modal é aberto pelo ícone FaTrash
+                buttonTitle={<></>}
+            >
+                <div className='flex flex-col gap-4 p-2'>
+                    <p className='text-gray-700'>
+                        Você tem certeza que deseja excluir esta conta SMTP? Esta ação é **irreversível**.
+                    </p>
+                    <p className='text-sm text-red-600 font-semibold'>
+                        Conta: {accounts.find(acc => acc.IdUsuarioSmtp === accountToDelete)?.EmailFrom || accounts.find(acc => acc.IdUsuarioSmtp === accountToDelete)?.Usuario}
+                    </p>
+                    <div className='flex justify-end gap-3 mt-4'>
+                        <Button
+                            onClick={closeDeleteModal}
+                            variant="ghost"
+                            className="text-gray-600 border border-gray-300 hover:bg-gray-100"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleDeleteAccount}
+                            className="bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-all"
+                        >
+                            <FaTrash className="mr-2" />
+                            Excluir Permanentemente
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
