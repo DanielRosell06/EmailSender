@@ -147,117 +147,124 @@ const EnvioDetailsPage = () => {
                         </div>
                     </div>
                 )}
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Painel Esquerdo - Visualização da Campanha */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-8 h-8 p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-                                <FaPaperPlane className="text-white text-sm" />
-                            </div>
-                            <h2 className="text-2xl font-semibold text-gray-800">
-                                Campanha: {envioData?.Campanha?.Titulo || 'Não encontrada'}
-                            </h2>
-                        </div>
-                        <div className="relative w-full h-[600px] border-2 border-gray-100 rounded-xl bg-white/70 backdrop-blur-sm shadow-lg overflow-hidden">
-                            {envioData?.Campanha?.Documento ? (
-                                <iframe
-                                    srcDoc={envioData.Campanha.Documento}
-                                    className="w-full h-full border-0"
-                                    frameBorder="0"
-                                    title="Preview da Campanha"
-                                    sandbox=""
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-center text-gray-500">
-                                    Conteúdo da campanha não disponível.
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Painel Direito - Dados do Envio */}
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between gap-3 mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 p-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                                    <FaEnvelope className="text-white text-sm" />
+                
+                {
+                    envioData != null?
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Painel Esquerdo - Visualização da Campanha */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-8 h-8 p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                                    <FaPaperPlane className="text-white text-sm" />
                                 </div>
                                 <h2 className="text-2xl font-semibold text-gray-800">
-                                    E-mails enviados
+                                    Campanha: {envioData?.Campanha?.Titulo || 'Não encontrada'}
                                 </h2>
                             </div>
-                            <div className="w-1/2 relative">
-                                <Input
-                                    type="text"
-                                    placeholder="Pesquisar e-mail..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors bg-white/80"
-                                />
-                                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                            </div>
-                        </div>
-
-                        {/* Estatísticas de Envio */}
-                        <div className="flex gap-4 p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg">
-                            <div className="flex items-center gap-2 text-gray-600">
-                                <FaChartBar className="text-green-500" />
-                                <span className="font-semibold">Entregues:</span>
-                                <span className="text-green-700 font-bold">{envioData?.Status.length || 0}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-gray-600">
-                                <FaUserShield className="text-blue-500" />
-                                <span className="font-semibold">Aberturas:</span>
-                                <span className="text-blue-700 font-bold">{viewedEmails}</span>
-                            </div>
-                        </div>
-
-                        <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border-2 border-gray-100 shadow-lg h-[515px] overflow-y-auto space-y-2">
-                            {filteredEmails.length > 0 ? (
-                                filteredEmails.map((email, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
-                                    >
-                                        <span className="text-sm font-medium text-gray-700">{email.IdEmail}</span>
-                                        {email.Visto ? (
-                                            <div className="flex items-center gap-1 text-green-500">
-                                                <FaEye />
-                                                <span className="text-xs">Visto</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-1 text-gray-400">
-                                                <FaEyeSlash />
-                                                <span className="text-xs">Não Visto</span>
-                                            </div>
-                                        )}
+                            <div className="relative w-full h-[600px] border-2 border-gray-100 rounded-xl bg-white/70 backdrop-blur-sm shadow-lg overflow-hidden">
+                                {envioData?.Campanha?.Documento ? (
+                                    <iframe
+                                        srcDoc={envioData.Campanha.Documento}
+                                        className="w-full h-full border-0"
+                                        frameBorder="0"
+                                        title="Preview da Campanha"
+                                        sandbox=""
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-center text-gray-500">
+                                        Conteúdo da campanha não disponível.
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-center text-gray-500 mt-4">Nenhum e-mail encontrado.</p>
-                            )}
+                                )}
+                            </div>
                         </div>
+
+                        {/* Painel Direito - Dados do Envio */}
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between gap-3 mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 p-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                                        <FaEnvelope className="text-white text-sm" />
+                                    </div>
+                                    <h2 className="text-2xl font-semibold text-gray-800">
+                                        E-mails enviados
+                                    </h2>
+                                </div>
+                                <div className="w-1/2 relative">
+                                    <Input
+                                        type="text"
+                                        placeholder="Pesquisar e-mail..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="pl-10 pr-4 py-2 border-gray-300 rounded-full focus:ring-0 focus:ring-offset-0 transition-colors bg-white/80"
+                                    />
+                                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                </div>
+                            </div>
+
+                            {/* Estatísticas de Envio */}
+                            <div className="flex gap-4 p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg">
+                                <div className="flex items-center gap-2 text-gray-600">
+                                    <FaChartBar className="text-green-500" />
+                                    <span className="font-semibold">Entregues:</span>
+                                    <span className="text-green-700 font-bold">{envioData?.Status.length || 0}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-gray-600">
+                                    <FaUserShield className="text-blue-500" />
+                                    <span className="font-semibold">Aberturas:</span>
+                                    <span className="text-blue-700 font-bold">{viewedEmails}</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border-2 border-gray-100 shadow-lg h-[515px] overflow-y-auto space-y-2">
+                                {filteredEmails.length > 0 ? (
+                                    filteredEmails.map((email, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+                                        >
+                                            <span className="text-sm font-medium text-gray-700">{email.IdEmail}</span>
+                                            {email.Visto ? (
+                                                <div className="flex items-center gap-1 text-green-500">
+                                                    <FaEye />
+                                                    <span className="text-xs">Visto</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1 text-gray-400">
+                                                    <FaEyeSlash />
+                                                    <span className="text-xs">Não Visto</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-center text-gray-500 mt-4">Nenhum e-mail encontrado.</p>
+                                )}
+                            </div>
+                        </div>
+                        {detailsData.filter(detalhe => detalhe.Codigo == 553).length > 0 && (
+                            <div className=" gap-4 p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg">
+                                <div className="flex">
+                                    <span className="p-2 rounded-lg bg-gradient-to-r from-red-400 to-red-600">
+                                        <FaSearch className="text-white text-lg" />
+                                    </span>
+                                    <h1 className="text-xl font-bold mt-auto mb-auto ml-2">Emails não encontrados</h1>
+                                </div>
+                                <h1 className="text-gray-500 mt-4">Esta é uma lista dos emails que estão na lista, mas não foram encontrados ao tentar realizar o envio e, portanto, o envio não foi feito.</h1>
+                                <div className="bg-gray-100 rounded-xl mt-4 p-2">
+                                    {detailsData.filter(detalhe => detalhe.Codigo == 553).map((detalhe, index) => (
+                                        <div key={index} className={index != 0 ? "mt-4" : ""}>
+                                            {detalhe.ConteudoEmail}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    {detailsData.filter(detalhe => detalhe.Codigo == 553).length > 0 && (
-                        <div className=" gap-4 p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg">
-                            <div className="flex">
-                                <span className="p-2 rounded-lg bg-gradient-to-r from-red-400 to-red-600">
-                                    <FaSearch className="text-white text-lg" />
-                                </span>
-                                <h1 className="text-xl font-bold mt-auto mb-auto ml-2">Emails não encontrados</h1>
-                            </div>
-                            <h1 className="text-gray-500 mt-4">Esta é uma lista dos emails que estão na lista, mas não foram encontrados ao tentar realizar o envio e, portanto, o envio não foi feito.</h1>
-                            <div className="bg-gray-100 rounded-xl mt-4 p-2">
-                                {detailsData.filter(detalhe => detalhe.Codigo == 553).map((detalhe, index) => (
-                                    <div key={index} className={index != 0 ? "mt-4" : ""}>
-                                        {detalhe.ConteudoEmail}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                    :
+                    <div className="flex">
+                        <h1 className="ml-auto mr-auto font-bold text-3xl mt-32">Envio não encontrado.</h1>
+                    </div>
+                }
             </div>
         </div >
     );

@@ -13,9 +13,14 @@ def update_status_envio(db: Session, token: str):
     return email_para_atualizar
 
 
-def get_status_envio_by_envio(db: Session, id_envio: int):
+def get_status_envio_by_envio(db: Session, id_envio: int, user_id: int):
     # 1. Busca o IdCampanha do envio.
-    id_campanha = db.query(models.Envio.Campanha).filter(models.Envio.IdEnvio == id_envio).scalar()
+    id_campanha = db.query(
+        models.Envio.Campanha
+    ).filter(
+        models.Envio.IdEnvio == id_envio,
+        models.Envio.IdUsuario == user_id
+    ).scalar()
 
     # 2. Busca os detalhes da campanha associada, se um IdCampanha foi encontrado.
     campanha_data = None

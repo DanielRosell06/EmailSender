@@ -31,6 +31,6 @@ def get_status_envio_by_envio(id_envio: Optional[int] = None, db: Session = Depe
     """
     Rota para contagem de abertura dos emails, retornando uma imagem transparente de 1x1.
     """
-    status = crud_status_envio.get_status_envio_by_envio(db, id_envio)
+    status = crud_status_envio.get_status_envio_by_envio(db, id_envio, user_id)
 
     return status
