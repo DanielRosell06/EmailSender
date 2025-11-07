@@ -16,7 +16,13 @@ from starlette.responses import FileResponse # Importe este módulo
 Base.metadata.create_all(bind=engine)
 
 # Configurações do SocketIO
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins="*")
+sio = socketio.AsyncServer(
+    async_mode='asgi',
+    cors_allowed_origins="*",
+    async_handlers=True,
+    threading=True,
+    max_workers=10  # Número máximo de workers para o thread pool
+)
 app = FastAPI()
 
 # Middleware do FastAPI
@@ -32,14 +38,32 @@ app.add_middleware(
 # Cria a aplicação ASGI combinada para ser o ponto de entrada principal
 socket_app = socketio.ASGIApp(sio, other_asgi_app=app)
 
+# Thread pool para operações assíncronas
+thread_pool = None
+
+@app.on_event("startup")
+async def startup_event():
+    global thread_pool
+    thread_pool = await asyncio.get_event_loop().run_in_executor(None, lambda: asyncio.new_event_loop())
+
 # Lida com eventos de conexão e desconexão do SocketIO
 @sio.on('connect')
 async def connect(sid, environ):
-    print(f'Conectado: {sid}')
+    async def handle_connection():
+        print(f'Conectado: {sid}')
+        # Aqui você pode adicionar qualquer lógica adicional de conexão
+    
+    # Executa o handler de conexão em uma thread separada
+    await asyncio.get_event_loop().run_in_executor(None, lambda: asyncio.run(handle_connection()))
 
 @sio.on('disconnect')
 async def disconnect(sid):
-    print(f'Desconectado: {sid}')
+    async def handle_disconnection():
+        print(f'Desconectado: {sid}')
+        # Aqui você pode adicionar qualquer lógica adicional de desconexão
+    
+    # Executa o handler de desconexão em uma thread separada
+    await asyncio.get_event_loop().run_in_executor(None, lambda: asyncio.run(handle_disconnection()))
 
 # Importa os roteadores dinamicamente
 ROUTERS_DIR = os.path.join(os.path.dirname(__file__), "rotas")
