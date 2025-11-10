@@ -120,7 +120,7 @@ export default function EditCampanhaPage() {
             }
 
             // Passa o ID da campanha na URL e o método e o corpo como opções
-            const response = await api(`/edit_campanha/?id_campanha=${IdCampanha}`, {
+            const response = await api(`/edit_campanha?id_campanha=${IdCampanha}`, {
                 method: 'PUT',
                 body: JSON.stringify(campanha_data)
             });
