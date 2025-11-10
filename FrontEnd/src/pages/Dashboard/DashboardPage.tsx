@@ -3,14 +3,14 @@ import { FaPaperPlane, FaCheckCircle, FaChartBar, FaEnvelopeOpenText, FaChartLin
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { api } from "@/services/api"; 
+import { api } from "@/services/api";
 import { Input } from "@/components/ui/input"; // Importado o Input
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Importado o Select
 
 // Renomeando o Tooltip do Recharts para evitar conflito com o Tooltip do shadcn/ui
-import { 
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, 
-    Legend, LineChart, Line 
+import {
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
+    Legend, LineChart, Line
 } from 'recharts';
 
 import { Badge } from "@/components/ui/badge";
@@ -57,11 +57,11 @@ type SearchType = 'Dt_Envio' | 'Campanha' | 'Lista';
 // --- Funções Auxiliares ---
 
 const formatDate = (dateString: string) => {
-    const localDateString = dateString + 'T12:00:00';        
+    const localDateString = dateString + 'T12:00:00';
     const date = new Date(localDateString);
-    
+
     if (isNaN(date.getTime())) {
-        return dateString; 
+        return dateString;
     }
 
     return date.toLocaleDateString('pt-BR');
@@ -81,10 +81,10 @@ const formatFullDate = (dateString: string) => {
 
 // Cores para os elementos da Dashboard (Vermelho para Laranja)
 const DASHBOARD_COLORS = {
-    PRIMARY: "from-red-500 to-orange-500", 
-    ENTREGAS: "#ef4444", 
-    ABERTURAS: "#f97316", 
-    TAXA_ABERTURA: "#f59e0b", 
+    PRIMARY: "from-red-500 to-orange-500",
+    ENTREGAS: "#ef4444",
+    ABERTURAS: "#f97316",
+    TAXA_ABERTURA: "#f59e0b",
     CARD_ICON_BG: "bg-gradient-to-r from-red-600 to-orange-700",
     BADGE_BG: "bg-red-500/100 hover:bg-red-600",
 };
@@ -95,7 +95,7 @@ const DASHBOARD_COLORS = {
 const DashboardPage: React.FC = () => {
     const [enviosRecentes, setEnviosRecentes] = useState<EnvioComMetricas[]>([]);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
-    
+
     // NOVOS ESTADOS PARA PESQUISA
     const [searchTerm, setSearchTerm] = useState('');
     const [searchType, setSearchType] = useState<SearchType>('Dt_Envio');
@@ -105,20 +105,11 @@ const DashboardPage: React.FC = () => {
         const fetchEnviosData = async () => {
             setLoadingEnvios(true);
             try {
-                const res = await api('/get_all_envio_com_lista_campanha_detalhe');
-                const envios: Envio[] = await res.json();
-                
-                const enviosComContagem = await Promise.all(
-                    envios.map(async (envio) => {
-                        const statusRes = await api(`/get_status_envio_by_envio?id_envio=${envio.IdEnvio}`);
-                        const statusData: { Status: StatusEnvio[] } = await statusRes.json();
-                        const entregues = statusData.Status.length;
-                        const aberturas = statusData.Status.filter(s => s.Visto).length;
-                        return { ...envio, entregas: entregues, aberturas: aberturas };
-                    })
-                );
+                const res = await api('/get_all_envios_with_stats');
+                const enviosComContagem = await res.json();
+
                 setEnviosRecentes(enviosComContagem);
-                setFilteredEnvios(enviosComContagem); // Inicializa com todos os envios
+                setFilteredEnvios(enviosComContagem);
             } catch (error) {
                 console.error("Erro ao carregar envios recentes:", error);
                 setEnviosRecentes([]);
@@ -139,7 +130,7 @@ const DashboardPage: React.FC = () => {
         }
 
         const term = searchTerm.toLowerCase();
-        
+
         const results = enviosRecentes.filter(envio => {
             if (searchType === 'Dt_Envio') {
                 const dataFormatada = formatDate(envio.Dt_Envio);
@@ -158,13 +149,13 @@ const DashboardPage: React.FC = () => {
     }, [searchTerm, searchType, enviosRecentes]);
 
 
-    const { 
-        totalEnvios, 
-        totalEntregas, 
-        totalAberturas, 
-        taxaMediaAbertura, 
-        dadosParaGraficoBarra, 
-        dadosParaGraficoLinha 
+    const {
+        totalEnvios,
+        totalEntregas,
+        totalAberturas,
+        taxaMediaAbertura,
+        dadosParaGraficoBarra,
+        dadosParaGraficoLinha
     } = useMemo(() => {
         const totalEnvios = enviosRecentes.length;
         const totalEntregas = enviosRecentes.reduce((acc, envio) => acc + envio.entregas, 0);
@@ -180,24 +171,24 @@ const DashboardPage: React.FC = () => {
             return acc;
         }, {} as { [key: string]: { name: string, entregues: number, aberturas: number } });
 
-        
+
         const uniqueCampaigns = Array.from(new Set(enviosRecentes.map(e => e.Campanha.Titulo)));
         const recentFiveCampaignNames = uniqueCampaigns.slice(0, 5);
-        
+
         const dadosParaGraficoBarra = Object.values(metricasPorCampanha)
             .filter(item => recentFiveCampaignNames.includes(item.name))
             .slice(0, 5);
-            
+
         const dadosParaGraficoLinha = enviosRecentes
             .slice(0, 15)
             .map((envio, index) => ({
-                name: `Envio #${enviosRecentes.length - index}`, 
+                name: `Envio #${enviosRecentes.length - index}`,
                 idEnvio: envio.IdEnvio,
                 data: formatDate(envio.Dt_Envio),
                 entregas: envio.entregas,
                 aberturas: envio.aberturas,
             }))
-            .reverse(); 
+            .reverse();
 
         return {
             totalEnvios,
@@ -384,21 +375,21 @@ const DashboardPage: React.FC = () => {
                                 labelFormatter={(label) => `Data: ${label}`}
                             />
                             <Legend wrapperStyle={{ fontSize: '12px' }} />
-                            <Line 
-                                type="monotone" 
-                                dataKey="entregas" 
-                                stroke={DASHBOARD_COLORS.ENTREGAS} 
-                                strokeWidth={2} 
-                                name="Entregues" 
+                            <Line
+                                type="monotone"
+                                dataKey="entregas"
+                                stroke={DASHBOARD_COLORS.ENTREGAS}
+                                strokeWidth={2}
+                                name="Entregues"
                                 dot={{ r: 4 }}
                                 activeDot={{ r: 8 }}
                             />
-                            <Line 
-                                type="monotone" 
-                                dataKey="aberturas" 
-                                stroke={DASHBOARD_COLORS.ABERTURAS} 
-                                strokeWidth={2} 
-                                name="Aberturas" 
+                            <Line
+                                type="monotone"
+                                dataKey="aberturas"
+                                stroke={DASHBOARD_COLORS.ABERTURAS}
+                                strokeWidth={2}
+                                name="Aberturas"
                                 dot={{ r: 4 }}
                                 activeDot={{ r: 8 }}
                             />
@@ -422,7 +413,7 @@ const DashboardPage: React.FC = () => {
                         <span className={`p-2 rounded-lg bg-gradient-to-r ${DASHBOARD_COLORS.PRIMARY} shadow-lg`}>
                             <FaChartBar className="text-white text-lg" />
                         </span>
-                        Dashboard de Envios 
+                        Dashboard de Envios
                     </h1>
                     <p className="text-lg text-gray-600 mt-2 ml-[50px]">
                         Visão geral e métricas de desempenho dos seus envios de e-mail.
@@ -472,7 +463,7 @@ const DashboardPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                     {renderBarChart()}
-                    {renderLineChart()} 
+                    {renderLineChart()}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -229,7 +229,7 @@ const Layout: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-gray-100 p-4 mt-auto">
-        <p className="text-center text-gray-600">© 2025 Meu App Incrível</p>
+        <p className="text-center text-gray-600">© 2025 EmailSender - NextStep</p>
       </footer>
     </div >
   );

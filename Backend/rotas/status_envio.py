@@ -34,3 +34,13 @@ def get_status_envio_by_envio(id_envio: Optional[int] = None, db: Session = Depe
     status = crud_status_envio.get_status_envio_by_envio(db, id_envio, user_id)
 
     return status
+
+
+@router.get("/get_all_envios_with_stats", response_model=list[schema_status_envio.EnvioWithStatsBase])
+def get_status_envio_by_envio(id_envio: Optional[int] = None, db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
+    """
+    Rota para contagem de abertura dos emails, retornando uma imagem transparente de 1x1.
+    """
+    status = crud_status_envio.get_all_envios_with_stats(db, user_id)
+
+    return status

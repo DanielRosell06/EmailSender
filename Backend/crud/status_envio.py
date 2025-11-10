@@ -1,6 +1,7 @@
 #crud/status_envio
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func, Integer, desc
 import models # Acessa a pasta acima para importar models.py
 from schema import status_envio as schema_status_envio
 
@@ -58,3 +59,69 @@ def get_status_envio_by_envio(db: Session, id_envio: int, user_id: int):
         "Status": status_list,
         "Campanha": campanha_schema
     }
+
+def get_all_envios_with_stats(db: Session, user_id: int):
+    envios_com_stats = (
+        db.query(
+            models.Envio.IdEnvio,
+            models.Envio.Dt_Envio,
+            models.Envio.Token,
+            models.Envio.Lista.label('IdLista'),  # Renomeando para IdLista
+            models.Envio.Campanha.label('IdCampanha'),  # Renomeando para IdCampanha
+            models.Campanha.Titulo,
+            models.Campanha.Cor,
+            models.Campanha.Assunto,
+            models.Campanha.Documento,
+            models.Lista.Titulo.label('ListaTitulo'),
+            func.count(models.StatusEnvio.IdStatusEnvio).label('total_emails'),
+            func.sum(func.cast(models.StatusEnvio.Visto, Integer)).label('emails_vistos')
+        )
+        .order_by(desc(models.Envio.Dt_Envio))
+        .join(models.Campanha, models.Envio.Campanha == models.Campanha.IdCampanha)
+        .join(models.Lista, models.Envio.Lista == models.Lista.IdLista)
+        .outerjoin(models.StatusEnvio, models.Envio.IdEnvio == models.StatusEnvio.IdEnvio)
+        .filter(models.Envio.IdUsuario == user_id)
+        .group_by(
+            models.Envio.IdEnvio,
+            models.Envio.Dt_Envio,
+            models.Envio.Token,
+            models.Envio.Lista,
+            models.Envio.Campanha,
+            models.Campanha.Titulo,
+            models.Campanha.Cor,
+            models.Campanha.Assunto,
+            models.Campanha.Documento,
+            models.Lista.Titulo
+        )
+        .all()
+    )
+    
+    resultado = []
+    for envio in envios_com_stats:
+        # Criando objetos Lista e Campanha como o frontend espera
+        lista_obj = {
+            "IdLista": envio.IdLista,
+            "Titulo": envio.ListaTitulo
+        }
+        
+        campanha_obj = {
+            "IdCampanha": envio.IdCampanha,
+            "Titulo": envio.Titulo,
+            "Cor": envio.Cor,
+            "Assunto": envio.Assunto
+        }
+        
+        envio_data = {
+            "IdEnvio": envio.IdEnvio,
+            "Dt_Envio": envio.Dt_Envio,
+            "Token": envio.Token,
+            "IdLista": envio.IdLista,
+            "IdCampanha": envio.IdCampanha,
+            "Lista": lista_obj,
+            "Campanha": campanha_obj,
+            "entregas": envio.total_emails or 0,
+            "aberturas": envio.emails_vistos or 0
+        }
+        resultado.append(envio_data)
+    
+    return resultado
