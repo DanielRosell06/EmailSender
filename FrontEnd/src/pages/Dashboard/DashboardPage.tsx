@@ -41,11 +41,6 @@ interface Envio {
     Campanha: Campanha;
 }
 
-interface StatusEnvio {
-    IdStatus: number;
-    Visto: boolean;
-}
-
 interface EnvioComMetricas extends Envio {
     entregas: number;
     aberturas: number;
