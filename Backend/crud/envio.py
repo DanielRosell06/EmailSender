@@ -9,7 +9,7 @@ import smtplib
 from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload
 import hashlib
 from datetime import datetime
@@ -20,6 +20,7 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import copy
+from typing import Dict, Any
 
 # Importa a instância do servidor SocketIO.
 # Isso geralmente é feito em um arquivo principal, como main.py, e a instância é passada aqui.
@@ -379,42 +380,60 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
     return db_envio
 
 
-def get_all_envio_com_lista_campanha_detalhe(user_id:int, db: Session):
+def get_all_envio_com_lista_campanha_detalhe(user_id: int, db: Session) -> list[Dict[str, Any]]:
     envios_com_relacoes = (
-        db.query(models.Envio)
+        db.query(
+            models.Envio.IdEnvio,
+            models.Envio.Dt_Envio,
+            # Dados da Campanha
+            models.Campanha.IdCampanha.label('campanha_id'),
+            models.Campanha.Titulo.label('campanha_titulo'),
+            models.Campanha.Cor.label('campanha_cor'),
+            # Dados da Lista
+            models.Lista.IdLista.label('lista_id'),
+            models.Lista.Titulo.label('lista_titulo'),
+            # Agregar detalhes como array de JSON
+            func.json_agg(
+                func.json_build_object(
+                    'IdDetalhe', models.Detalhe.IdDetalhe,
+                    'Conteudo', models.Detalhe.Conteudo
+                )
+            ).filter(models.Detalhe.IdDetalhe.isnot(None)).label('detalhes')
+        )
+        .join(models.Campanha, models.Envio.Campanha == models.Campanha.IdCampanha)
+        .join(models.Lista, models.Envio.Lista == models.Lista.IdLista)
+        .outerjoin(models.Detalhe, models.Envio.IdEnvio == models.Detalhe.Envio)
         .filter(models.Envio.IdUsuario == user_id)
-        .options(
-            joinedload(models.Envio.detalhes),
-            joinedload(models.Envio.lista_pai),   # Alterado de .Lista para .lista_pai
-            joinedload(models.Envio.campanha_pai) # Alterado de .Campanha para .campanha_pai
+        .group_by(
+            models.Envio.IdEnvio,
+            models.Envio.Dt_Envio,
+            models.Campanha.IdCampanha,
+            models.Campanha.Titulo,
+            models.Campanha.Cor,
+            models.Lista.IdLista,
+            models.Lista.Titulo
         )
         .order_by(desc(models.Envio.Dt_Envio))
         .all()
     )
     
+    # Construir o resultado final
     resultados_finais = []
     
     for envio in envios_com_relacoes:
-        campanha = envio.campanha_pai
-        lista = envio.lista_pai
-        detalhes = envio.detalhes
-        
         resultado_envio = {
             "IdEnvio": envio.IdEnvio,
             "Dt_Envio": envio.Dt_Envio,
             "Campanha": {
-                "IdCampanha": campanha.IdCampanha,
-                "Titulo": campanha.Titulo,
-                "Cor": campanha.Cor
-            } if campanha else None,
+                "IdCampanha": envio.campanha_id,
+                "Titulo": envio.campanha_titulo,
+                "Cor": envio.campanha_cor
+            },
             "Lista": {
-                "IdLista": lista.IdLista,
-                "Titulo": lista.Titulo
-            } if lista else None,
-            "Detalhes": [{
-                "IdDetalhe": detalhe.IdDetalhe,
-                "Conteudo": detalhe.Conteudo
-            } for detalhe in detalhes]
+                "IdLista": envio.lista_id,
+                "Titulo": envio.lista_titulo
+            },
+            "Detalhes": envio.detalhes or []  # Garante que seja uma lista vazia se não houver detalhes
         }
         
         resultados_finais.append(resultado_envio)
