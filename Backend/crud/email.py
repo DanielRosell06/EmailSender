@@ -34,14 +34,25 @@ def edit_email(db: Session, emails: list[schemas_email.EmailEdit]):
     return True
 
 def delete_email(db: Session, email_ids: list[int]):
-    try:
-        db.query(models.StatusEnvio).filter(
-            models.StatusEnvio.IdEmail.in_(email_ids)
-        ).delete(synchronize_session=False)
+    print(f"Deletando: {email_ids}")
+    # retorna False se lista vazia ou inválida
+    if not email_ids:
+        return False
 
-        num_deleted = db.query(models.Email).filter(models.Email.IdEmail.in_(email_ids)).delete(synchronize_session=False)
+    try:
+        # normaliza/valida ids (remove duplicados e garante inteiros)
+        ids = list({int(i) for i in email_ids})
+    except (ValueError, TypeError):
+        return False
+
+    try:
+        # deleta registros dependentes primeiro, depois os emails
+        db.query(models.Detalhe).filter(models.Detalhe.Email.in_(ids)).delete(synchronize_session=False)
+        db.query(models.StatusEnvio).filter(models.StatusEnvio.IdEmail.in_(ids)).delete(synchronize_session=False)
+        db.query(models.Email).filter(models.Email.IdEmail.in_(ids)).delete(synchronize_session=False)
         db.commit()
         return True
     except Exception as e:
-        db.rollback()  # Em caso de erro, desfaz as operações para evitar inconsistências
+        print(e)
+        db.rollback()
         return False
