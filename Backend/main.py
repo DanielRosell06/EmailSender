@@ -19,7 +19,6 @@ Base.metadata.create_all(bind=engine)
 sio = socketio.AsyncServer(
     async_mode='asgi',
     cors_allowed_origins="*",
-    async_handlers=True
 )
 app = FastAPI()
 
@@ -35,9 +34,6 @@ app.add_middleware(
 
 # Cria a aplicação ASGI combinada para ser o ponto de entrada principal
 socket_app = socketio.ASGIApp(sio, other_asgi_app=app)
-
-# Thread pool para operações assíncronas
-thread_pool = None
 
 # Lida com eventos de conexão e desconexão do SocketIO
 @sio.on('connect')

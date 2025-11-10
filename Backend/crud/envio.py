@@ -74,6 +74,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
     Agora: baixa imagens externas encontradas em <img src="..."> e as embute como CID.
     Recebe o 'sid' (Session ID) para enviar mensagens específicas.
     """
+    print("Pedido de envio recebido")
     global sio
     if not sio:
         print("Servidor SocketIO não está configurado.")
@@ -103,6 +104,7 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
     IdNewEnvio = db_envio.IdEnvio
 
     # --- ETAPA 1: INÍCIO DO PROCESSO (10% DA BARRA) ---
+    print("preparando processo de envio")
     await sio.emit('progress', {'sent': 0, 'total': total_emails, 'percentage': 10, 'id_envio': db_envio.IdEnvio}, room=sid)
 
     def _embed_external_images_and_get_html(html: str, msg):
@@ -158,108 +160,140 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
         
     emails_enviados_count = 0
 
+
     try:
         contexto_ssl = ssl.create_default_context()
-        with smtplib.SMTP(smtp_domain, smtp_port) as server:
+
+        progresso_anterior = 0
+
+        # --- PRÉ-PROCESSAMENTO: Processa tudo UMA VEZ fora do loop ---
+        email_from = usuario_smtp.EmailFrom if usuario_smtp.EmailFrom else usuario_smtp.Usuario
+        assunto = campanha.Assunto
+        
+        # Processa o documento base e imagens UMA ÚNICA VEZ
+        msg_template = MIMEMultipart("related")
+        alternative_template = MIMEMultipart("alternative")
+        msg_template.attach(alternative_template)
+        
+        # Processa imagens no template base (apenas uma vez!)
+        documento_com_imagens = _embed_external_images_and_get_html(campanha.Documento, msg_template)
+        
+        # Gera plain text uma única vez
+        try:
+            from bs4 import BeautifulSoup as _BS
+            plain_text = _BS(campanha.Documento, "html.parser").get_text(separator="\n").strip()
+        except Exception:
+            plain_text = ""
+
+        alternative_template.attach(MIMEText(plain_text, 'plain', 'utf-8'))
+
+        def create_new_connection():
+            server = smtplib.SMTP(smtp_domain, smtp_port)
             server.starttls(context=contexto_ssl)
             server.login(smtp_user, smtp_password)
+            print("Nova conexão SMTP estabelecida")
+            return server
+        
+        server = create_new_connection()
 
-            progresso_anterior = 0
+        # --- ETAPA 2: ENVIO DE EMAILS (10% a 90% da barra) ---
+        print("Enviando")
+        for email_obj in lista:
+            try:
+                email = email_obj.Conteudo
+                token = generate_token(email, db_envio.IdEnvio)
 
-            # --- ETAPA 2: ENVIO DE EMAILS (10% a 90% da barra) ---
-            for email_obj in lista:
+                # Clona a mensagem template (já com imagens processadas)
+                msg = copy.deepcopy(msg_template)
+                
+                # Configura headers únicos para cada email
+                msg['From'] = email_from
+                msg['Subject'] = assunto
+                msg['To'] = email
+
+                # Adiciona o HTML com tracking único para este email
+                html_with_cid = documento_com_imagens + f' <img src="{SERVER_URL}/api/update_status_envio?token={token}">'
+                
+                # Encontra a parte alternativa e adiciona o HTML atualizado
+                for part in msg.get_payload():
+                    if part.get_content_type() == 'multipart/alternative':
+                        html_parts = [p for p in part.get_payload() if p.get_content_type() != 'text/html']
+                        part.set_payload(html_parts)  # Remove HTML antigo
+                        part.attach(MIMEText(html_with_cid, 'html', 'utf-8'))  # Adiciona novo HTML
+                        break
+
+                # Envia o email
+                server.sendmail(email_from, email, msg.as_string())
+
+                emails_enviados_count += 1
+                        
+                progresso_atual = int((emails_enviados_count / total_emails) * 80)
+                progresso_total_barra = 10 + progresso_atual
+                
+                await sio.emit('progress', {
+                    'sent': emails_enviados_count, 
+                    'total': total_emails, 
+                    'percentage': progresso_total_barra, 
+                    'id_envio': db_envio.IdEnvio
+                }, room=sid)
+
+                print(f"Enviando para {email}")
+                db_status = models.StatusEnvio(
+                    IdEnvio=db_envio.IdEnvio,
+                    IdEmail=email_obj.IdEmail,
+                    Token=token,
+                )
+                db.add(db_status)
+
+            except (smtplib.SMTPServerDisconnected, smtplib.SMTPConnectError, ConnectionResetError) as e:
+                print(f"Erro de conexão: {e}. Tentando reconectar...")
                 try:
-                    email = email_obj.Conteudo
-                    token = generate_token(email, db_envio.IdEnvio)
-
-                    # Cria uma mensagem multiparte relacionada (html + imagens inline)
-                    # A mensagem base agora é criada dentro do loop para cada email
-                    msg = MIMEMultipart("related")
-
-                    if usuario_smtp.EmailFrom:
-                        email_from = usuario_smtp.EmailFrom
-                    else:
-                        email_from = usuario_smtp.Usuario
-
-                    msg['From'] = email_from
-                    msg['Subject'] = campanha.Assunto
+                    server.quit()
+                except:
+                    pass
+                
+                # Tenta reconectar
+                try:
+                    server = create_new_connection()
+                    server.sendmail(email_from, email, msg.as_string())
                     
-                    # Cria a parte alternativa
-                    alternative = MIMEMultipart("alternative")
-                    msg.attach(alternative)
-
-                    # Tenta embutir imagens externas e obter o html modificado com cid
-                    documento_com_imagens = _embed_external_images_and_get_html(campanha.Documento, msg)
-                    html_with_cid = documento_com_imagens + f' <img src="{SERVER_URL}/api/update_status_envio?token={token}">'
-
-                    # plain fallback: remove tags simples (pega texto bruto)
-                    try:
-                        from bs4 import BeautifulSoup as _BS
-                        plain_text = _BS(html_with_cid, "html.parser").get_text(separator="\n").strip()
-                    except Exception:
-                        plain_text = ""
-
-                    alternative.attach(MIMEText(plain_text, 'plain', 'utf-8'))
-                    alternative.attach(MIMEText(html_with_cid, 'html', 'utf-8'))
-
-                    # define destinatário
-                    try:
-                        del msg['To']
-                    except Exception:
-                        pass
-                    msg['To'] = email
-
-                    # envia o email e, se for bem-sucedido, registra o status
-                    server.sendmail(
-                        email_from,
-                        email,
-                        msg.as_string())
-
+                    print(f"Enviado para {email} após reconexão")
                     db_status = models.StatusEnvio(
-                        IdEnvio = db_envio.IdEnvio,
-                        IdEmail = email_obj.IdEmail,
-                        Token = token,
+                        IdEnvio=db_envio.IdEnvio,
+                        IdEmail=email_obj.IdEmail,
+                        Token=token,
                     )
                     db.add(db_status)
-                    
                     emails_enviados_count += 1
 
-                except smtplib.SMTPDataError as e:
-                    if e.smtp_code == 452:
-                        db_detalhe = models.Detalhe(
-                            Conteudo = "nEnviado " + emails_enviados_count,
-                            Tipo = 1,
-                            Codigo = 452,
-                            Envio = db_envio.IdEnvio
-                        )
-                        db.add(db_detalhe)
-                        db.commit()
-                        await sio.emit('redirect', {'url': f"/envio_detail/{IdNewEnvio}"}, room=sid)
-                        break 
-                    else:
-                        emails_enviados_count += 1
-                        error_code = e.smtp_code
-                        print(f"Erro SMTPDataError ao enviar e-mail para {email_obj.Conteudo}: {e}")
-                        
-                        db_detalhe = models.Detalhe(
-                            Tipo = 1,
-                            Codigo = error_code,
-                            Envio = db_envio.IdEnvio,
-                            Email = email_obj.IdEmail
-                        )
-                        db.add(db_detalhe)
-                        db.commit()
+                except Exception as retry_error:
+                    print(f"Falha ao reenviar para {email} após reconexão: {retry_error}")
+                    # Registra o erro no banco
+                    error_code = getattr(retry_error, 'smtp_code', 0)
+                    db_detalhe = models.Detalhe(
+                        Tipo=1,
+                        Codigo=error_code,
+                        Envio=db_envio.IdEnvio,
+                        Email=email_obj.IdEmail
+                    )
+                    db.add(db_detalhe)
+                    continue
 
-                except smtplib.SMTPRecipientsRefused as e:
+            except smtplib.SMTPDataError as e:
+                if e.smtp_code == 452:
+                    db_detalhe = models.Detalhe(
+                        Conteudo = "nEnviado " + emails_enviados_count,
+                        Tipo = 1,
+                        Codigo = 452,
+                        Envio = db_envio.IdEnvio
+                    )
+                    db.add(db_detalhe)
+                    await sio.emit('redirect', {'url': f"/envio_detail/{IdNewEnvio}"}, room=sid)
+                    break 
+                else:
                     emails_enviados_count += 1
-                    error_code = 0
-                    
-                    if e.recipients:
-                        first_recipient = list(e.recipients.values())[0]
-                        if isinstance(first_recipient, tuple) and len(first_recipient) > 0:
-                            error_code = first_recipient[0]  # Vai capturar 553, 550, etc.
-                    
-                    print(f"Erro SMTPRecipientsRefused: {error_code} com o email {email_obj.Conteudo}")
+                    error_code = e.smtp_code
+                    print(f"Erro SMTPDataError ao enviar e-mail para {email_obj.Conteudo}: {e}")
                     
                     db_detalhe = models.Detalhe(
                         Tipo = 1,
@@ -268,38 +302,55 @@ async def create_envio(user_id:int, db: Session, envio: schemas_envio.EnvioCreat
                         Email = email_obj.IdEmail
                     )
                     db.add(db_detalhe)
-                    db.commit()
 
-                except Exception as e:
-                    emails_enviados_count += 1
-                    error_code = 0
-                    
-                    # Para qualquer outro tipo de erro, tentamos extrair o código de forma genérica
-                    if hasattr(e, 'smtp_code'):
-                        error_code = e.smtp_code
-                    elif hasattr(e, 'code'):
-                        error_code = e.code
-                    elif hasattr(e, 'status_code'):
-                        error_code = e.status_code
-                    
-                    print(f"Erro genérico: {error_code} com o email {email_obj.Conteudo}: {e}")
-                    
-                    db_detalhe = models.Detalhe(
-                        Tipo = 1,
-                        Codigo = error_code,
-                        Envio = db_envio.IdEnvio,
-                        Email = email_obj.IdEmail
-                    )
-                    db.add(db_detalhe)
-                    db.commit()
-
-                progresso_emails_bruto = (emails_enviados_count / total_emails) * 80
-                progresso_atual = int(progresso_emails_bruto)
+            except smtplib.SMTPRecipientsRefused as e:
+                emails_enviados_count += 1
+                error_code = 0
                 
-                if progresso_atual > progresso_anterior:
-                    progresso_total_barra = 10 + progresso_atual
-                    await sio.emit('progress', {'sent': emails_enviados_count, 'total': total_emails, 'percentage': progresso_total_barra, 'id_envio': db_envio.IdEnvio}, room=sid)
-                    progresso_anterior = progresso_atual
+                if e.recipients:
+                    first_recipient = list(e.recipients.values())[0]
+                    if isinstance(first_recipient, tuple) and len(first_recipient) > 0:
+                        error_code = first_recipient[0]  # Vai capturar 553, 550, etc.
+                
+                print(f"Erro SMTPRecipientsRefused: {error_code} com o email {email_obj.Conteudo}")
+                
+                db_detalhe = models.Detalhe(
+                    Tipo = 1,
+                    Codigo = error_code,
+                    Envio = db_envio.IdEnvio,
+                    Email = email_obj.IdEmail
+                )
+                db.add(db_detalhe)
+
+            except Exception as e:
+                emails_enviados_count += 1
+                error_code = 0
+                
+                # Para qualquer outro tipo de erro, tentamos extrair o código de forma genérica
+                if hasattr(e, 'smtp_code'):
+                    error_code = e.smtp_code
+                elif hasattr(e, 'code'):
+                    error_code = e.code
+                elif hasattr(e, 'status_code'):
+                    error_code = e.status_code
+                
+                print(f"Erro genérico: {error_code} com o email {email_obj.Conteudo}: {e}")
+                
+                db_detalhe = models.Detalhe(
+                    Tipo = 1,
+                    Codigo = error_code,
+                    Envio = db_envio.IdEnvio,
+                    Email = email_obj.IdEmail
+                )
+                db.add(db_detalhe)
+
+            progresso_emails_bruto = (emails_enviados_count / total_emails) * 80
+            progresso_atual = int(progresso_emails_bruto)
+            
+            if progresso_atual > progresso_anterior:
+                progresso_total_barra = 10 + progresso_atual
+                await sio.emit('progress', {'sent': emails_enviados_count, 'total': total_emails, 'percentage': progresso_total_barra, 'id_envio': db_envio.IdEnvio}, room=sid)
+                progresso_anterior = progresso_atual
 
     except smtplib.SMTPAuthenticationError:
         if emails_enviados_count > 0:
