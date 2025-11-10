@@ -241,7 +241,7 @@ const EnvioDetailsPage = () => {
                                 )}
                             </div>
                         </div>
-                        {detailsData.filter(detalhe => detalhe.Codigo == 553).length > 0 && (
+                        {detailsData.filter(detalhe => detalhe.Codigo == 553 || detalhe.Codigo == 554).length > 0 && (
                             <div className=" gap-4 p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg">
                                 <div className="flex">
                                     <span className="p-2 rounded-lg bg-gradient-to-r from-red-400 to-red-600">
@@ -251,7 +251,26 @@ const EnvioDetailsPage = () => {
                                 </div>
                                 <h1 className="text-gray-500 mt-4">Esta é uma lista dos emails que estão na lista, mas não foram encontrados ao tentar realizar o envio e, portanto, o envio não foi feito.</h1>
                                 <div className="bg-gray-100 rounded-xl mt-4 p-2">
-                                    {detailsData.filter(detalhe => detalhe.Codigo == 553).map((detalhe, index) => (
+                                    {detailsData.filter(detalhe => detalhe.Codigo == 553 || detalhe.Codigo == 554).map((detalhe, index) => (
+                                        <div key={index} className={index != 0 ? "mt-4" : ""}>
+                                            {detalhe.ConteudoEmail}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {detailsData.filter(detalhe => detalhe.Codigo == 501).length > 0 && (
+                            <div className=" gap-4 p-4 rounded-xl border-2 border-gray-100 bg-white/70 backdrop-blur-sm shadow-lg">
+                                <div className="flex">
+                                    <span className="p-2 rounded-lg bg-gradient-to-r from-red-400 to-red-600">
+                                        <FaSearch className="text-white text-lg" />
+                                    </span>
+                                    <h1 className="text-xl font-bold mt-auto mb-auto ml-2">Emails digitados incorretamente</h1>
+                                </div>
+                                <h1 className="text-gray-500 mt-4">Esta é uma lista dos emails que estão na lista, mas possuem algum caracter que não é possível de existir em um e-mail. Por favor, verifique e atualize os e-mails abaixo antes de tentar enviar novamente</h1>
+                                <div className="bg-gray-100 rounded-xl mt-4 p-2">
+                                    {detailsData.filter(detalhe => detalhe.Codigo == 501).map((detalhe, index) => (
                                         <div key={index} className={index != 0 ? "mt-4" : ""}>
                                             {detalhe.ConteudoEmail}
                                         </div>

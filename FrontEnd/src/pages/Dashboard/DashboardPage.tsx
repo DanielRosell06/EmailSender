@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 // Importações Padrão do shadcn/ui
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
 
 
 // --- Interfaces de Dados ---
@@ -88,6 +89,8 @@ const DASHBOARD_COLORS = {
 // --- Componente DashboardPage ---
 
 const DashboardPage: React.FC = () => {
+    const navigate = useNavigate();
+
     const [enviosRecentes, setEnviosRecentes] = useState<EnvioComMetricas[]>([]);
     const [loadingEnvios, setLoadingEnvios] = useState(true);
 
@@ -271,7 +274,10 @@ const DashboardPage: React.FC = () => {
                                 {filteredEnvios.map((envio) => { // Mapeia os envios filtrados
                                     const taxaAbertura = envio.entregas > 0 ? ((envio.aberturas / envio.entregas) * 100).toFixed(1) : 0;
                                     return (
-                                        <TableRow key={envio.IdEnvio} className="hover:bg-red-50/30 transition-colors">
+                                        <TableRow key={envio.IdEnvio}
+                                            className="hover:bg-red-50/30 transition-colors"
+                                            onClick={() => {navigate(`/envio_detail/${envio.IdEnvio}`)}}
+                                        >
                                             <TableCell className="font-medium">
                                                 <div className="text-gray-800 truncate" title={envio.Campanha.Titulo}>{envio.Campanha.Titulo}</div>
                                                 <div className="text-xs text-gray-500 truncate" title={envio.Lista.Titulo}>{envio.Lista.Titulo}</div>
