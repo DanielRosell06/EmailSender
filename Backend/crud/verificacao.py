@@ -22,7 +22,7 @@ def verificar_mx_dominio(domain: str) -> bool:
     except:
         return False
 
-def verificar_email(email: str) -> bool:
+def verificar_email(email: str, total: int, num: int) -> bool:
     """Verifica um email individual"""
     # Valida formato
     if not validar_formato_email(email):
@@ -34,6 +34,8 @@ def verificar_email(email: str) -> bool:
 
 def verificar_lista_emails(id_lista: int, db: Session, user_id: int):
     # Verifica se a lista existe e pertence ao usuário
+    num = 0
+    total = 0
     lista = db.query(Lista).filter(
         Lista.IdLista == id_lista,
         Lista.IdUsuario == user_id,
@@ -54,9 +56,14 @@ def verificar_lista_emails(id_lista: int, db: Session, user_id: int):
     
     # Processa cada email
     for email in emails_para_verificar:
+        total += 1
+        num+=1
         try:
-            valido = verificar_email(email.Conteudo)
+            valido = verificar_email(email.Conteudo, total, num)
             email.Verificacao = 1 if valido else -1
+            if num >= 10:
+                db.commit()
+                num = 0
         except Exception as e:
             logger.error(f"Erro ao verificar email {email.Conteudo}: {str(e)}")
             # Marca como inválido em caso de erro
