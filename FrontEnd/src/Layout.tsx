@@ -1,7 +1,7 @@
 // src/components/layout/Layout.tsx
 import { Mail } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { FaEnvelope, FaPaperPlane, FaUsers, FaHome, FaCog, FaChartBar, FaList, FaClipboardCheck } from 'react-icons/fa';
+import { FaEnvelope, FaPaperPlane, FaUsers, FaHome, FaCog, FaChartBar, FaClipboardCheck } from 'react-icons/fa';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { api } from './services/api';
 
