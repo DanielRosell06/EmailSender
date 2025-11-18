@@ -70,3 +70,12 @@ def edit_lista( id_lista: int, new_titulo: str, db: Session = Depends(get_db), u
     """
     result = crud_lista.edit_lista(db=db, id_lista=id_lista, new_titulo=new_titulo)
     return result
+
+
+@router.get("/lista_com_contagem_de_verificacoes", response_model=list[schemas_lista.ListaComContagemVerificacao])
+def get_all_listas(db: Session = Depends(get_db), user_id: int = Depends(verificar_token)):
+    """
+    Retorna todas as listas e o número de emails verificados, não verificados e inválidos
+    """
+    listas = crud_lista.get_all_lista_com_contagem_de_verificacao(user_id=user_id, db=db)
+    return listas

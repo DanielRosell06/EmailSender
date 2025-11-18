@@ -53,6 +53,7 @@ class Email(Base):
     
     IdEmail = Column(Integer, primary_key=True, nullable=False, index=True)
     Conteudo = Column(String, nullable=False)
+    Verificacao = Column(Integer, nullable=False, default=0)
     
     # Chave Estrangeira
     Lista = Column(Integer, ForeignKey("lista.IdLista"))

@@ -29,3 +29,12 @@ class Lista(BaseModel):
     Lixeira: bool
     
     model_config = ConfigDict(from_attributes=True)
+
+class ListaComContagemVerificacao(BaseModel):
+    IdLista: int
+    Titulo: str
+    Ultimo_Uso: date | None = None
+    TotalEmails: int
+    EmailsVerificados: int
+    EmailsNaoVerificados: int
+    EmailsInvalidos: int

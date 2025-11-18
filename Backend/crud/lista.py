@@ -1,6 +1,7 @@
 # crud/lista.py
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func, case
 import models # Acessa a pasta acima para importar models.py
 from schema import lista as schemas_lista # Acessa a pasta acima para importar schemas/lista.py
 
@@ -16,6 +17,28 @@ def create_lista(user_id: int, db: Session, lista: schemas_lista.ListaCreate):
 
 def get_all_lista(user_id: int, db: Session):
     return db.query(models.Lista.IdLista, models.Lista.Titulo, models.Lista.Lixeira, models.Lista.Ultimo_Uso).filter(models.Lista.IdUsuario == user_id).all()
+
+def get_all_lista_com_contagem_de_verificacao(user_id: int, db: Session):
+    res = db.query(
+        models.Lista.IdLista,
+        models.Lista.Titulo,
+        models.Lista.Ultimo_Uso,
+        func.count(models.Email.IdEmail).label('TotalEmails'),
+        func.count(case((models.Email.Verificacao == 1, models.Email.IdEmail))).label('EmailsVerificados'),
+        func.count(case((models.Email.Verificacao == 0, models.Email.IdEmail))).label('EmailsNaoVerificados'),
+        func.count(case((models.Email.Verificacao == -1, models.Email.IdEmail))).label('EmailsInvalidos')
+    ).filter(
+        models.Lista.IdUsuario == user_id,
+        models.Lista.Lixeira == False
+    ).join(
+        models.Email,
+        models.Email.Lista == models.Lista.IdLista
+    ).group_by(
+        models.Lista.IdLista,
+        models.Lista.Titulo,
+        models.Lista.Ultimo_Uso
+    )
+    return res
 
 def get_lista_com_emails(user_id: int, db: Session, id_lista: int):
     lista = db.query(models.Lista).filter(models.Lista.IdLista == id_lista, models.Lista.IdUsuario == user_id).first()

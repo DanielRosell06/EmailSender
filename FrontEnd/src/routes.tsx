@@ -21,6 +21,7 @@ import RotaPrivada from "./components/Auth.tsx";
 import LandingInicio from "./pages/Landing/Inicio.tsx";
 import LandingSaibaMais from "./pages/Landing/SaibaMais.tsx";
 import DashboardPage from "./pages/Dashboard/DashboardPage.tsx";
+import VerificarEmailsPage from "./pages/Verificacao_de_lista/Verificacao_page.tsx";
 
 
 const router = createBrowserRouter([
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
             {
                 path: "dashboard_page",
                 element: <DashboardPage />,
+            },
+            {
+                path: "verificar_emails",
+                element: <VerificarEmailsPage />,
             },
 
         ],

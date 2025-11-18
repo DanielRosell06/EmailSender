@@ -1,7 +1,7 @@
 // src/components/layout/Layout.tsx
 import { Mail } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { FaEnvelope, FaPaperPlane, FaUsers, FaHome, FaCog, FaChartBar } from 'react-icons/fa';
+import { FaEnvelope, FaPaperPlane, FaUsers, FaHome, FaCog, FaChartBar, FaList, FaClipboardCheck } from 'react-icons/fa';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { api } from './services/api';
 
@@ -184,6 +184,19 @@ const Layout: React.FC = () => {
               <div className='flex flex-row items-center'>
                 <FaEnvelope className='w-[20px] h-[20px] mr-3' />
                 <h1 className='text-[18px]'>Campanhas</h1>
+              </div>
+            </button>
+            <button
+              onClick={() => {
+                closeSidebar()
+                navigate('/verificar_emails')
+              }}
+              className={`flex flex-row items-center w-full p-2 rounded-md transition-colors duration-200 cursor-pointer justify-between ${activePath === '/verificar_emails' ? 'bg-gray-200' : 'hover:bg-gradient-to-br from-cyan-500 to-blue-600 hover:text-white'
+                }`}
+            >
+              <div className='flex flex-row items-center'>
+                <FaClipboardCheck className='w-[20px] h-[20px] mr-3' />
+                <h1 className='text-[18px]'>Verificar E-mails</h1>
               </div>
             </button>
             <button className={`hover:bg-gradient-to-br from-green-600/60 via-emerald-500 to-teal-500/60 hover:text-white flex flex-row items-center p-2 rounded-md transition-colors duration-200 ${activePath === '/create_envio' ? 'bg-gray-200' : ''
